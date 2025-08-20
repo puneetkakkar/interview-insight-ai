@@ -11,6 +11,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from .config import settings
 from .db.database import close_db, init_db
 from .logger import logger
+from .response import build_success_response
 from .exceptions.handlers import (
     http_exception_handler,
     unhandled_exception_handler,
@@ -52,8 +53,8 @@ def _configure_exception_handlers(app: FastAPI) -> None:
 
 def _configure_routes(app: FastAPI) -> None:
     @app.get("/health")
-    async def health_check() -> dict[str, str]:
-        return {"status": "healthy", "service": settings.APP_NAME}
+    async def health_check() -> dict[str, object]:
+        return build_success_response({"status": "healthy", "service": settings.APP_NAME})
 
 
 def _configure_access_logging(app: FastAPI) -> None:

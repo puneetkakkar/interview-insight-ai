@@ -1,21 +1,22 @@
-from typing import List
+from typing import List, Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...api.dependencies import get_db
 from ...core.exceptions.http_exceptions import NotFoundException, DuplicateValueException
-from ...crud.crud_items import crud_items
+from ...repositories.items import items_repository
 from ...schemas.item import ItemCreate, ItemRead, ItemUpdate
+from ...core.response import build_success_response
 
 router = APIRouter(prefix="/items", tags=["items"])
 
 
-@router.post("/", response_model=ItemRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_item(
     item: ItemCreate,
     db: AsyncSession = Depends(get_db)
-) -> ItemRead:
+) -> Dict[str, Any]:
     """
     Create a new item.
     
@@ -30,20 +31,21 @@ async def create_item(
         DuplicateValueException: If item with same title already exists
     """
     # Check if item with same title already exists
-    existing_item = await crud_items.get_by_title(db, title=item.title)
+    existing_item = await items_repository.get_by_title(db, title=item.title)
     if existing_item:
         raise DuplicateValueException(f"Item with title '{item.title}' already exists")
     
-    return await crud_items.create(db, obj_in=item)
+    created = await items_repository.create(db, obj_in=item)
+    return build_success_response(created, message="Item created successfully")
 
 
-@router.get("/", response_model=List[ItemRead])
+@router.get("/")
 async def read_items(
     skip: int = Query(0, ge=0, description="Number of items to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of items to return"),
     search: str = Query(None, description="Search items by title"),
     db: AsyncSession = Depends(get_db)
-) -> List[ItemRead]:
+) -> Dict[str, Any]:
     """
     Retrieve items with optional pagination and search.
     
@@ -57,18 +59,18 @@ async def read_items(
         List of items
     """
     if search:
-        items = await crud_items.search_by_title(db, title_search=search, skip=skip, limit=limit)
+        items = await items_repository.search_by_title(db, title_search=search, skip=skip, limit=limit)
     else:
-        items = await crud_items.get_active_items(db, skip=skip, limit=limit)
+        items = await items_repository.get_active_items(db, skip=skip, limit=limit)
     
-    return items
+    return build_success_response(items)
 
 
-@router.get("/{item_id}", response_model=ItemRead)
+@router.get("/{item_id}")
 async def read_item(
     item_id: int,
     db: AsyncSession = Depends(get_db)
-) -> ItemRead:
+) -> Dict[str, Any]:
     """
     Retrieve a specific item by ID.
     
@@ -82,19 +84,19 @@ async def read_item(
     Raises:
         NotFoundException: If item not found
     """
-    item = await crud_items.get(db, id=item_id)
+    item = await items_repository.get(db, id=item_id)
     if not item or item.is_deleted:
         raise NotFoundException(f"Item with ID {item_id} not found")
     
-    return item
+    return build_success_response(item)
 
 
-@router.put("/{item_id}", response_model=ItemRead)
+@router.put("/{item_id}")
 async def update_item(
     item_id: int,
     item: ItemUpdate,
     db: AsyncSession = Depends(get_db)
-) -> ItemRead:
+) -> Dict[str, Any]:
     """
     Update an existing item.
     
@@ -111,26 +113,26 @@ async def update_item(
         DuplicateValueException: If new title conflicts with existing item
     """
     # Check if item exists
-    db_item = await crud_items.get(db, id=item_id)
+    db_item = await items_repository.get(db, id=item_id)
     if not db_item or db_item.is_deleted:
         raise NotFoundException(f"Item with ID {item_id} not found")
     
     # Check for title conflicts if title is being updated
     if item.title and item.title != db_item.title:
-        existing_item = await crud_items.get_by_title(db, title=item.title)
+        existing_item = await items_repository.get_by_title(db, title=item.title)
         if existing_item:
             raise DuplicateValueException(f"Item with title '{item.title}' already exists")
     
     # Update item
-    updated_item = await crud_items.update(db, db_obj=db_item, obj_in=item)
-    return updated_item
+    updated_item = await items_repository.update(db, db_obj=db_item, obj_in=item)
+    return build_success_response(updated_item, message="Item updated successfully")
 
 
-@router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{item_id}")
 async def delete_item(
     item_id: int,
     db: AsyncSession = Depends(get_db)
-) -> None:
+) -> Dict[str, Any]:
     """
     Soft delete an item.
     
@@ -142,21 +144,22 @@ async def delete_item(
         NotFoundException: If item not found
     """
     # Check if item exists
-    db_item = await crud_items.get(db, id=item_id)
+    db_item = await items_repository.get(db, id=item_id)
     if not db_item or db_item.is_deleted:
         raise NotFoundException(f"Item with ID {item_id} not found")
     
     # Soft delete
-    await crud_items.remove(db, id=item_id)
+    await items_repository.remove(db, id=item_id)
+    return build_success_response({"id": item_id}, message="Item deleted successfully")
 
 
-@router.get("/search/{title_search}", response_model=List[ItemRead])
+@router.get("/search/{title_search}")
 async def search_items(
     title_search: str,
     skip: int = Query(0, ge=0, description="Number of items to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of items to return"),
     db: AsyncSession = Depends(get_db)
-) -> List[ItemRead]:
+) -> Dict[str, Any]:
     """
     Search items by title (partial match).
     
@@ -169,10 +172,10 @@ async def search_items(
     Returns:
         List of matching items
     """
-    items = await crud_items.search_by_title(
+    items = await items_repository.search_by_title(
         db, 
         title_search=title_search, 
         skip=skip, 
         limit=limit
     )
-    return items
+    return build_success_response(items)

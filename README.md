@@ -248,3 +248,59 @@ Perfect for:
 - Learning FastAPI
 - Building production APIs
 - Extending with AI/ML features
+
+## API Response Structure
+
+All API responses are wrapped in a consistent envelope to simplify frontend handling. The frontend can always check `success`, display `message`, and use `data` or `error.details` accordingly.
+
+Success (HTTP 2xx):
+
+```json
+{
+  "success": true,
+  "data": { /* payload object or array */ },
+  "message": "optional success info"
+}
+```
+
+Error (HTTP 4xx/5xx):
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": 422,
+    "message": "Validation Error",
+    "details": [ /* validation errors array */ ]
+  }
+}
+```
+
+Notes:
+
+- Validation errors (422) include `details` as an array of error objects with `type`, `loc`, and `msg`.
+- Other errors (e.g., 404, 500) include a human-friendly `message` and `details` as a string or array.
+- The HTTP status code is preserved and also provided in `error.code`.
+
+Examples:
+
+```json
+{
+  "success": true,
+  "data": {"id": 1, "title": "Item"},
+  "message": "Item created successfully"
+}
+```
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": 404,
+    "message": "Not Found",
+    "details": "Item with ID 123 not found"
+  }
+}
+```

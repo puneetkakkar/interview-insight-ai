@@ -6,19 +6,23 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette import status
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from http import HTTPStatus
 
 from ..logger import logger
 from ..config import settings
+from ..response import build_error_response
 
 
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
-    payload = {
-        "error": {
-            "type": "http_error",
-            "status_code": exc.status_code,
-            "detail": exc.detail,
-        }
-    }
+    try:
+        message = HTTPStatus(exc.status_code).phrase
+    except ValueError:
+        message = "HTTP Error"
+    payload = build_error_response(
+        code=exc.status_code,
+        message=message,
+        details=exc.detail,
+    )
     logger.warning(
         "HTTPException: %s",
         exc.detail,
@@ -33,13 +37,11 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
 
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-    payload = {
-        "error": {
-            "type": "validation_error",
-            "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY,
-            "detail": exc.errors(),
-        }
-    }
+    payload = build_error_response(
+        code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        message="Validation Error",
+        details=exc.errors(),
+    )
     logger.warning(
         "Validation error",
         extra={
@@ -62,13 +64,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
             "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
         },
     )
-    payload = {
-        "error": {
-            "type": "internal_server_error",
-            "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "detail": str(exc) if settings.DEBUG else "Internal server error",
-        }
-    }
+    payload = build_error_response(
+        code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        message="Internal Server Error",
+        details=str(exc) if settings.DEBUG else "Internal server error",
+    )
     return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=payload)
 
 

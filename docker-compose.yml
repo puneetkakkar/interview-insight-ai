@@ -21,6 +21,7 @@ services:
       - db
     volumes:
       - ./src:/code/src
+      - ./tests:/code/tests
       - ./.env:/code/.env
     environment:
       - POSTGRES_SERVER=db
