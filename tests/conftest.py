@@ -1,5 +1,6 @@
 import asyncio
 from typing import AsyncGenerator, Generator
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 import pytest_asyncio
@@ -44,6 +45,8 @@ def event_loop() -> Generator:
 async def test_db_setup() -> AsyncGenerator[None, None]:
     """Setup test database."""
     async with test_engine.begin() as conn:
+        # Import all models here to ensure they are registered
+        from src.app.models import Item  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)
     yield
     async with test_engine.begin() as conn:
@@ -59,7 +62,7 @@ async def db_session(test_db_setup: None) -> AsyncGenerator[AsyncSession, None]:
 
 @pytest.fixture
 def client(db_session: AsyncSession) -> Generator[TestClient, None, None]:
-    """Create a test client."""
+    """Create a test client with database dependency override."""
     
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
@@ -72,8 +75,15 @@ def client(db_session: AsyncSession) -> Generator[TestClient, None, None]:
     app.dependency_overrides.clear()
 
 
+@pytest.fixture
+def mock_client() -> Generator[TestClient, None, None]:
+    """Create a test client without database dependency override."""
+    with TestClient(app) as test_client:
+        yield test_client
+
+
 @pytest_asyncio.fixture
-async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None, None]:
+async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Create an async test client."""
     
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -91,3 +101,54 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
 def app_instance() -> FastAPI:
     """Get the FastAPI application instance."""
     return app
+
+
+@pytest.fixture
+def mock_db_session() -> AsyncSession:
+    """Create a mock database session for unit testing."""
+    session = AsyncMock(spec=AsyncSession)
+    session.commit = AsyncMock()
+    session.rollback = AsyncMock()
+    session.close = AsyncMock()
+    session.refresh = AsyncMock()
+    session.add = MagicMock()
+    session.execute = AsyncMock()
+    return session
+
+
+@pytest.fixture
+def sample_item_data() -> dict:
+    """Sample item data for testing."""
+    return {
+        "title": "Test Item",
+        "description": "Test Description",
+        "price": 99.99,
+    }
+
+
+@pytest.fixture
+def sample_item_update_data() -> dict:
+    """Sample item update data for testing."""
+    return {
+        "title": "Updated Item",
+        "price": 149.99,
+    }
+
+
+@pytest.fixture
+def pagination_params() -> dict:
+    """Sample pagination parameters for testing."""
+    return {
+        "skip": 0,
+        "limit": 10,
+    }
+
+
+@pytest.fixture
+def search_params() -> dict:
+    """Sample search parameters for testing."""
+    return {
+        "search": "test",
+        "skip": 0,
+        "limit": 10,
+    }

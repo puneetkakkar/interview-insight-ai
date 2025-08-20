@@ -60,11 +60,128 @@ make build         # Build Docker images
 make migrate       # Create and apply migrations
 make revision      # Create new migration
 make upgrade       # Apply migrations
-make test          # Run tests
+make test          # Run all tests
+make test-unit     # Run unit tests only
+make test-integration # Run integration tests only
+make test-all      # Run all tests with verbose output
+make coverage      # Run tests with coverage report
 make run           # Run dev server
 make logs          # Show service logs
 make clean         # Clean up containers and volumes
 ```
+
+## 🧪 Testing Strategy
+
+This boilerplate follows **Test-Driven Development (TDD)** principles and industry best practices for FastAPI testing.
+
+### TDD Workflow
+
+**For new features:**
+1. **Write failing test first** - Define expected behavior in test
+2. **Implement code to pass** - Write minimal code to make test pass
+3. **Refactor** - Clean up code while keeping tests green
+
+**For code changes:**
+1. **Update tests first** - Modify tests to reflect new requirements
+2. **Run tests** - Ensure they fail (red)
+3. **Implement changes** - Make tests pass (green)
+4. **Refactor** - Clean up while maintaining test coverage
+
+### Test Structure
+
+```
+tests/
+├── conftest.py                    # Global fixtures and configuration
+├── unit/                          # Unit tests for business logic
+│   ├── test_items.py             # CRUD operations, models, schemas
+│   └── test_exceptions.py        # Custom exceptions and handlers
+├── integration/                   # API endpoint tests
+│   ├── test_api_items.py         # Items API integration tests
+│   └── test_api_response_envelope.py # Response envelope tests
+└── helpers/                       # Test utilities
+    ├── generators.py              # Fake data generation
+    └── mocks.py                   # Mock objects and responses
+```
+
+### Testing Commands
+
+```bash
+make test          # Run all tests
+make test-unit     # Run unit tests only
+make test-integration # Run integration tests only
+make test-all      # Run all tests with verbose output
+make coverage      # Run tests with coverage report
+```
+
+### Test Coverage Goals
+
+- **Unit Tests**: 90%+ coverage for business logic
+- **Integration Tests**: 80%+ coverage for API endpoints
+- **Overall Coverage**: 85%+ across the codebase
+
+### Testing Best Practices
+
+1. **AAA Pattern**: Arrange, Act, Assert
+2. **Descriptive Names**: Test names should explain what is being tested
+3. **Mock External Dependencies**: Database, external APIs, etc.
+4. **Test Edge Cases**: Invalid input, error conditions, boundary values
+5. **Fast Execution**: Tests should run quickly (< 30 seconds total)
+6. **Isolation**: Tests should not depend on each other
+
+### Adding New Tests
+
+**For new endpoints:**
+```python
+# tests/integration/test_api_new_feature.py
+def test_new_endpoint_success():
+    """Test new endpoint returns success response."""
+    # Arrange
+    test_data = {"key": "value"}
+    
+    # Act
+    response = client.post("/api/v1/new-feature", json=test_data)
+    
+    # Assert
+    assert response.status_code == 201
+    assert response.json()["success"] is True
+```
+
+**For new models/schemas:**
+```python
+# tests/unit/test_new_model.py
+def test_new_model_validation():
+    """Test new model validation rules."""
+    # Arrange & Act
+    valid_data = {"field": "value"}
+    model = NewModel(**valid_data)
+    
+    # Assert
+    assert model.field == "value"
+```
+
+### Maintaining Tests
+
+**When adding features:**
+- Add corresponding tests before or alongside implementation
+- Ensure new code paths are covered
+- Run `make test-all` to verify all tests pass
+
+**When removing features:**
+- Remove or update related tests
+- Run `make test-all` to ensure no broken tests remain
+- Update test documentation if needed
+
+**When refactoring:**
+- Run tests frequently during refactoring
+- Update tests to reflect new structure
+- Maintain test coverage levels
+
+### Test Data Management
+
+- Use `tests/helpers/generators.py` for fake data
+- Use `tests/helpers/mocks.py` for mock objects
+- Keep test data realistic but minimal
+- Use fixtures for common test setup
 
 ## 📁 Project Structure
 
@@ -79,12 +196,13 @@ src/
 │   │   ├── db/
 │   │   │   ├── database.py       # Database connection
 │   │   │   └── models.py         # Base model
+│   │   ├── response.py           # Response envelope helpers
 │   │   └── exceptions/           # Custom exceptions
-│   ├── crud/
-│   │   ├── crud_base.py          # Base CRUD operations
-│   │   └── crud_items.py         # Example CRUD implementation
 │   ├── models/
 │   │   └── item.py               # Example database model
+│   ├── repositories/
+│   │   ├── base.py               # Base repository
+│   │   └── items.py              # Example repository
 │   ├── schemas/
 │   │   └── item.py               # Pydantic schemas
 │   └── main.py                   # FastAPI application
@@ -122,18 +240,6 @@ Environment variables are loaded from `.env` file:
 - **App**: Application name, version, description
 - **Security**: Secret key and algorithm (minimal setup)
 
-## 🧪 Testing
-
-```bash
-make test          # Run all tests
-make test -k       # Run tests with verbose output
-```
-
-Tests include:
-- Unit tests for CRUD operations
-- Database integration tests
-- API endpoint tests
-
 ## 🚀 Production Deployment
 
 ### Docker Compose
@@ -156,7 +262,8 @@ docker compose up -d
 3. Create schemas in `src/app/schemas/`
 4. Implement CRUD operations
 5. Add API endpoints
-6. Run migrations
+6. Add tests (TDD approach)
+7. Run migrations
 
 ### Example: Adding User Authentication
 ```python
@@ -178,9 +285,10 @@ docker compose up -d
 - Pydantic V2 schemas
 - Alembic migrations
 - Docker Compose setup
-- Comprehensive testing
+- Comprehensive testing with TDD approach
 - Type hints throughout
 - Clean architecture
+- Consistent API response envelope
 
 ### ❌ Removed (for simplicity)
 - Redis caching
@@ -220,6 +328,19 @@ lsof -i :8000
 # Kill process or change port in docker-compose.yml
 ```
 
+**Test Failures**
+```bash
+# Run tests with verbose output
+make test-all
+
+# Check test coverage
+make coverage
+
+# Run specific test categories
+make test-unit
+make test-integration
+```
+
 ## 📚 API Documentation
 
 - **Swagger UI**: http://localhost:8000/docs
@@ -230,9 +351,10 @@ lsof -i :8000
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+3. Write tests first (TDD approach)
+4. Make your changes
+5. **Ensure all tests pass**
+6. Submit a pull request
 
 ## 📄 License
 
@@ -248,6 +370,7 @@ Perfect for:
 - Learning FastAPI
 - Building production APIs
 - Extending with AI/ML features
+- Demonstrating TDD and testing expertise
 
 ## API Response Structure
 
