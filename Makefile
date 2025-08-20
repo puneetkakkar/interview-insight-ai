@@ -1,37 +1,56 @@
-.PHONY: help up down build migrate revision upgrade test run logs clean
+.PHONY: help migrate revision upgrade test clean \
+	dev-up dev-down dev-logs dev-build \
+	prod-up prod-down prod-logs prod-build \
+	format lint
 
 help: ## Show this help message
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-up: ## Start services with docker compose
-	docker compose up -d
+migrate: ## Create and apply DB migrations inside API container
+	docker compose exec -T api uv run alembic revision --autogenerate
+	docker compose exec -T api uv run alembic upgrade head
 
-down: ## Stop and remove services
-	docker compose down
+revision: ## Create new DB migration inside API container
+	docker compose exec -T api uv run alembic revision --autogenerate
 
-build: ## Build docker images
-	docker compose build
+upgrade: ## Apply DB migrations inside API container
+	docker compose exec -T api uv run alembic upgrade head
 
-migrate: ## Create and apply database migrations
-	uv run alembic revision --autogenerate
-	uv run alembic upgrade head
+test: ## Run tests inside API container
+	docker compose exec -T api uv run pytest
 
-revision: ## Create new database migration
-	uv run alembic revision --autogenerate
-
-upgrade: ## Apply database migrations
-	uv run alembic upgrade head
-
-test: ## Run tests
-	uv run pytest
-
-run: ## Run development server
-	uv run uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
-
-logs: ## Show service logs
-	docker compose logs -f
-
-clean: ## Clean up docker volumes and containers
+clean: ## Remove containers and volumes for this project
 	docker compose down -v
 	docker system prune -f
+
+# New targets for environments
+dev-up: ## Start dev stack
+	docker compose up -d
+
+dev-down: ## Stop dev stack
+	docker compose down
+
+dev-logs: ## Tail dev logs
+	docker compose logs -f
+
+dev-build: ## Build dev images
+	docker compose build --no-cache
+
+prod-up: ## Start prod stack (no reload)
+	ENVIRONMENT=production DEBUG=false RELOAD=false docker compose up -d --build
+
+prod-down: ## Stop prod stack
+	docker compose down
+
+prod-logs: ## Tail prod logs
+	docker compose logs -f
+
+prod-build: ## Build prod images
+	ENVIRONMENT=production DEBUG=false RELOAD=false docker compose build --no-cache
+
+format: ## Run formatter/linter fixes
+	uv run ruff --fix .
+
+lint: ## Run linter
+	uv run ruff .
