@@ -1,0 +1,45 @@
+# Production environment configuration
+services:
+  api-prod:
+    build:
+      context: ../../
+      dockerfile: docker/prod/Dockerfile.prod
+      target: production
+    command: >-
+      sh -c '
+      uv run gunicorn src.app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --access-logfile -'
+    env_file:
+      - ../../.env
+    ports:
+      - "8001:8000"
+    depends_on:
+      db-prod:
+        condition: service_healthy
+    environment:
+      - POSTGRES_SERVER=db-prod
+      - POSTGRES_PORT=5432
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - RELOAD=false
+
+  db-prod:
+    image: postgres:15
+    env_file:
+      - ../../.env
+    ports:
+      - "5436:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-fastapi_db}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data-prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres-data-prod:

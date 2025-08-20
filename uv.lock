@@ -254,6 +254,20 @@ lint = [
     { name = "mypy" },
     { name = "ruff" },
 ]
+prod = [
+    { name = "alembic" },
+    { name = "asyncpg" },
+    { name = "fastapi" },
+    { name = "greenlet" },
+    { name = "gunicorn" },
+    { name = "psycopg2-binary" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "python-json-logger" },
+    { name = "sqlalchemy" },
+    { name = "uvicorn", extra = ["standard"] },
+]
 test = [
     { name = "aiosqlite" },
     { name = "faker" },
@@ -268,18 +282,26 @@ requires-dist = [
     { name = "aiosqlite", marker = "extra == 'dev'", specifier = ">=0.20.0" },
     { name = "aiosqlite", marker = "extra == 'test'", specifier = ">=0.20.0" },
     { name = "alembic", specifier = ">=1.13.1" },
+    { name = "alembic", marker = "extra == 'prod'", specifier = ">=1.13.1" },
     { name = "asyncpg", specifier = ">=0.29.0" },
+    { name = "asyncpg", marker = "extra == 'prod'", specifier = ">=0.29.0" },
     { name = "faker", marker = "extra == 'dev'", specifier = ">=26.0.0" },
     { name = "faker", marker = "extra == 'test'", specifier = ">=26.0.0" },
     { name = "fastapi", specifier = ">=0.109.1" },
+    { name = "fastapi", marker = "extra == 'prod'", specifier = ">=0.109.1" },
     { name = "greenlet", specifier = ">=2.0.2" },
+    { name = "greenlet", marker = "extra == 'prod'", specifier = ">=2.0.2" },
     { name = "gunicorn", specifier = ">=21.2.0" },
+    { name = "gunicorn", marker = "extra == 'prod'", specifier = ">=21.2.0" },
     { name = "httpx", specifier = ">=0.26.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.16.0" },
     { name = "mypy", marker = "extra == 'lint'", specifier = ">=1.16.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.9" },
+    { name = "psycopg2-binary", marker = "extra == 'prod'", specifier = ">=2.9.9" },
     { name = "pydantic", specifier = ">=2.6.1" },
+    { name = "pydantic", marker = "extra == 'prod'", specifier = ">=2.6.1" },
     { name = "pydantic-settings", specifier = ">=2.0.3" },
+    { name = "pydantic-settings", marker = "extra == 'prod'", specifier = ">=2.0.3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.2" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.4.2" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=1.0.0" },
@@ -289,13 +311,17 @@ requires-dist = [
     { name = "pytest-mock", marker = "extra == 'dev'", specifier = ">=3.14.0" },
     { name = "pytest-mock", marker = "extra == 'test'", specifier = ">=3.14.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
+    { name = "python-dotenv", marker = "extra == 'prod'", specifier = ">=1.0.0" },
     { name = "python-json-logger", specifier = ">=2.0.7" },
+    { name = "python-json-logger", marker = "extra == 'prod'", specifier = ">=2.0.7" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11.13" },
     { name = "ruff", marker = "extra == 'lint'", specifier = ">=0.11.13" },
     { name = "sqlalchemy", specifier = ">=2.0.25" },
+    { name = "sqlalchemy", marker = "extra == 'prod'", specifier = ">=2.0.25" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.27.0" },
+    { name = "uvicorn", extras = ["standard"], marker = "extra == 'prod'", specifier = ">=0.27.0" },
 ]
-provides-extras = ["dev", "test", "lint"]
+provides-extras = ["dev", "test", "lint", "prod"]
 
 [[package]]
 name = "greenlet"

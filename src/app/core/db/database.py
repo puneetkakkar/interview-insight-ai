@@ -12,9 +12,9 @@ class Base(DeclarativeBase, MappedAsDataclass):
     pass
 
 
-# Create async engine
+# Create async engine with environment-specific configuration
 async_engine = create_async_engine(
-    settings.POSTGRES_ASYNC_URL,
+    settings.DATABASE_URL,
     echo=settings.DEBUG,
     future=True,
     pool_pre_ping=True,

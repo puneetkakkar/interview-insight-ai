@@ -2,13 +2,14 @@ import os
 from enum import Enum
 from typing import Optional
 
-from pydantic import Field
+from pydantic import Field, ConfigDict
 from pydantic_settings import BaseSettings
 
 
 class EnvironmentOption(str, Enum):
     """Environment options for the application."""
     DEVELOPMENT = "development"
+    TESTING = "testing"
     PRODUCTION = "production"
 
 
@@ -29,20 +30,18 @@ class DatabaseSettings(BaseSettings):
     POSTGRES_PORT: int = Field(default=5432, description="PostgreSQL server port")
     POSTGRES_DB: str = Field(default="fastapi_db", description="PostgreSQL database name")
     
-    @property
-    def POSTGRES_URI(self) -> str:
-        """Build PostgreSQL URI."""
-        return f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+    # Test database settings
+    POSTGRES_TEST_DB: str = Field(default="fastapi_test_db", description="PostgreSQL test database name")
     
     @property
     def POSTGRES_ASYNC_URL(self) -> str:
         """Build async PostgreSQL URL."""
-        return f"postgresql+asyncpg://{self.POSTGRES_URI}"
-
-    @property
-    def POSTGRES_ASYNC_URL_DOCKER(self) -> str:
-        """Build async PostgreSQL URL for Docker environment."""
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+    
+    @property
+    def POSTGRES_TEST_ASYNC_URL(self) -> str:
+        """Build async PostgreSQL test database URL."""
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_TEST_DB}"
 
 
 class SecuritySettings(BaseSettings):
@@ -55,10 +54,33 @@ class Settings(AppSettings, DatabaseSettings, SecuritySettings):
     """Main settings class combining all configuration."""
     ENVIRONMENT: EnvironmentOption = Field(default=EnvironmentOption.DEVELOPMENT, description="Application environment")
     
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = True
+    @property
+    def DATABASE_URL(self) -> str:
+        """Get the appropriate database URL based on environment."""
+        if self.ENVIRONMENT == EnvironmentOption.TESTING:
+            return self.POSTGRES_TEST_ASYNC_URL
+        return self.POSTGRES_ASYNC_URL
+    
+    @property
+    def IS_TESTING(self) -> bool:
+        """Check if running in testing environment."""
+        return self.ENVIRONMENT == EnvironmentOption.TESTING
+    
+    @property
+    def IS_DEVELOPMENT(self) -> bool:
+        """Check if running in development environment."""
+        return self.ENVIRONMENT == EnvironmentOption.DEVELOPMENT
+    
+    @property
+    def IS_PRODUCTION(self) -> bool:
+        """Check if running in production environment."""
+        return self.ENVIRONMENT == EnvironmentOption.PRODUCTION
+    
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True
+    )
 
 
 # Global settings instance

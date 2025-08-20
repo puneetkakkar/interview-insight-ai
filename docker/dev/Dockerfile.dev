@@ -1,0 +1,40 @@
+# Development Dockerfile with fast rebuilds and hot reload
+FROM python:3.11-slim as base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/code
+ENV PATH="/root/.local/bin:$PATH"
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        postgresql-client \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+RUN pip install --no-cache-dir --user uv
+
+# Set work directory
+WORKDIR /code
+
+# Copy dependency files and README first for better caching
+COPY pyproject.toml uv.lock README.md ./
+
+# Install all dependencies (including test dependencies for development)
+RUN uv sync --frozen
+
+# Development stage
+FROM base as development
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 8000
+
+# Default command for development
+CMD ["/root/.local/bin/uv", "run", "uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

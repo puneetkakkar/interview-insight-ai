@@ -1,421 +1,385 @@
 # FastAPI Minimal Boilerplate
 
-A minimal, production-ready FastAPI boilerplate designed for rapid development and coding interviews. Built with SQLAlchemy 2.0, Pydantic V2, and PostgreSQL.
+A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V2, and PostgreSQL. This project provides a solid foundation for building scalable web APIs with modern Python practices.
 
-## 🚀 Quick Start
+## 🚀 Features
 
-### Prerequisites
-- Python 3.11+
-- Docker and Docker Compose
-- UV package manager (recommended) or pip
+- **FastAPI Framework**: Modern, fast web framework with automatic API documentation
+- **SQLAlchemy 2.0**: Latest ORM with async support and type hints
+- **Pydantic V2**: Data validation and serialization with improved performance
+- **PostgreSQL**: Robust relational database with async driver support
+- **Alembic**: Database migration management
+- **Docker & Docker Compose**: Containerized development and production environments
+- **Comprehensive Testing**: Unit and integration tests with pytest
+- **Type Hints**: Full type annotation support throughout the codebase
+- **Clean Architecture**: Repository pattern with separation of concerns
+- **Logging**: Structured logging with request tracking
+- **CORS Support**: Configurable cross-origin resource sharing
+- **Health Checks**: Built-in health monitoring endpoints
+- **Exception Handling**: Centralized error handling with custom exceptions
 
-### 1. Clone and Setup
-```bash
-git clone <your-repo>
-cd fastapi-minimal-boilerplate
-cp env.example .env
-# Edit .env with your database credentials
-```
+## 🏗️ Architecture
 
-### 2. Start Services
-```bash
-# Start database and API services
-make up
-
-# Or manually:
-docker compose up -d
-```
-
-### 3. Run Migrations
-```bash
-# Create and apply initial migrations
-make migrate
-
-# Or step by step:
-make revision  # Create migration
-make upgrade   # Apply migration
-```
-
-### 4. Start Development Server
-```bash
-# Run locally (outside Docker)
-make run
-
-# Or with Docker (already running from step 2)
-# Access at http://localhost:8000
-```
-
-### 5. Verify Setup
-- API docs: http://localhost:8000/docs
-- Health check: http://localhost:8000/health
-- Example endpoint: http://localhost:8000/api/v1/items
-
-## 🛠️ Development Commands
-
-```bash
-make help          # Show all available commands
-make up            # Start services
-make down          # Stop services
-make build         # Build Docker images
-make migrate       # Create and apply migrations
-make revision      # Create new migration
-make upgrade       # Apply migrations
-make test          # Run all tests
-make test-unit     # Run unit tests only
-make test-integration # Run integration tests only
-make test-all      # Run all tests with verbose output
-make coverage      # Run tests with coverage report
-make run           # Run dev server
-make logs          # Show service logs
-make clean         # Clean up containers and volumes
-```
-
-## 🧪 Testing Strategy
-
-This boilerplate follows **Test-Driven Development (TDD)** principles and industry best practices for FastAPI testing.
-
-### TDD Workflow
-
-**For new features:**
-1. **Write failing test first** - Define expected behavior in test
-2. **Implement code to pass** - Write minimal code to make test pass
-3. **Refactor** - Clean up code while keeping tests green
-
-**For code changes:**
-1. **Update tests first** - Modify tests to reflect new requirements
-2. **Run tests** - Ensure they fail (red)
-3. **Implement changes** - Make tests pass (green)
-4. **Refactor** - Clean up while maintaining test coverage
-
-### Test Structure
-
-```
-tests/
-├── conftest.py                    # Global fixtures and configuration
-├── unit/                          # Unit tests for business logic
-│   ├── test_items.py             # CRUD operations, models, schemas
-│   └── test_exceptions.py        # Custom exceptions and handlers
-├── integration/                   # API endpoint tests
-│   ├── test_api_items.py         # Items API integration tests
-│   └── test_api_response_envelope.py # Response envelope tests
-└── helpers/                       # Test utilities
-    ├── generators.py              # Fake data generation
-    └── mocks.py                   # Mock objects and responses
-```
-
-### Testing Commands
-
-```bash
-make test          # Run all tests
-make test-unit     # Run unit tests only
-make test-integration # Run integration tests only
-make test-all      # Run all tests with verbose output
-make coverage      # Run tests with coverage report
-```
-
-### Test Coverage Goals
-
-- **Unit Tests**: 90%+ coverage for business logic
-- **Integration Tests**: 80%+ coverage for API endpoints
-- **Overall Coverage**: 85%+ across the codebase
-
-### Testing Best Practices
-
-1. **AAA Pattern**: Arrange, Act, Assert
-2. **Descriptive Names**: Test names should explain what is being tested
-3. **Mock External Dependencies**: Database, external APIs, etc.
-4. **Test Edge Cases**: Invalid input, error conditions, boundary values
-5. **Fast Execution**: Tests should run quickly (< 30 seconds total)
-6. **Isolation**: Tests should not depend on each other
-
-### Adding New Tests
-
-**For new endpoints:**
-```python
-# tests/integration/test_api_new_feature.py
-def test_new_endpoint_success():
-    """Test new endpoint returns success response."""
-    # Arrange
-    test_data = {"key": "value"}
-    
-    # Act
-    response = client.post("/api/v1/new-feature", json=test_data)
-    
-    # Assert
-    assert response.status_code == 201
-    assert response.json()["success"] is True
-```
-
-**For new models/schemas:**
-```python
-# tests/unit/test_new_model.py
-def test_new_model_validation():
-    """Test new model validation rules."""
-    # Arrange & Act
-    valid_data = {"field": "value"}
-    model = NewModel(**valid_data)
-    
-    # Assert
-    assert model.field == "value"
-```
-
-### Maintaining Tests
-
-**When adding features:**
-- Add corresponding tests before or alongside implementation
-- Ensure new code paths are covered
-- Run `make test-all` to verify all tests pass
-
-**When removing features:**
-- Remove or update related tests
-- Run `make test-all` to ensure no broken tests remain
-- Update test documentation if needed
-
-**When refactoring:**
-- Run tests frequently during refactoring
-- Update tests to reflect new structure
-- Maintain test coverage levels
-
-### Test Data Management
-
-- Use `tests/helpers/generators.py` for fake data
-- Use `tests/helpers/mocks.py` for mock objects
-- Keep test data realistic but minimal
-- Use fixtures for common test setup
-
-## 📁 Project Structure
+The project follows a clean, layered architecture:
 
 ```
 src/
 ├── app/
-│   ├── api/
-│   │   └── v1/
-│   │       └── items.py          # Example CRUD endpoints
-│   ├── core/
-│   │   ├── config.py             # Settings and configuration
-│   │   ├── db/
-│   │   │   ├── database.py       # Database connection
-│   │   │   └── models.py         # Base model
-│   │   ├── response.py           # Response envelope helpers
-│   │   └── exceptions/           # Custom exceptions
-│   ├── models/
-│   │   └── item.py               # Example database model
-│   ├── repositories/
-│   │   ├── base.py               # Base repository
-│   │   └── items.py              # Example repository
-│   ├── schemas/
-│   │   └── item.py               # Pydantic schemas
-│   └── main.py                   # FastAPI application
-├── migrations/                    # Alembic migrations
-└── tests/                        # Test suite
+│   ├── api/           # API endpoints and routing
+│   ├── core/          # Core application configuration
+│   ├── models/        # SQLAlchemy database models
+│   ├── repositories/  # Data access layer
+│   └── schemas/       # Pydantic data models
+├── migrations/        # Database migrations
+└── tests/            # Test suite
 ```
 
-## 🗄️ Database Migrations
+### Key Components
 
-### Creating Migrations
+- **Models**: SQLAlchemy models with timestamp and soft delete mixins
+- **Repositories**: Generic CRUD operations with async support
+- **Schemas**: Pydantic models for request/response validation
+- **API Routes**: RESTful endpoints with proper error handling
+- **Dependencies**: FastAPI dependency injection system
+- **Configuration**: Environment-based settings management
+
+## 📋 Prerequisites
+
+- Python 3.11+
+- Docker and Docker Compose
+- PostgreSQL (if running locally)
+- UV package manager (recommended) or pip
+
+## 🛠️ Installation & Setup
+
+### 1. Clone the Repository
+
 ```bash
-# After modifying models in src/app/models/
+git clone <repository-url>
+cd frai-be
+```
+
+### 2. Environment Configuration
+
+Copy the example environment file and configure your settings:
+
+```bash
+cp env.example .env
+```
+
+Edit `.env` with your configuration:
+
+```env
+# Database Settings
+POSTGRES_SERVER=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=fastapi_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password
+
+# Environment
+ENVIRONMENT=development
+DEBUG=true
+RELOAD=true
+```
+
+### 3. Install Dependencies
+
+Using UV (recommended):
+```bash
+uv sync
+```
+
+Or using pip:
+```bash
+pip install -r requirements.txt
+```
+
+## 🚀 Quick Start
+
+### Development Environment
+
+Start the development environment with Docker Compose:
+
+```bash
+make dev-up
+```
+
+This will:
+- Start PostgreSQL database on port 5433
+- Start the FastAPI application on port 8000
+- Enable auto-reload for development
+
+### Production Environment
+
+Start the production environment:
+
+```bash
+make prod-up
+```
+
+This will:
+- Start PostgreSQL database on port 5436
+- Start the FastAPI application on port 8001
+- Use Gunicorn with multiple workers
+- Disable debug mode and auto-reload
+
+## 📚 API Documentation
+
+Once the application is running, you can access:
+
+- **Interactive API Docs**: http://localhost:8000/docs (Swagger UI)
+- **Alternative API Docs**: http://localhost:8000/redoc (ReDoc)
+- **Health Check**: http://localhost:8000/health
+- **API Info**: http://localhost:8000/info
+
+## 🗄️ Database Management
+
+### Migrations
+
+Create a new migration:
+```bash
 make revision
 ```
 
-**Important**: Always import new models in `src/app/models/__init__.py` before running `make revision`.
-
-### Applying Migrations
+Apply migrations:
 ```bash
 make upgrade
 ```
 
-### Migration Workflow
-1. Modify models in `src/app/models/`
-2. Import new models in `src/app/models/__init__.py`
-3. Run `make revision` to generate migration
-4. Review generated migration file
-5. Run `make upgrade` to apply changes
-
-## 🔧 Configuration
-
-Environment variables are loaded from `.env` file:
-
-- **Database**: PostgreSQL connection settings
-- **App**: Application name, version, description
-- **Security**: Secret key and algorithm (minimal setup)
-
-## 🚀 Production Deployment
-
-### Docker Compose
+Create and apply migrations in one command:
 ```bash
-# Comment out development command in docker-compose.yml
-# Uncomment gunicorn command for production
-docker compose up -d
-```
-
-### Environment Variables
-- Set `ENVIRONMENT=production`
-- Use strong `SECRET_KEY`
-- Configure production database credentials
-
-## 🔌 Extending the Boilerplate
-
-### Adding New Models
-1. Create model in `src/app/models/`
-2. Add to `src/app/models/__init__.py`
-3. Create schemas in `src/app/schemas/`
-4. Implement CRUD operations
-5. Add API endpoints
-6. Add tests (TDD approach)
-7. Run migrations
-
-### Example: Adding User Authentication
-```python
-# Prompt Claude: "Add JWT authentication with user model and login endpoints"
-# This will generate the necessary code for user management
-```
-
-### Example: Adding AI Integration
-```python
-# Prompt Claude: "Add LangChain RAG integration with document processing endpoints"
-# This will add AI/ML capabilities to your API
-```
-
-## 🎯 Features
-
-### ✅ Included
-- FastAPI with async support
-- SQLAlchemy 2.0 + PostgreSQL
-- Pydantic V2 schemas
-- Alembic migrations
-- Docker Compose setup
-- Comprehensive testing with TDD approach
-- Type hints throughout
-- Clean architecture
-- Consistent API response envelope
-  
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Database Connection Failed**
-```bash
-# Check if database is running
-docker compose ps
-
-# Check database logs
-docker compose logs db
-```
-
-**Migration Errors**
-```bash
-# Reset migrations (development only)
-docker compose down -v
-docker compose up -d
 make migrate
 ```
 
-**Port Already in Use**
-```bash
-# Check what's using port 8000
-lsof -i :8000
+### Database Connection
 
-# Kill process or change port in docker-compose.yml
+The application automatically connects to PostgreSQL using the settings in your `.env` file. The database URL is constructed as:
+
+```
+postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}
 ```
 
-**Test Failures**
-```bash
-# Run tests with verbose output
-make test-all
+## 🧪 Testing
 
-# Check test coverage
+### Run Tests Locally
+
+```bash
+make test
+```
+
+### Run Tests with Coverage
+
+```bash
 make coverage
-
-# Run specific test categories
-make test-unit
-make test-integration
 ```
 
-## 📚 API Documentation
+### Run Tests in Docker Environment
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI JSON**: http://localhost:8000/openapi.json
+```bash
+make test-env
+```
+
+### Test Coverage Report
+
+After running coverage, you'll find an HTML report in the `htmlcov/` directory.
+
+## 🐳 Docker Commands
+
+The project uses an environment-based Docker structure for better organization:
+
+```
+docker/
+│── dev/     # Development environment
+│── test/    # Testing environment  
+│── prod/    # Production environment
+```
+
+Each environment contains its own Dockerfile and docker-compose.yml for complete isolation.
+
+### Development
+
+```bash
+make dev-up      # Start development environment
+make dev-down    # Stop development environment
+make dev-logs    # View development logs
+```
+
+### Production
+
+```bash
+make prod-up     # Start production environment
+make prod-down   # Stop production environment
+make prod-logs   # View production logs
+```
+
+### Testing
+
+```bash
+make test-env    # Start testing environment
+make test-down   # Stop testing environment
+```
+
+### Utility
+
+```bash
+make clean       # Remove all containers and volumes
+make format      # Format code with ruff
+make lint        # Run linting checks
+```
+
+For detailed Docker configuration information, see [docker/README.md](docker/README.md).
+
+## 📁 Project Structure
+
+```
+frai-be/
+│
+├── docker/                         # Docker configuration
+│   ├── README.md                   # Docker documentation
+│   ├── dev/                        # Development environment
+│   │   ├── Dockerfile.dev          # Development Dockerfile
+│   │   └── docker-compose.dev.yml
+│   ├── test/                       # Testing environment
+│   │   ├── Dockerfile.test         # Testing Dockerfile
+│   │   └── docker-compose.test.yml
+│   └── prod/                       # Production environment
+│       ├── Dockerfile.prod         # Production Dockerfile
+│       └── docker-compose.prod.yml
+├── src/                            # Source code
+│   └── app/
+│       ├── api/                    # API endpoints
+│       │   └── v1/                 # API version 1
+│       ├── core/                   # Core application logic
+│       │   ├── config.py           # Configuration management
+│       │   ├── db/                 # Database setup
+│       │   ├── exceptions/         # Custom exceptions
+│       │   ├── logger.py           # Logging configuration
+│       │   ├── response.py         # Response formatting
+│       │   └── setup.py            # Application setup
+│       ├── models/                 # Database models
+│       ├── repositories/           # Data access layer
+│       ├── schemas/                # Pydantic schemas
+│       └── main.py                 # Application entry point
+├── migrations/                     # Database migrations
+├── tests/                          # Test suite
+│   ├── integration/                # Integration tests
+│   ├── unit/                       # Unit tests
+│   └── conftest.py                 # Test configuration
+├── alembic.ini                     # Alembic configuration
+├── pyproject.toml                  # Project configuration
+├── Makefile                        # Build and deployment commands
+└── README.md                       # This file
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ENVIRONMENT` | Application environment (development/testing/production) | `development` |
+| `DEBUG` | Enable debug mode | `true` |
+| `RELOAD` | Enable auto-reload | `true` |
+| `POSTGRES_SERVER` | PostgreSQL server host | `localhost` |
+| `POSTGRES_PORT` | PostgreSQL server port | `5432` |
+| `POSTGRES_DB` | PostgreSQL database name | `fastapi_db` |
+| `POSTGRES_USER` | PostgreSQL username | `postgres` |
+| `POSTGRES_PASSWORD` | PostgreSQL password | `postgres` |
+| `SECRET_KEY` | JWT secret key | `your-secret-key-here` |
+
+### Database Configuration
+
+The application supports multiple database configurations:
+
+- **Development**: Uses main database with debug logging
+- **Testing**: Uses separate test database
+- **Production**: Uses main database with production optimizations
+
+## 🚀 Deployment
+
+### Production Considerations
+
+1. **Environment Variables**: Set `ENVIRONMENT=production` and `DEBUG=false`
+2. **Database**: Use production PostgreSQL instance
+3. **Secrets**: Change default secret keys
+4. **CORS**: Restrict allowed origins
+5. **Logging**: Configure production logging levels
+6. **Monitoring**: Add health checks and metrics
+
+### Docker Production
+
+```bash
+make prod-up
+```
+
+The production Docker setup includes:
+- Gunicorn with multiple workers
+- Health checks for database
+- Persistent volume for PostgreSQL data
+- Optimized container configuration
+
+## 🧹 Code Quality
+
+### Linting and Formatting
+
+```bash
+make format    # Auto-fix code style issues
+make lint      # Check code quality
+```
+
+### Type Checking
+
+```bash
+uv run mypy src/
+```
+
+### Pre-commit Hooks
+
+Consider setting up pre-commit hooks for:
+- Code formatting with ruff
+- Type checking with mypy
+- Linting with ruff
+- Running tests
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Write tests first (TDD approach)
-4. Make your changes
-5. **Ensure all tests pass**
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
 6. Submit a pull request
 
-## 📄 License
+## 📝 License
 
-MIT License - see LICENSE file for details.
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For issues and questions:
+1. Check the existing issues
+2. Review the API documentation
+3. Check the test examples
+4. Create a new issue with detailed information
+
+## 🔄 Updates and Maintenance
+
+### Dependencies
+
+Update dependencies regularly:
+```bash
+uv update
+```
+
+### Database Migrations
+
+Always backup your database before running migrations in production.
+
+### Security Updates
+
+Keep dependencies updated, especially security-related packages.
 
 ---
 
-**Built for speed and simplicity** 🚀
-
-Perfect for:
-- Coding interviews
-- Rapid prototyping
-- Learning FastAPI
-- Building production APIs
-- Extending with AI/ML features
-- Demonstrating TDD and testing expertise
-
-## API Response Structure
-
-All API responses are wrapped in a consistent envelope to simplify frontend handling. The frontend can always check `success`, display `message`, and use `data` or `error.details` accordingly.
-
-Success (HTTP 2xx):
-
-```json
-{
-  "success": true,
-  "data": { /* payload object or array */ },
-  "message": "optional success info"
-}
-```
-
-Error (HTTP 4xx/5xx):
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": 422,
-    "message": "Validation Error",
-    "details": [ /* validation errors array */ ]
-  }
-}
-```
-
-Notes:
-
-- Validation errors (422) include `details` as an array of error objects with `type`, `loc`, and `msg`.
-- Other errors (e.g., 404, 500) include a human-friendly `message` and `details` as a string or array.
-- The HTTP status code is preserved and also provided in `error.code`.
-
-Examples:
-
-```json
-{
-  "success": true,
-  "data": {"id": 1, "title": "Item"},
-  "message": "Item created successfully"
-}
-```
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": 404,
-    "message": "Not Found",
-    "details": "Item with ID 123 not found"
-  }
-}
-```
+**Happy Coding! 🎉**
