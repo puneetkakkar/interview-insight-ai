@@ -17,11 +17,12 @@ class TestItemsAPI:
         """Test creating an item successfully via API."""
         # Arrange
         item_data = generate_item_data()
-        expected_item = Item(**item_data, id=1)
+        expected_item = Item(**item_data)
+        expected_item.id = 1
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get_by_title.return_value = None
-            mock_repo.create.return_value = expected_item
+            mock_repo.get_by_title = AsyncMock(return_value=None)
+            mock_repo.create = AsyncMock(return_value=expected_item)
             
             with TestClient(app) as client:
                 # Act
@@ -41,10 +42,11 @@ class TestItemsAPI:
         """Test creating an item with duplicate title returns error."""
         # Arrange
         item_data = generate_item_data()
-        existing_item = Item(**item_data, id=1)
+        existing_item = Item(**item_data)
+        existing_item.id = 1
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get_by_title.return_value = existing_item
+            mock_repo.get_by_title = AsyncMock(return_value=existing_item)
             
             with TestClient(app) as client:
                 # Act
@@ -80,10 +82,14 @@ class TestItemsAPI:
         """Test getting items successfully via API."""
         # Arrange
         items_data = [mock_item_data(), mock_item_data()]
-        expected_items = [Item(**data) for data in items_data]
+        expected_items = []
+        for data in items_data:
+            itm = Item(**{k: v for k, v in data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+            itm.id = data["id"]
+            expected_items.append(itm)
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get_active_items.return_value = expected_items
+            mock_repo.get_active_items = AsyncMock(return_value=expected_items)
             
             with TestClient(app) as client:
                 # Act
@@ -101,10 +107,14 @@ class TestItemsAPI:
         """Test getting items with pagination parameters."""
         # Arrange
         items_data = [mock_item_data()]
-        expected_items = [Item(**data) for data in items_data]
+        expected_items = []
+        for data in items_data:
+            itm = Item(**{k: v for k, v in data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+            itm.id = data["id"]
+            expected_items.append(itm)
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get_active_items.return_value = expected_items
+            mock_repo.get_active_items = AsyncMock(return_value=expected_items)
             
             with TestClient(app) as client:
                 # Act
@@ -122,10 +132,14 @@ class TestItemsAPI:
         """Test getting items with search parameter."""
         # Arrange
         items_data = [mock_item_data()]
-        expected_items = [Item(**data) for data in items_data]
+        expected_items = []
+        for data in items_data:
+            itm = Item(**{k: v for k, v in data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+            itm.id = data["id"]
+            expected_items.append(itm)
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.search_by_title.return_value = expected_items
+            mock_repo.search_by_title = AsyncMock(return_value=expected_items)
             
             with TestClient(app) as client:
                 # Act
@@ -141,10 +155,11 @@ class TestItemsAPI:
         """Test getting a specific item by ID successfully."""
         # Arrange
         item_data = mock_item_data()
-        expected_item = Item(**item_data)
+        expected_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        expected_item.id = item_data["id"]
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = expected_item
+            mock_repo.get = AsyncMock(return_value=expected_item)
             
             with TestClient(app) as client:
                 # Act
@@ -162,7 +177,7 @@ class TestItemsAPI:
         """Test getting an item by ID when not found returns 404."""
         # Arrange
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = None
+            mock_repo.get = AsyncMock(return_value=None)
             
             with TestClient(app) as client:
                 # Act
@@ -181,10 +196,12 @@ class TestItemsAPI:
         # Arrange
         item_data = mock_item_data()
         item_data["is_deleted"] = True
-        deleted_item = Item(**item_data)
+        deleted_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        deleted_item.id = item_data["id"]
+        deleted_item.is_deleted = True
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = deleted_item
+            mock_repo.get = AsyncMock(return_value=deleted_item)
             
             with TestClient(app) as client:
                 # Act
@@ -200,14 +217,16 @@ class TestItemsAPI:
         """Test updating an item successfully via API."""
         # Arrange
         item_data = mock_item_data()
-        existing_item = Item(**item_data)
+        existing_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        existing_item.id = item_data["id"]
         update_data = {"title": "Updated Title", "price": 149.99}
-        updated_item = Item(**item_data, **update_data)
+        updated_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"} | set(update_data.keys())}, **update_data)
+        updated_item.id = item_data["id"]
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = existing_item
-            mock_repo.get_by_title.return_value = None
-            mock_repo.update.return_value = updated_item
+            mock_repo.get = AsyncMock(return_value=existing_item)
+            mock_repo.get_by_title = AsyncMock(return_value=None)
+            mock_repo.update = AsyncMock(return_value=updated_item)
             
             with TestClient(app) as client:
                 # Act
@@ -227,7 +246,7 @@ class TestItemsAPI:
         update_data = {"title": "Updated Title"}
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = None
+            mock_repo.get = AsyncMock(return_value=None)
             
             with TestClient(app) as client:
                 # Act
@@ -243,13 +262,16 @@ class TestItemsAPI:
         """Test updating item with duplicate title returns error."""
         # Arrange
         item_data = mock_item_data()
-        existing_item = Item(**item_data)
+        existing_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        existing_item.id = item_data["id"]
         update_data = {"title": "New Title"}
-        conflicting_item = Item(**item_data, id=2, title="New Title")
+        conflicting_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        conflicting_item.id = 2
+        conflicting_item.title = "New Title"
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = existing_item
-            mock_repo.get_by_title.return_value = conflicting_item
+            mock_repo.get = AsyncMock(return_value=existing_item)
+            mock_repo.get_by_title = AsyncMock(return_value=conflicting_item)
             
             with TestClient(app) as client:
                 # Act
@@ -265,11 +287,12 @@ class TestItemsAPI:
         """Test deleting an item successfully via API."""
         # Arrange
         item_data = mock_item_data()
-        existing_item = Item(**item_data)
+        existing_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        existing_item.id = item_data["id"]
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = existing_item
-            mock_repo.remove.return_value = existing_item
+            mock_repo.get = AsyncMock(return_value=existing_item)
+            mock_repo.remove = AsyncMock(return_value=existing_item)
             
             with TestClient(app) as client:
                 # Act
@@ -287,7 +310,7 @@ class TestItemsAPI:
         """Test deleting a non-existent item returns 404."""
         # Arrange
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = None
+            mock_repo.get = AsyncMock(return_value=None)
             
             with TestClient(app) as client:
                 # Act
@@ -303,10 +326,14 @@ class TestItemsAPI:
         """Test searching items by title successfully."""
         # Arrange
         items_data = [mock_item_data()]
-        expected_items = [Item(**data) for data in items_data]
+        expected_items = []
+        for data in items_data:
+            itm = Item(**{k: v for k, v in data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+            itm.id = data["id"]
+            expected_items.append(itm)
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.search_by_title.return_value = expected_items
+            mock_repo.search_by_title = AsyncMock(return_value=expected_items)
             
             with TestClient(app) as client:
                 # Act
@@ -323,7 +350,7 @@ class TestItemsAPI:
         """Test searching items with no results returns empty array."""
         # Arrange
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.search_by_title.return_value = []
+            mock_repo.search_by_title = AsyncMock(return_value=[])
             
             with TestClient(app) as client:
                 # Act
@@ -339,10 +366,14 @@ class TestItemsAPI:
         """Test searching items with pagination parameters."""
         # Arrange
         items_data = [mock_item_data()]
-        expected_items = [Item(**data) for data in items_data]
+        expected_items = []
+        for data in items_data:
+            itm = Item(**{k: v for k, v in data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+            itm.id = data["id"]
+            expected_items.append(itm)
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.search_by_title.return_value = expected_items
+            mock_repo.search_by_title = AsyncMock(return_value=expected_items)
             
             with TestClient(app) as client:
                 # Act
@@ -403,12 +434,13 @@ class TestItemsAPIEdgeCases:
         """Test updating item with no actual changes."""
         # Arrange
         item_data = mock_item_data()
-        existing_item = Item(**item_data)
+        existing_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        existing_item.id = item_data["id"]
         update_data = {}  # Empty update
         
         with patch("src.app.api.v1.items.items_repository") as mock_repo:
-            mock_repo.get.return_value = existing_item
-            mock_repo.update.return_value = existing_item
+            mock_repo.get = AsyncMock(return_value=existing_item)
+            mock_repo.update = AsyncMock(return_value=existing_item)
             
             with TestClient(app) as client:
                 # Act

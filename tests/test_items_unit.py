@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.repositories.items import items_repository
 from src.app.models.item import Item
-from src.app.schemas.item import ItemCreate, ItemUpdate
+from src.app.schemas.item import ItemCreate, ItemUpdate, ItemRead
 from tests.helpers.generators import generate_item_data
 from tests.helpers.mocks import mock_db_session, mock_item_data
 
@@ -22,7 +22,9 @@ class TestCRUDItems:
 
         # Mock the create method
         with patch.object(items_repository, "create") as mock_create:
-            mock_create.return_value = Item(**item_data, id=1)
+            expected_item = Item(**item_data)
+            expected_item.id = 1
+            mock_create.return_value = expected_item
             result = await items_repository.create(db, obj_in=item_create)
 
             assert result.id == 1
@@ -35,7 +37,8 @@ class TestCRUDItems:
         """Test getting an item by ID."""
         db = mock_db_session()
         item_data = mock_item_data()
-        mock_item = Item(**item_data)
+        mock_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        mock_item.id = item_data["id"]
 
         with patch.object(items_repository, "get") as mock_get:
             mock_get.return_value = mock_item
@@ -50,7 +53,8 @@ class TestCRUDItems:
         """Test getting an item by title."""
         db = mock_db_session()
         item_data = mock_item_data()
-        mock_item = Item(**item_data)
+        mock_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        mock_item.id = item_data["id"]
 
         with patch.object(items_repository, "get_by_title") as mock_get_by_title:
             mock_get_by_title.return_value = mock_item
@@ -64,12 +68,14 @@ class TestCRUDItems:
         """Test updating an item."""
         db = mock_db_session()
         item_data = mock_item_data()
-        mock_item = Item(**item_data)
+        mock_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        mock_item.id = item_data["id"]
         update_data = {"title": "Updated Title", "price": 149.99}
         item_update = ItemUpdate(**update_data)
 
         with patch.object(items_repository, "update") as mock_update:
-            updated_item = Item(**item_data, **update_data)
+            updated_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"} | set(update_data.keys())}, **update_data)
+            updated_item.id = item_data["id"]
             mock_update.return_value = updated_item
             result = await items_repository.update(
                 db, db_obj=mock_item, obj_in=item_update
@@ -86,7 +92,8 @@ class TestCRUDItems:
         """Test soft deleting an item."""
         db = mock_db_session()
         item_data = mock_item_data()
-        mock_item = Item(**item_data)
+        mock_item = Item(**{k: v for k, v in item_data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+        mock_item.id = item_data["id"]
 
         with patch.object(items_repository, "remove") as mock_remove:
             mock_remove.return_value = mock_item
@@ -100,7 +107,12 @@ class TestCRUDItems:
         """Test getting only active items."""
         db = mock_db_session()
         items_data = [mock_item_data(), mock_item_data()]
-        mock_items = [Item(**data) for data in items_data]
+        mock_items = []
+        for data in items_data:
+            itm = Item(**{k: v for k, v in data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+            itm.id = data["id"]
+            itm.is_deleted = False
+            mock_items.append(itm)
 
         with patch.object(items_repository, "get_active_items") as mock_get_active:
             mock_get_active.return_value = mock_items
@@ -115,7 +127,11 @@ class TestCRUDItems:
         """Test searching items by title."""
         db = mock_db_session()
         items_data = [mock_item_data(), mock_item_data()]
-        mock_items = [Item(**data) for data in items_data]
+        mock_items = []
+        for data in items_data:
+            itm = Item(**{k: v for k, v in data.items() if k not in {"id", "created_at", "updated_at", "is_deleted", "deleted_at"}})
+            itm.id = data["id"]
+            mock_items.append(itm)
 
         with patch.object(items_repository, "search_by_title") as mock_search:
             mock_search.return_value = mock_items
@@ -158,8 +174,9 @@ class TestItemSchemas:
         assert item_read.id == 1
         assert item_read.title == "Test Item"
         assert item_read.price == 99.99
-        assert item_read.created_at == "2024-01-01T00:00:00Z"
-        assert item_read.updated_at == "2024-01-01T00:00:00Z"
+        expected_dt = datetime.fromisoformat("2024-01-01T00:00:00+00:00")
+        assert item_read.created_at == expected_dt
+        assert item_read.updated_at == expected_dt
 
     def test_item_create_validation(self):
         """Test ItemCreate schema validation rules."""
