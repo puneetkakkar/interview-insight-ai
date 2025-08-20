@@ -18,7 +18,7 @@ upgrade: ## Apply DB migrations inside API container
 	docker compose exec -T api uv run alembic upgrade head
 
 test: ## Run tests inside API container
-	docker compose exec -T api uv run pytest
+	docker compose exec -T api sh -lc 'uv pip install -q ".[dev]" aiosqlite >/dev/null 2>&1 || true && uv run pytest'
 
 clean: ## Remove containers and volumes for this project
 	docker compose down -v

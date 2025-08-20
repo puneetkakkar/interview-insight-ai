@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from .core.setup import create_application
 from .api.v1 import items
+from .core.response import build_success_response
 
 # Create the FastAPI application
 app = create_application()
@@ -11,20 +12,20 @@ app.include_router(items.router, prefix="/api/v1")
 
 # Add root endpoint
 @app.get("/")
-async def root() -> dict[str, str]:
+async def root() -> dict[str, object]:
     """Root endpoint with basic information."""
-    return {
+    return build_success_response({
         "message": "FastAPI Minimal Boilerplate",
         "version": "0.1.0",
         "docs": "/docs",
         "health": "/health"
-    }
+    })
 
 # Add info endpoint
 @app.get("/info")
-async def info() -> dict[str, str]:
+async def info() -> dict[str, object]:
     """Application information endpoint."""
-    return {
+    return build_success_response({
         "name": "FastAPI Minimal Boilerplate",
         "description": "A minimal, production-ready FastAPI boilerplate",
         "version": "0.1.0",
@@ -39,7 +40,7 @@ async def info() -> dict[str, str]:
             "Type hints throughout",
             "Clean architecture"
         ]
-    }
+    })
 
 if __name__ == "__main__":
     import uvicorn
