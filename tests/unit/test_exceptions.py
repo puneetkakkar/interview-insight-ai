@@ -1,198 +1,445 @@
 import pytest
-from fastapi import HTTPException, status
-from fastapi.testclient import TestClient
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
+from fastapi import HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.datastructures import State
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response
+from pydantic import ValidationError
 
-from src.app.main import app
+from src.app.core.exceptions.handlers import (
+    http_exception_handler,
+    validation_exception_handler,
+    unhandled_exception_handler
+)
 from src.app.core.exceptions.http_exceptions import (
     NotFoundException,
     DuplicateValueException,
     ValidationException,
     ForbiddenException,
-    UnauthorizedException,
+    UnauthorizedException
 )
+from src.app.core.response import build_error_response
 
 
 class TestCustomExceptions:
-    """Test custom exception classes."""
+    """Test custom HTTP exceptions."""
 
     def test_not_found_exception(self):
-        """Test NotFoundException creation and properties."""
+        """Test NotFoundException instantiation and properties."""
         # Arrange & Act
-        exception = NotFoundException("Custom not found message")
+        exc = NotFoundException("Item not found")
         
         # Assert
-        assert exception.status_code == status.HTTP_404_NOT_FOUND
-        assert exception.detail == "Custom not found message"
+        assert exc.status_code == 404
+        assert exc.detail == "Item not found"
+        assert isinstance(exc, HTTPException)
 
     def test_not_found_exception_default_message(self):
         """Test NotFoundException with default message."""
         # Arrange & Act
-        exception = NotFoundException()
+        exc = NotFoundException()
         
         # Assert
-        assert exception.status_code == status.HTTP_404_NOT_FOUND
-        assert exception.detail == "Resource not found"
+        assert exc.status_code == 404
+        assert exc.detail == "Resource not found"
+        assert isinstance(exc, HTTPException)
 
     def test_duplicate_value_exception(self):
-        """Test DuplicateValueException creation and properties."""
+        """Test DuplicateValueException instantiation and properties."""
         # Arrange & Act
-        exception = DuplicateValueException("Custom duplicate message")
+        exc = DuplicateValueException("Title already exists")
         
         # Assert
-        assert exception.status_code == status.HTTP_409_CONFLICT
-        assert exception.detail == "Custom duplicate message"
+        assert exc.status_code == 409
+        assert exc.detail == "Title already exists"
+        assert isinstance(exc, HTTPException)
 
     def test_validation_exception(self):
-        """Test ValidationException creation and properties."""
+        """Test ValidationException instantiation and properties."""
         # Arrange & Act
-        exception = ValidationException("Custom validation message")
+        exc = ValidationException("Invalid input data")
         
         # Assert
-        assert exception.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert exception.detail == "Custom validation message"
+        assert exc.status_code == 422
+        assert exc.detail == "Invalid input data"
+        assert isinstance(exc, HTTPException)
 
     def test_forbidden_exception(self):
-        """Test ForbiddenException creation and properties."""
+        """Test ForbiddenException instantiation and properties."""
         # Arrange & Act
-        exception = ForbiddenException("Custom forbidden message")
+        exc = ForbiddenException("Access denied")
         
         # Assert
-        assert exception.status_code == status.HTTP_403_FORBIDDEN
-        assert exception.detail == "Custom forbidden message"
+        assert exc.status_code == 403
+        assert exc.detail == "Access denied"
+        assert isinstance(exc, HTTPException)
 
     def test_unauthorized_exception(self):
-        """Test UnauthorizedException creation and properties."""
+        """Test UnauthorizedException instantiation and properties."""
         # Arrange & Act
-        exception = UnauthorizedException("Custom unauthorized message")
+        exc = UnauthorizedException("Authentication required")
         
         # Assert
-        assert exception.status_code == status.HTTP_401_UNAUTHORIZED
-        assert exception.detail == "Custom unauthorized message"
+        assert exc.status_code == 401
+        assert exc.detail == "Authentication required"
+        assert isinstance(exc, HTTPException)
+
+    def test_exception_inheritance(self):
+        """Test that custom exceptions properly inherit from HTTPException."""
+        # Arrange & Act
+        exceptions = [
+            NotFoundException(),
+            DuplicateValueException("test"),
+            ValidationException("test"),
+            ForbiddenException("test"),
+            UnauthorizedException("test")
+        ]
+        
+        # Assert
+        for exc in exceptions:
+            assert isinstance(exc, HTTPException)
+            assert hasattr(exc, 'status_code')
+            assert hasattr(exc, 'detail')
 
 
 class TestExceptionHandlers:
     """Test global exception handlers."""
 
-    def test_http_exception_handler_404(self):
+    @pytest.mark.asyncio
+    async def test_http_exception_handler_404(self):
         """Test HTTP exception handler for 404 errors."""
-        with TestClient(app) as client:
-            # Act - Trigger 404 by accessing non-existent endpoint
-            response = client.get("/non-existent-endpoint")
-            
-            # Assert
-            assert response.status_code == 404
-            body = response.json()
-            assert body["success"] is False
-            assert body["data"] is None
-            assert body["error"]["code"] == 404
-            assert body["error"]["message"] == "Not Found"
-            assert "not found" in body["error"]["details"].lower()
-
-    def test_http_exception_handler_405(self):
-        """Test HTTP exception handler for 405 errors."""
-        with TestClient(app) as client:
-            # Act - Trigger 405 by using wrong HTTP method
-            response = client.delete("/health")
-            
-            # Assert
-            assert response.status_code == 405
-            body = response.json()
-            assert body["success"] is False
-            assert body["data"] is None
-            assert body["error"]["code"] == 405
-            assert body["error"]["message"] == "Method Not Allowed"
-
-    def test_validation_exception_handler(self):
-        """Test validation exception handler for 422 errors."""
-        with TestClient(app) as client:
-            # Act - Trigger 422 by sending invalid data
-            response = client.post("/api/v1/items/", json={"invalid": "data"})
-            
-            # Assert
-            assert response.status_code == 422
-            body = response.json()
-            assert body["success"] is False
-            assert body["data"] is None
-            assert body["error"]["code"] == 422
-            assert body["error"]["message"] == "Validation Error"
-            assert isinstance(body["error"]["details"], list)
-
-    def test_custom_exception_integration(self):
-        """Test custom exceptions are properly handled by global handlers."""
-        # This test verifies that custom exceptions inherit from HTTPException
-        # and are handled by the global http_exception_handler
-        
         # Arrange
-        custom_exception = NotFoundException("Custom message")
+        exc = NotFoundException("Item not found")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
         
         # Assert
-        assert isinstance(custom_exception, HTTPException)
-        assert custom_exception.status_code == 404
-        assert custom_exception.detail == "Custom message"
+        assert response.status_code == 404
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Item not found" in body
 
-    def test_exception_handler_response_structure(self):
-        """Test all exception handlers return consistent response structure."""
-        with TestClient(app) as client:
-            # Test 404
-            response = client.get("/non-existent")
-            body = response.json()
-            assert "success" in body
-            assert "data" in body
-            assert "error" in body
-            assert body["success"] is False
-            assert body["data"] is None
-            assert "code" in body["error"]
-            assert "message" in body["error"]
-            assert "details" in body["error"]
+    @pytest.mark.asyncio
+    async def test_http_exception_handler_405(self):
+        """Test HTTP exception handler for 405 errors."""
+        # Arrange
+        exc = HTTPException(status_code=405, detail="Method not allowed")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 405
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Method Not Allowed" in body
 
-            # Test 422
-            response = client.post("/api/v1/items/", json={})
-            body = response.json()
-            assert "success" in body
-            assert "data" in body
-            assert "error" in body
-            assert body["success"] is False
-            assert body["data"] is None
-            assert "code" in body["error"]
-            assert "message" in body["error"]
-            assert "details" in body["error"]
+    @pytest.mark.asyncio
+    async def test_http_exception_handler_custom_status(self):
+        """Test HTTP exception handler for custom status codes."""
+        # Arrange
+        exc = HTTPException(status_code=418, detail="I'm a teapot")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 418
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+
+    @pytest.mark.asyncio
+    async def test_validation_exception_handler(self):
+        """Test validation exception handler."""
+        # Arrange
+        errors = [
+            {
+                "type": "missing",
+                "loc": ["body", "title"],
+                "msg": "Field required",
+                "input": None
+            }
+        ]
+        exc = RequestValidationError(errors=errors)
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await validation_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 422
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Validation Error" in body
+        assert "Field required" in body
+
+    @pytest.mark.asyncio
+    async def test_validation_exception_handler_multiple_errors(self):
+        """Test validation exception handler with multiple errors."""
+        # Arrange
+        errors = [
+            {
+                "type": "missing",
+                "loc": ["body", "title"],
+                "msg": "Field required",
+                "input": None
+            },
+            {
+                "type": "value_error",
+                "loc": ["body", "price"],
+                "msg": "Value error, got -10",
+                "input": -10
+            }
+        ]
+        exc = RequestValidationError(errors=errors)
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await validation_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 422
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Validation Error" in body
+        assert "Field required" in body
+        assert "Value error" in body
+
+    @pytest.mark.asyncio
+    async def test_unhandled_exception_handler(self):
+        """Test unhandled exception handler."""
+        # Arrange
+        exc = Exception("Unexpected error")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await unhandled_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 500
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Internal Server Error" in body
+
+    @pytest.mark.asyncio
+    async def test_unhandled_exception_handler_with_message(self):
+        """Test unhandled exception handler with custom message."""
+        # Arrange
+        exc = ValueError("Invalid value")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await unhandled_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 500
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Internal Server Error" in body
+
+    @pytest.mark.asyncio
+    async def test_custom_exception_integration(self):
+        """Test that custom exceptions are handled by global handlers."""
+        # Arrange
+        exc = DuplicateValueException("Title already exists")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 409
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Title already exists" in body
+
+    @pytest.mark.asyncio
+    async def test_exception_handler_response_structure(self):
+        """Test that exception handlers return proper response structure."""
+        # Arrange
+        exc = NotFoundException("Item not found")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 404
+        body = response.body.decode()
+        # Check JSON structure
+        import json
+        data = json.loads(body)
+        assert "success" in data
+        assert "data" in data
+        assert "error" in data
+        assert data["success"] is False
+        assert data["data"] is None
+        assert "code" in data["error"]
+        assert "message" in data["error"]
+        assert "details" in data["error"]
 
 
 class TestExceptionHandlerEdgeCases:
     """Test edge cases for exception handlers."""
 
-    def test_http_exception_handler_unknown_status_code(self):
+    @pytest.mark.asyncio
+    async def test_http_exception_handler_unknown_status_code(self):
         """Test HTTP exception handler with unknown status code."""
-        # This test verifies the handler gracefully handles unknown status codes
-        with TestClient(app) as client:
-            # Act - Use a method that's not allowed on an endpoint
-            response = client.patch("/health")
-            
-            # Assert - Should still return proper error envelope
-            assert response.status_code in [405, 422]  # Method not allowed or validation error
-            body = response.json()
-            assert body["success"] is False
-            assert body["data"] is None
-            assert "error" in body
+        # Arrange
+        exc = HTTPException(status_code=599, detail="Unknown error")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 599
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
 
-    def test_validation_error_details_structure(self):
-        """Test validation error details follow expected structure."""
-        with TestClient(app) as client:
-            # Act - Trigger validation error with multiple issues
-            response = client.post("/api/v1/items/", json={"title": "", "price": -100})
-            
-            # Assert
-            assert response.status_code == 422
-            body = response.json()
-            assert body["success"] is False
-            assert body["error"]["code"] == 422
-            assert body["error"]["message"] == "Validation Error"
-            assert isinstance(body["error"]["details"], list)
-            
-            # Check that details contain validation error objects
-            for detail in body["error"]["details"]:
-                assert "type" in detail
-                assert "loc" in detail
-                assert "msg" in detail
-                assert "input" in detail
+    @pytest.mark.asyncio
+    async def test_validation_error_details_structure(self):
+        """Test validation error details structure."""
+        # Arrange
+        errors = [
+            {
+                "type": "missing",
+                "loc": ["body", "title"],
+                "msg": "Field required",
+                "input": None
+            }
+        ]
+        exc = RequestValidationError(errors=errors)
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await validation_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 422
+        body = response.body.decode()
+        import json
+        data = json.loads(body)
+        assert "error" in data
+        assert "details" in data["error"]
+        assert isinstance(data["error"]["details"], list)
+        assert len(data["error"]["details"]) == 1
+        detail = data["error"]["details"][0]
+        assert "type" in detail
+        assert "loc" in detail
+        assert "msg" in detail
+        assert "input" in detail
+
+    @pytest.mark.asyncio
+    async def test_validation_error_empty_errors(self):
+        """Test validation exception handler with empty errors."""
+        # Arrange
+        exc = RequestValidationError(errors=[])
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await validation_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 422
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+
+    @pytest.mark.asyncio
+    async def test_unhandled_exception_handler_none_exception(self):
+        """Test unhandled exception handler with None exception."""
+        # Arrange
+        exc = None
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await unhandled_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 500
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+        assert "Internal Server Error" in body
+
+    @pytest.mark.asyncio
+    async def test_http_exception_handler_starlette_exception(self):
+        """Test HTTP exception handler with Starlette HTTPException."""
+        # Arrange
+        exc = StarletteHTTPException(status_code=400, detail="Bad Request")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 400
+        body = response.body.decode()
+        assert "success" in body
+        assert "false" in body
+
+    @pytest.mark.asyncio
+    async def test_exception_handler_content_type(self):
+        """Test that exception handlers return proper content type."""
+        # Arrange
+        exc = NotFoundException("Item not found")
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await http_exception_handler(request, exc)
+        
+        # Assert
+        assert response.headers["content-type"] == "application/json"
+
+    @pytest.mark.asyncio
+    async def test_validation_exception_handler_complex_errors(self):
+        """Test validation exception handler with complex error structures."""
+        # Arrange
+        errors = [
+            {
+                "type": "missing",
+                "loc": ["body", "nested", "field"],
+                "msg": "Field required",
+                "input": None
+            },
+            {
+                "type": "type_error",
+                "loc": ["body", "items", 0, "id"],
+                "msg": "Input should be a valid integer",
+                "input": "not_an_int"
+            }
+        ]
+        exc = RequestValidationError(errors=errors)
+        request = MagicMock(spec=Request)
+        
+        # Act
+        response = await validation_exception_handler(request, exc)
+        
+        # Assert
+        assert response.status_code == 422
+        body = response.body.decode()
+        import json
+        data = json.loads(body)
+        assert "error" in data
+        assert "details" in data["error"]
+        assert len(data["error"]["details"]) == 2
+        # Check nested location
+        assert data["error"]["details"][0]["loc"] == ["body", "nested", "field"]
+        # Check array location
+        assert data["error"]["details"][1]["loc"] == ["body", "items", 0, "id"]
