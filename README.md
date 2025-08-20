@@ -1,4 +1,4 @@
-# FastAPI Minimal Boilerplate
+# FRAI Boilerplate
 
 A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V2, and PostgreSQL. This project provides a solid foundation for building scalable web APIs with modern Python practices.
 
@@ -73,7 +73,7 @@ Edit `.env` with your configuration:
 # Database Settings
 POSTGRES_SERVER=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=fastapi_db
+POSTGRES_DB=frai_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 
@@ -283,7 +283,7 @@ frai-be/
 | `RELOAD` | Enable auto-reload | `true` |
 | `POSTGRES_SERVER` | PostgreSQL server host | `localhost` |
 | `POSTGRES_PORT` | PostgreSQL server port | `5432` |
-| `POSTGRES_DB` | PostgreSQL database name | `fastapi_db` |
+| `POSTGRES_DB` | PostgreSQL database name | `frai_db` |
 | `POSTGRES_USER` | PostgreSQL username | `postgres` |
 | `POSTGRES_PASSWORD` | PostgreSQL password | `postgres` |
 | `SECRET_KEY` | JWT secret key | `your-secret-key-here` |

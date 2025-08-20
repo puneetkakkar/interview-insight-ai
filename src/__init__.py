@@ -1,1 +1,1 @@
-# FastAPI Minimal Boilerplate Source Package
+# FRAI Boilerplate Source Package

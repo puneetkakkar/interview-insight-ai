@@ -1,8 +1,8 @@
 [project]
-name = "fastapi-minimal-boilerplate"
+name = "frai-boilerplate"
 version = "0.1.0"
-description = "A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0 and Pydantic V2"
-authors = [{ name = "FastAPI Minimal Boilerplate", email = "dev@example.com" }]
+description = "A production-ready FRAI boilerplate using SQLAlchemy 2.0 and Pydantic V2"
+authors = [{ name = "FRAI Boilerplate", email = "dev@example.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11"
