@@ -2,12 +2,12 @@ from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, MappedAsDataclass
 
 from .database import Base
 
 
-class TimestampMixin:
+class TimestampMixin(MappedAsDataclass):
     """Mixin to add timestamp fields to models."""
     
     created_at: Mapped[datetime] = mapped_column(
@@ -25,7 +25,7 @@ class TimestampMixin:
     )
 
 
-class SoftDeleteMixin:
+class SoftDeleteMixin(MappedAsDataclass):
     """Mixin to add soft delete functionality to models."""
     
     deleted_at: Mapped[datetime | None] = mapped_column(

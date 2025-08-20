@@ -7,6 +7,7 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    # Core application dependencies
     "fastapi>=0.109.1",
     "uvicorn[standard]>=0.27.0",
     "pydantic>=2.6.1",
@@ -23,17 +24,19 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Development dependencies (for local development)
 dev = [
     "pytest>=7.4.2",
     "pytest-asyncio>=1.0.0",
     "pytest-mock>=3.14.0",
     "pytest-cov>=6.2.1",
     "faker>=26.0.0",
+    "aiosqlite>=0.20.0",
     "ruff>=0.11.13",
     "mypy>=1.16.0",
-    "aiosqlite>=0.20.0",
 ]
 
+# Testing dependencies (for running tests)
 test = [
     "pytest>=7.4.2",
     "pytest-asyncio>=1.0.0",
@@ -43,9 +46,27 @@ test = [
     "aiosqlite>=0.20.0",
 ]
 
+# Linting and type checking dependencies
 lint = [
     "ruff>=0.11.13",
     "mypy>=1.16.0",
+]
+
+# Production dependencies (minimal runtime)
+prod = [
+    # Only essential runtime dependencies
+    "fastapi>=0.109.1",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.6.1",
+    "pydantic-settings>=2.0.3",
+    "sqlalchemy>=2.0.25",
+    "asyncpg>=0.29.0",
+    "psycopg2-binary>=2.9.9",
+    "alembic>=1.13.1",
+    "python-dotenv>=1.0.0",
+    "greenlet>=2.0.2",
+    "python-json-logger>=2.0.7",
+    "gunicorn>=21.2.0",
 ]
 
 [build-system]

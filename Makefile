@@ -1,65 +1,86 @@
-.PHONY: help migrate revision upgrade test clean \
-	dev-up dev-down dev-logs dev-build \
-	prod-up prod-down prod-logs prod-build \
-	format lint test-unit test-integration test-all coverage
+.PHONY: help dev-up dev-down dev-logs test test-env test-down prod-up prod-down prod-logs clean format lint migrate revision upgrade coverage coverage-clean
 
 help: ## Show this help message
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-migrate: ## Create and apply DB migrations inside API container
-	docker compose exec -T api uv run alembic revision --autogenerate
-	docker compose exec -T api uv run alembic upgrade head
+# Development environment commands
+dev-up: ## Start development environment
+	docker compose -f docker/dev/docker-compose.dev.yml up -d --build
 
-revision: ## Create new DB migration inside API container
-	docker compose exec -T api uv run alembic revision --autogenerate
+dev-down: ## Stop development environment
+	docker compose -f docker/dev/docker-compose.dev.yml down
 
-upgrade: ## Apply DB migrations inside API container
-	docker compose exec -T api uv run alembic upgrade head
+dev-logs: ## Tail development logs
+	docker compose -f docker/dev/docker-compose.dev.yml logs -f
 
-test: ## Run all tests inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest'
+# Testing commands
+test: ## Run all tests locally
+	uv run pytest tests/ -v
 
-test-unit: ## Run unit tests only inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest tests/unit/'
-
-test-integration: ## Run integration tests only inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest tests/integration/'
-
-test-all: ## Run all tests with verbose output inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest -v'
+test-env: ## Run tests in dedicated testing environment
+	@echo "Starting testing environment..."
+	docker compose -f docker/test/docker-compose.test.yml up -d --build
+	@echo "Waiting for containers to be ready..."
+	@sleep 10
+	@echo "Installing test dependencies..."
+	docker compose -f docker/test/docker-compose.test.yml exec -T api-test uv pip install pytest pytest-asyncio pytest-mock pytest-cov faker aiosqlite
+	@echo "Running tests..."
+	docker compose -f docker/test/docker-compose.test.yml exec -T api-test uv run pytest tests/ -v
+	@echo "Tests completed. Stopping testing environment..."
+	@$(MAKE) test-down
 
 coverage: ## Run tests with coverage report inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest --cov=src --cov-report=term-missing --cov-report=html'
+	@echo "Starting development environment for coverage..."
+	@$(MAKE) dev-up
+	@echo "Installing test dependencies..."
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv pip install pytest pytest-cov pytest-asyncio pytest-mock faker aiosqlite
+	@echo "Running tests with coverage..."
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv run pytest --cov=src --cov-report=term-missing --cov-report=html
+	@echo "Coverage report generated. You can find HTML report in htmlcov/ directory."
+	@echo "Note: Development environment is still running. Use 'make dev-down' to stop it when done."
 
-clean: ## Remove containers and volumes for this project
-	docker compose down -v
+coverage-clean: ## Run tests with coverage report and clean up environment
+	@echo "Starting development environment for coverage..."
+	@$(MAKE) dev-up
+	@echo "Installing test dependencies..."
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv pip install pytest pytest-cov pytest-asyncio pytest-mock faker aiosqlite
+	@echo "Running tests with coverage..."
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv run pytest --cov=src --cov-report=term-missing --cov-report=html
+	@echo "Coverage report generated. You can find HTML report in htmlcov/ directory."
+	@echo "Cleaning up development environment..."
+	@$(MAKE) dev-down
+
+test-down: ## Stop testing environment
+	docker compose -f docker/test/docker-compose.test.yml down -v
+
+# Production environment commands
+prod-up: ## Start production environment
+	docker compose -f docker/prod/docker-compose.prod.yml up -d --build
+
+prod-down: ## Stop production environment
+	docker compose -f docker/prod/docker-compose.prod.yml down
+
+prod-logs: ## Tail production logs
+	docker compose -f docker/prod/docker-compose.prod.yml logs -f
+
+# Database migration commands
+migrate: ## Create and apply DB migrations inside API container
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv run alembic revision --autogenerate
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv run alembic upgrade head
+
+revision: ## Create new DB migration inside API container
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv run alembic revision --autogenerate
+
+upgrade: ## Apply DB migrations inside API container
+	docker compose -f docker/dev/docker-compose.dev.yml exec -T api-dev uv run alembic upgrade head
+
+# Utility commands
+clean: ## Remove all containers and volumes for this project
+	docker compose -f docker/dev/docker-compose.dev.yml down -v
+	docker compose -f docker/test/docker-compose.test.yml down -v
+	docker compose -f docker/prod/docker-compose.prod.yml down -v
 	docker system prune -f
-
-# New targets for environments
-dev-up: ## Start dev stack
-	docker compose up -d
-
-dev-down: ## Stop dev stack
-	docker compose down
-
-dev-logs: ## Tail dev logs
-	docker compose logs -f
-
-dev-build: ## Build dev images
-	docker compose build --no-cache
-
-prod-up: ## Start prod stack (no reload)
-	ENVIRONMENT=production DEBUG=false RELOAD=false docker compose up -d --build
-
-prod-down: ## Stop prod stack
-	docker compose down
-
-prod-logs: ## Tail prod logs
-	docker compose logs -f
-
-prod-build: ## Build prod images
-	ENVIRONMENT=production DEBUG=false RELOAD=false docker compose build --no-cache
 
 format: ## Run formatter/linter fixes
 	uv run ruff --fix .

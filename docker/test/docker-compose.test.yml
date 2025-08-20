@@ -1,0 +1,47 @@
+# Testing environment configuration
+services:
+  api-test:
+    build:
+      context: ../../
+      dockerfile: docker/test/Dockerfile.test
+      target: testing
+    command: >-
+      sh -c '
+      tail -f /dev/null'
+    env_file:
+      - ../../.env
+    depends_on:
+      db-test:
+        condition: service_healthy
+    volumes:
+      - ../../src:/code/src
+      - ../../tests:/code/tests
+      - ../../.env:/code/.env
+    environment:
+      - POSTGRES_SERVER=db-test
+      - POSTGRES_PORT=5432
+      - ENVIRONMENT=testing
+      - DEBUG=false
+      - RELOAD=false
+
+  db-test:
+    image: postgres:15
+    env_file:
+      - ../../.env
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_TEST_DB:-fastapi_test_db}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data-test:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres-data-test:
