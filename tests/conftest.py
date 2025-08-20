@@ -70,7 +70,7 @@ def test_app() -> FastAPI:
         """Root endpoint with basic information."""
         return build_success_response(
             {
-                "message": "FastAPI Minimal Boilerplate",
+                "message": "FRAI Boilerplate",
                 "version": "0.1.0",
                 "docs": "/docs",
                 "health": "/health",
@@ -83,20 +83,10 @@ def test_app() -> FastAPI:
         """Application information endpoint."""
         return build_success_response(
             {
-                "name": "FastAPI Minimal Boilerplate",
-                "description": "A minimal, production-ready FastAPI boilerplate",
+                "name": "FRAI Boilerplate",
+                "description": "A production-ready FRAI boilerplate",
                 "version": "0.1.0",
                 "status": "running",
-                "features": [
-                    "FastAPI with async support",
-                    "SQLAlchemy 2.0 + PostgreSQL",
-                    "Pydantic V2 schemas",
-                    "Alembic migrations",
-                    "Docker Compose setup",
-                    "Comprehensive testing",
-                    "Type hints throughout",
-                    "Clean architecture",
-                ],
             }
         )
 

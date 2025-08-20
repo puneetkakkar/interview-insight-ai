@@ -22,7 +22,7 @@ class TestMainEndpoints:
         assert body["success"] is True
         assert "data" in body
         assert "message" in body["data"]
-        assert "FastAPI Minimal Boilerplate" in body["data"]["message"]
+        assert "FRAI" in body["data"]["message"]
 
     def test_info_endpoint(self):
         """Test info endpoint returns correct response structure."""
@@ -81,7 +81,6 @@ class TestMainEndpoints:
         assert "version" in body["data"]
         assert "description" in body["data"]
         assert "status" in body["data"]
-        assert "features" in body["data"]
 
     def test_root_endpoint_content_type(self):
         """Test root endpoint returns correct content type."""
@@ -149,7 +148,7 @@ class TestMainEndpoints:
         assert response.status_code == 200
         body = response.json()
         data = body["data"]
-        assert data["message"] == "FastAPI Minimal Boilerplate"
+        assert data["message"] == "FRAI Boilerplate"
         assert data["version"] == "0.1.0"
         assert data["docs"] == "/docs"
         assert data["health"] == "/health"
@@ -166,12 +165,10 @@ class TestMainEndpoints:
         assert response.status_code == 200
         body = response.json()
         data = body["data"]
-        assert data["name"] == "FastAPI Minimal Boilerplate"
+        assert data["name"] == "FRAI Boilerplate"
         assert data["version"] == "0.1.0"
-        assert data["description"] == "A minimal, production-ready FastAPI boilerplate"
+        assert data["description"] == "A production-ready FRAI boilerplate"
         assert data["status"] == "running"
-        assert isinstance(data["features"], list)
-        assert len(data["features"]) > 0
 
     def test_root_endpoint_no_optional_fields(self):
         """Test root endpoint doesn't have unexpected fields."""
@@ -201,8 +198,8 @@ class TestMainEndpoints:
         # Assert
         assert response.status_code == 200
         body = response.json()
-        # Should only have success, data, and data.name, data.version, data.description, data.status, data.features
+        # Should only have success, data, and data.name, data.version, data.description, data.status
         expected_keys = {"success", "data"}
         assert set(body.keys()) == expected_keys
-        expected_data_keys = {"name", "version", "description", "status", "features"}
+        expected_data_keys = {"name", "version", "description", "status"}
         assert set(body["data"].keys()) == expected_data_keys

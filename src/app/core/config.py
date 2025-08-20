@@ -15,8 +15,8 @@ class EnvironmentOption(str, Enum):
 
 class AppSettings(BaseSettings):
     """Application settings."""
-    APP_NAME: str = Field(default="FastAPI Minimal Boilerplate", description="Application name")
-    APP_DESCRIPTION: str = Field(default="A minimal, production-ready FastAPI boilerplate", description="Application description")
+    APP_NAME: str = Field(default="FRAI Boilerplate", description="Application name")
+    APP_DESCRIPTION: str = Field(default="A production-ready FRAI boilerplate", description="Application description")
     APP_VERSION: str = Field(default="0.1.0", description="Application version")
     DEBUG: bool = Field(default=True, description="Debug mode")
     RELOAD: bool = Field(default=True, description="Auto-reload on code changes")
@@ -28,10 +28,10 @@ class DatabaseSettings(BaseSettings):
     POSTGRES_PASSWORD: str = Field(default="postgres", description="PostgreSQL password")
     POSTGRES_SERVER: str = Field(default="localhost", description="PostgreSQL server host")
     POSTGRES_PORT: int = Field(default=5432, description="PostgreSQL server port")
-    POSTGRES_DB: str = Field(default="fastapi_db", description="PostgreSQL database name")
+    POSTGRES_DB: str = Field(default="frai_db", description="PostgreSQL database name")
     
     # Test database settings
-    POSTGRES_TEST_DB: str = Field(default="fastapi_test_db", description="PostgreSQL test database name")
+    POSTGRES_TEST_DB: str = Field(default="frai_test_db", description="PostgreSQL test database name")
     
     @property
     def POSTGRES_ASYNC_URL(self) -> str:

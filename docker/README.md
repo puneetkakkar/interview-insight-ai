@@ -83,8 +83,8 @@ Each environment uses the same `.env` file but with different configurations:
 - `RELOAD`: Enabled in dev, disabled in test/prod
 
 ### Database Configuration
-- **Development**: Uses `fastapi_db` database
-- **Testing**: Uses `fastapi_test_db` database (isolated)
+- **Development**: Uses `frai_db` database
+- **Testing**: Uses `frai_test_db` database (isolated)
 - **Production**: Uses production database with persistent volumes
 
 ### Port Mapping
