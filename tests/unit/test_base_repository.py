@@ -8,8 +8,12 @@ from typing import List, Optional, TypeVar, Generic
 from src.app.repositories.base import BaseRepository
 from src.app.models.item import Item
 from src.app.schemas.item import ItemCreate, ItemUpdate
-from src.app.core.exceptions.http_exceptions import NotFoundException, DuplicateValueException
+from src.app.core.exceptions.http_exceptions import (
+    NotFoundException,
+    DuplicateValueException,
+)
 from tests.helpers.mocks import mock_db_session, mock_item_data
+
 
 # Create a mock model for testing
 class MockModel:
@@ -17,13 +21,16 @@ class MockModel:
         self.id = id
         self.name = name
 
+
 class MockCreate:
     def __init__(self, name: str):
         self.name = name
 
+
 class MockUpdate:
     def __init__(self, name: str = None):
         self.name = name
+
 
 class MockRepository(BaseRepository[MockModel, MockCreate, MockUpdate]):
     def __init__(self):
@@ -47,13 +54,13 @@ class TestBaseRepository:
         repo = MockRepository()
         create_data = MockCreate("Test Item")
         expected_item = MockModel(1, "Test Item")
-        
-        with patch.object(repo, 'create') as mock_create:
+
+        with patch.object(repo, "create") as mock_create:
             mock_create.return_value = expected_item
-            
+
             # Act
             result = await repo.create(db, obj_in=create_data)
-            
+
             # Assert
             assert result.id == 1
             assert result.name == "Test Item"
@@ -66,10 +73,10 @@ class TestBaseRepository:
         db = mock_db_session()
         repo = MockRepository()
         create_data = MockCreate("Test Item")
-        
-        with patch.object(repo, 'create') as mock_create:
+
+        with patch.object(repo, "create") as mock_create:
             mock_create.side_effect = IntegrityError("duplicate key", None, None)
-            
+
             # Act & Assert
             with pytest.raises(IntegrityError):
                 await repo.create(db, obj_in=create_data)
@@ -81,13 +88,13 @@ class TestBaseRepository:
         db = mock_db_session()
         repo = MockRepository()
         expected_item = MockModel(1, "Test Item")
-        
-        with patch.object(repo, 'get') as mock_get:
+
+        with patch.object(repo, "get") as mock_get:
             mock_get.return_value = expected_item
-            
+
             # Act
             result = await repo.get(db, id=1)
-            
+
             # Assert
             assert result.id == 1
             assert result.name == "Test Item"
@@ -99,13 +106,13 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        
-        with patch.object(repo, 'get') as mock_get:
+
+        with patch.object(repo, "get") as mock_get:
             mock_get.return_value = None
-            
+
             # Act
             result = await repo.get(db, id=999)
-            
+
             # Assert
             assert result is None
 
@@ -115,17 +122,14 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        expected_items = [
-            MockModel(1, "Item 1"),
-            MockModel(2, "Item 2")
-        ]
-        
-        with patch.object(repo, 'get_multi') as mock_get_multi:
+        expected_items = [MockModel(1, "Item 1"), MockModel(2, "Item 2")]
+
+        with patch.object(repo, "get_multi") as mock_get_multi:
             mock_get_multi.return_value = expected_items
-            
+
             # Act
             result = await repo.get_multi(db, skip=0, limit=10)
-            
+
             # Assert
             assert len(result) == 2
             assert result[0].name == "Item 1"
@@ -138,13 +142,13 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        
-        with patch.object(repo, 'get_multi') as mock_get_multi:
+
+        with patch.object(repo, "get_multi") as mock_get_multi:
             mock_get_multi.return_value = []
-            
+
             # Act
             result = await repo.get_multi(db, skip=0, limit=10)
-            
+
             # Assert
             assert result == []
             assert len(result) == 0
@@ -158,17 +162,19 @@ class TestBaseRepository:
         existing_item = MockModel(1, "Old Name")
         update_data = MockUpdate("New Name")
         expected_updated = MockModel(1, "New Name")
-        
-        with patch.object(repo, 'update') as mock_update:
+
+        with patch.object(repo, "update") as mock_update:
             mock_update.return_value = expected_updated
-            
+
             # Act
             result = await repo.update(db, db_obj=existing_item, obj_in=update_data)
-            
+
             # Assert
             assert result.id == 1
             assert result.name == "New Name"
-            mock_update.assert_called_once_with(db, db_obj=existing_item, obj_in=update_data)
+            mock_update.assert_called_once_with(
+                db, db_obj=existing_item, obj_in=update_data
+            )
 
     @pytest.mark.asyncio
     async def test_update_database_error(self):
@@ -178,10 +184,10 @@ class TestBaseRepository:
         repo = MockRepository()
         existing_item = MockModel(1, "Old Name")
         update_data = MockUpdate("New Name")
-        
-        with patch.object(repo, 'update') as mock_update:
+
+        with patch.object(repo, "update") as mock_update:
             mock_update.side_effect = IntegrityError("duplicate key", None, None)
-            
+
             # Act & Assert
             with pytest.raises(IntegrityError):
                 await repo.update(db, db_obj=existing_item, obj_in=update_data)
@@ -193,13 +199,13 @@ class TestBaseRepository:
         db = mock_db_session()
         repo = MockRepository()
         existing_item = MockModel(1, "Test Item")
-        
-        with patch.object(repo, 'remove') as mock_remove:
+
+        with patch.object(repo, "remove") as mock_remove:
             mock_remove.return_value = existing_item
-            
+
             # Act
             result = await repo.remove(db, id=1)
-            
+
             # Assert
             assert result.id == 1
             mock_remove.assert_called_once_with(db, id=1)
@@ -210,10 +216,10 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        
-        with patch.object(repo, 'remove') as mock_remove:
+
+        with patch.object(repo, "remove") as mock_remove:
             mock_remove.side_effect = NotFoundException("Item not found")
-            
+
             # Act & Assert
             with pytest.raises(NotFoundException):
                 await repo.remove(db, id=999)
@@ -224,13 +230,13 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        
-        with patch.object(repo, 'count') as mock_count:
+
+        with patch.object(repo, "count") as mock_count:
             mock_count.return_value = 5
-            
+
             # Act
             result = await repo.count(db)
-            
+
             # Assert
             assert result == 5
             mock_count.assert_called_once_with(db)
@@ -241,15 +247,15 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        
+
         # Act - Test that the method exists and can be called
         # Since exists method doesn't exist in base repo, we'll test the count method instead
-        with patch.object(repo, 'count') as mock_count:
+        with patch.object(repo, "count") as mock_count:
             mock_count.return_value = 1
-            
+
             # Act
             result = await repo.count(db, filters={"id": 1})
-            
+
             # Assert
             assert result == 1
             mock_count.assert_called_once_with(db, filters={"id": 1})
@@ -260,15 +266,15 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        
+
         # Act - Test that the method exists and can be called
         # Since exists method doesn't exist in base repo, we'll test the count method instead
-        with patch.object(repo, 'count') as mock_count:
+        with patch.object(repo, "count") as mock_count:
             mock_count.return_value = 0
-            
+
             # Act
             result = await repo.count(db, filters={"id": 999})
-            
+
             # Assert
             assert result == 0
 
@@ -280,13 +286,13 @@ class TestBaseRepository:
         repo = MockRepository()
         create_data = MockCreate("Test Item")
         expected_item = MockModel(1, "Test Item")
-        
-        with patch.object(repo, 'create') as mock_create:
+
+        with patch.object(repo, "create") as mock_create:
             mock_create.return_value = expected_item
-            
+
             # Act
             result = await repo.create(db, obj_in=create_data)
-            
+
             # Assert
             assert result.id == 1
             # Note: The base repository doesn't have commit parameter, so we don't test commit
@@ -300,13 +306,13 @@ class TestBaseRepository:
         existing_item = MockModel(1, "Old Name")
         update_data = MockUpdate("New Name")
         expected_updated = MockModel(1, "New Name")
-        
-        with patch.object(repo, 'update') as mock_update:
+
+        with patch.object(repo, "update") as mock_update:
             mock_update.return_value = expected_updated
-            
+
             # Act
             result = await repo.update(db, db_obj=existing_item, obj_in=update_data)
-            
+
             # Assert
             assert result.id == 1
             # Note: The base repository doesn't have commit parameter, so we don't test commit
@@ -318,13 +324,13 @@ class TestBaseRepository:
         db = mock_db_session()
         repo = MockRepository()
         existing_item = MockModel(1, "Test Item")
-        
-        with patch.object(repo, 'remove') as mock_remove:
+
+        with patch.object(repo, "remove") as mock_remove:
             mock_remove.return_value = existing_item
-            
+
             # Act
             result = await repo.remove(db, id=1)
-            
+
             # Assert
             assert result.id == 1
             # Note: The base repository doesn't have commit parameter, so we don't test commit
@@ -336,14 +342,14 @@ class TestBaseRepository:
         db = mock_db_session()
         repo = MockRepository()
         create_data = MockCreate("Test Item")
-        
-        with patch.object(repo, 'create') as mock_create:
+
+        with patch.object(repo, "create") as mock_create:
             mock_create.side_effect = IntegrityError("duplicate key", None, None)
-            
+
             # Act & Assert
             with pytest.raises(IntegrityError):
                 await repo.create(db, obj_in=create_data)
-            
+
             # Note: The base repository doesn't handle commit/rollback, so we don't test rollback
 
     @pytest.mark.asyncio
@@ -352,19 +358,19 @@ class TestBaseRepository:
         # Arrange
         db = mock_db_session()
         repo = MockRepository()
-        
-        with patch.object(repo, 'get_multi') as mock_get_multi:
+
+        with patch.object(repo, "get_multi") as mock_get_multi:
             mock_get_multi.return_value = []
-            
+
             # Act - Test different pagination values
             await repo.get_multi(db, skip=10, limit=5)
             await repo.get_multi(db, skip=0, limit=100)
             await repo.get_multi(db, skip=50, limit=25)
-            
+
             # Assert
             assert mock_get_multi.call_count == 3
             # Verify the calls were made with correct parameters
             calls = mock_get_multi.call_args_list
-            assert calls[0][1] == {'skip': 10, 'limit': 5}
-            assert calls[1][1] == {'skip': 0, 'limit': 100}
-            assert calls[2][1] == {'skip': 50, 'limit': 25}
+            assert calls[0][1] == {"skip": 10, "limit": 5}
+            assert calls[1][1] == {"skip": 0, "limit": 100}
+            assert calls[2][1] == {"skip": 50, "limit": 25}
