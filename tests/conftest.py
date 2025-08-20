@@ -47,6 +47,7 @@ async def test_db_setup() -> AsyncGenerator[None, None]:
     async with test_engine.begin() as conn:
         # Import all models here to ensure they are registered
         from src.app.models import Item  # noqa: F401
+
         await conn.run_sync(Base.metadata.create_all)
     yield
     async with test_engine.begin() as conn:
@@ -61,59 +62,118 @@ async def db_session(test_db_setup: None) -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest.fixture
+def test_app() -> FastAPI:
+    """Create a test app without database initialization."""
+    from src.app.core.setup import (
+        _configure_cors,
+        _configure_exception_handlers,
+        _configure_routes,
+        _configure_access_logging,
+    )
+    from src.app.api.v1 import items
+    from src.app.core.response import build_success_response
+
+    # Create app without lifespan (database initialization)
+    test_app = FastAPI(
+        title="Test App",
+        description="Test application without database",
+        version="0.1.0",
+        debug=True,
+    )
+
+    # Apply all configurations except lifespan
+    _configure_cors(test_app)
+    _configure_access_logging(test_app)
+    _configure_exception_handlers(test_app)
+    _configure_routes(test_app)
+
+    # Include API routers
+    test_app.include_router(items.router, prefix="/api/v1")
+
+    # Add root endpoint
+    @test_app.get("/")
+    async def root() -> dict[str, object]:
+        """Root endpoint with basic information."""
+        return build_success_response(
+            {
+                "message": "FastAPI Minimal Boilerplate",
+                "version": "0.1.0",
+                "docs": "/docs",
+                "health": "/health",
+            }
+        )
+
+    # Add info endpoint
+    @test_app.get("/info")
+    async def info() -> dict[str, object]:
+        """Application information endpoint."""
+        return build_success_response(
+            {
+                "name": "FastAPI Minimal Boilerplate",
+                "description": "A minimal, production-ready FastAPI boilerplate",
+                "version": "0.1.0",
+                "status": "running",
+                "features": [
+                    "FastAPI with async support",
+                    "SQLAlchemy 2.0 + PostgreSQL",
+                    "Pydantic V2 schemas",
+                    "Alembic migrations",
+                    "Docker Compose setup",
+                    "Comprehensive testing",
+                    "Type hints throughout",
+                    "Clean architecture",
+                ],
+            }
+        )
+
+    return test_app
+
+
+@pytest.fixture
 def client(db_session: AsyncSession) -> Generator[TestClient, None, None]:
     """Create a test client with database dependency override."""
-    
+
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 
 @pytest.fixture
-def mock_client() -> Generator[TestClient, None, None]:
+def mock_client(test_app: FastAPI) -> Generator[TestClient, None, None]:
     """Create a test client without database dependency override."""
-    with TestClient(app) as test_client:
+    with TestClient(test_app) as test_client:
         yield test_client
 
 
 @pytest_asyncio.fixture
 async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Create an async test client."""
-    
+
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
-    
+
     app.dependency_overrides.clear()
 
 
 @pytest.fixture
-def app_instance() -> FastAPI:
-    """Get the FastAPI application instance."""
-    return app
-
-
-@pytest.fixture
-def mock_db_session() -> AsyncSession:
-    """Create a mock database session for unit testing."""
-    session = AsyncMock(spec=AsyncSession)
-    session.commit = AsyncMock()
-    session.rollback = AsyncMock()
-    session.close = AsyncMock()
-    session.refresh = AsyncMock()
-    session.add = MagicMock()
-    session.execute = AsyncMock()
-    return session
+def mock_db_session() -> MagicMock:
+    """Create a mock database session for unit tests."""
+    mock_session = MagicMock()
+    mock_session.commit = MagicMock()
+    mock_session.rollback = MagicMock()
+    mock_session.close = MagicMock()
+    return mock_session
 
 
 @pytest.fixture
@@ -121,8 +181,9 @@ def sample_item_data() -> dict:
     """Sample item data for testing."""
     return {
         "title": "Test Item",
-        "description": "Test Description",
-        "price": 99.99,
+        "description": "A test item for testing purposes",
+        "price": 29.99,
+        "is_active": True,
     }
 
 
@@ -130,25 +191,20 @@ def sample_item_data() -> dict:
 def sample_item_update_data() -> dict:
     """Sample item update data for testing."""
     return {
-        "title": "Updated Item",
-        "price": 149.99,
+        "title": "Updated Test Item",
+        "description": "An updated test item",
+        "price": 39.99,
+        "is_active": False,
     }
 
 
 @pytest.fixture
 def pagination_params() -> dict:
     """Sample pagination parameters for testing."""
-    return {
-        "skip": 0,
-        "limit": 10,
-    }
+    return {"skip": 0, "limit": 10}
 
 
 @pytest.fixture
 def search_params() -> dict:
     """Sample search parameters for testing."""
-    return {
-        "search": "test",
-        "skip": 0,
-        "limit": 10,
-    }
+    return {"title": "test", "skip": 0, "limit": 10}

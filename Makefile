@@ -18,19 +18,19 @@ upgrade: ## Apply DB migrations inside API container
 	docker compose exec -T api uv run alembic upgrade head
 
 test: ## Run all tests inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[dev]" aiosqlite >/dev/null 2>&1 || true && uv run pytest'
+	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest'
 
 test-unit: ## Run unit tests only inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[dev]" aiosqlite >/dev/null 2>&1 || true && uv run pytest tests/unit/'
+	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest tests/unit/'
 
 test-integration: ## Run integration tests only inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[dev]" aiosqlite >/dev/null 2>&1 || true && uv run pytest tests/integration/'
+	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest tests/integration/'
 
 test-all: ## Run all tests with verbose output inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[dev]" aiosqlite >/dev/null 2>&1 || true && uv run pytest -v'
+	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest -v'
 
 coverage: ## Run tests with coverage report inside API container
-	docker compose exec -T api sh -lc 'uv pip install -q ".[dev]" aiosqlite pytest-cov >/dev/null 2>&1 || true && uv run pytest --cov=src --cov-report=term-missing --cov-report=html'
+	docker compose exec -T api sh -lc 'uv pip install -q ".[test]" >/dev/null 2>&1 || true && uv run pytest --cov=src --cov-report=term-missing --cov-report=html'
 
 clean: ## Remove containers and volumes for this project
 	docker compose down -v

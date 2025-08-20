@@ -7,32 +7,11 @@ from typing import Any, Dict
 
 from pythonjsonlogger import jsonlogger
 
-try:
-    from colorlog import ColoredFormatter
-except Exception:  # pragma: no cover - optional in prod
-    ColoredFormatter = None  # type: ignore
-
 from .config import settings
 
 
 def _get_console_formatter() -> logging.Formatter:
-    if settings.DEBUG and ColoredFormatter is not None:
-        return ColoredFormatter(
-            fmt=(
-                "%(log_color)s%(levelname)-8s%(reset)s | %(asctime)s | %(cyan)s%(name)s%(reset)s | "
-                "%(method)s %(path)s -> %(status_code)s (%(duration_ms)sdms) [req:%(request_id)s] "
-                "| %(message)s"
-            ),
-            datefmt="%Y-%m-%d %H:%M:%S",
-            log_colors={
-                "DEBUG": "blue",
-                "INFO": "green",
-                "WARNING": "yellow",
-                "ERROR": "red",
-                "CRITICAL": "bold_red",
-            },
-        )
-    # Fallback plain formatter
+    """Get console formatter for development."""
     return logging.Formatter(
         fmt=(
             "%(levelname)-8s | %(asctime)s | %(name)s | "
@@ -43,6 +22,7 @@ def _get_console_formatter() -> logging.Formatter:
 
 
 def _get_json_formatter() -> logging.Formatter:
+    """Get JSON formatter for production."""
     return jsonlogger.JsonFormatter(
         fmt="%(asctime)s %(name)s %(levelname)s %(message)s %(request_id)s %(path)s %(method)s %(status_code)s",
         datefmt="%Y-%m-%dT%H:%M:%S%z",
@@ -99,4 +79,3 @@ class RequestContextFilter(logging.Filter):
 
 
 logger.addFilter(RequestContextFilter())
-
