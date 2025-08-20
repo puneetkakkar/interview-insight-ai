@@ -3,8 +3,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # Development command (default)
-    command: uv run uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
+    # Environment-aware command
+    command: >-
+      sh -c '
+      if [ "${ENVIRONMENT}" = "production" ]; then
+        uv run gunicorn src.app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --access-logfile -;
+      else
+        uv run uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload --no-access-log;
+      fi'
     # Production command (uncomment to use gunicorn)
     # command: gunicorn src.app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
     env_file:
@@ -19,6 +25,9 @@ services:
     environment:
       - POSTGRES_SERVER=db
       - POSTGRES_PORT=5432
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DEBUG=${DEBUG:-true}
+      - RELOAD=${RELOAD:-true}
 
   db:
     image: postgres:15
