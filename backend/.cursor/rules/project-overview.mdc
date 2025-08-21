@@ -1,0 +1,38 @@
+# FRAI Boilerplate Project Overview
+
+## Project Structure
+This is a production-ready FastAPI boilerplate with a clean architecture pattern:
+
+### Backend Architecture
+- **Entry Point**: [src/app/main.py](mdc:src/app/main.py) - FastAPI application initialization
+- **Configuration**: [src/app/core/config.py](mdc:src/app/core/config.py) - Environment-based settings management
+- **API Structure**: [src/app/api/v1/](mdc:src/app/api/v1/) - Versioned API endpoints
+- **Database**: [src/app/core/db/](mdc:src/app/core/db/) - SQLAlchemy 2.0 database setup
+- **Models**: [src/app/models/](mdc:src/app/models/) - SQLAlchemy ORM models
+- **Schemas**: [src/app/schemas/](mdc:src/app/schemas/) - Pydantic V2 data validation
+- **Repositories**: [src/app/repositories/](mdc:src/app/repositories/) - Data access layer
+- **Core Utilities**: [src/app/core/](mdc:src/app/core/) - Shared functionality
+
+### Key Technologies
+- **FastAPI**: Modern, fast web framework
+- **SQLAlchemy 2.0**: Async ORM with type annotations
+- **Pydantic V2**: Data validation and settings management
+- **PostgreSQL**: Primary database with async support
+- **Alembic**: Database migrations
+- **Docker**: Multi-environment containerization
+
+### Development Tools
+- **Package Manager**: UV for dependency management
+- **Linting**: Ruff for fast Python linting
+- **Type Checking**: MyPy for static type analysis
+- **Testing**: Pytest with async support
+- **Code Formatting**: Ruff with auto-fix capabilities
+
+## Architecture Principles
+- **Clean Architecture**: Separation of concerns with clear layers
+- **Dependency Injection**: FastAPI dependency system for clean code
+- **Async First**: Built for high-performance async operations
+- **Type Safety**: Comprehensive type hints throughout
+- **Environment Based**: Different configurations for dev/test/prod
+alwaysApply: true
+---

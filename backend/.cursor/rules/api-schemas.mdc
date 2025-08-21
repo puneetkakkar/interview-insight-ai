@@ -1,0 +1,72 @@
+# API Schema and Validation Guidelines
+
+## Pydantic Schema Structure
+- **File Organization**: One schema file per domain in [src/app/schemas/](mdc:src/app/schemas/)
+- **Naming Convention**: Use descriptive names ending with purpose (e.g., `ItemCreate`, `ItemUpdate`, `ItemResponse`)
+- **Inheritance**: Use Pydantic BaseModel for all schemas
+- **Validation**: Leverage Pydantic's built-in validators
+
+## Schema Patterns
+- **Input Schemas**: For API requests (e.g., `ItemCreate`, `ItemUpdate`)
+- **Response Schemas**: For API responses (e.g., `ItemResponse`, `ItemList`)
+- **Query Schemas**: For query parameters (e.g., `ItemQuery`, `PaginationQuery`)
+- **Filter Schemas**: For filtering and searching (e.g., `ItemFilter`)
+
+## Field Definitions
+- **Required Fields**: Mark required fields without defaults
+- **Optional Fields**: Use `Optional[Type]` for nullable fields
+- **Defaults**: Provide sensible defaults where appropriate
+- **Validation**: Use Pydantic validators for complex validation logic
+
+## Example Schema Pattern
+```python
+from pydantic import BaseModel, Field, validator
+from typing import Optional, List
+from datetime import datetime
+
+class ItemBase(BaseModel):
+    """Base item schema with common fields."""
+    name: str = Field(..., min_length=1, max_length=100, description="Item name")
+    description: Optional[str] = Field(None, max_length=500, description="Item description")
+    price: float = Field(..., gt=0, description="Item price")
+
+class ItemCreate(ItemBase):
+    """Schema for creating a new item."""
+    tags: List[str] = Field(default=[], description="Item tags")
+
+class ItemUpdate(BaseModel):
+    """Schema for updating an existing item."""
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    price: Optional[float] = Field(None, gt=0)
+    tags: Optional[List[str]] = None
+
+class ItemResponse(ItemBase):
+    """Schema for item responses."""
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    tags: List[str]
+    
+    class Config:
+        from_attributes = True
+```
+
+## Response Envelope
+Always use the standardized response envelope from [src/app/core/response.py](mdc:src/app/core/response.py):
+```python
+from .core.response import build_success_response, build_error_response
+
+@app.get("/items/{item_id}", response_model=ItemResponse)
+async def get_item(item_id: int) -> dict[str, object]:
+    # Implementation
+    return build_success_response(item_data)
+```
+
+## Validation Best Practices
+- **Input Validation**: Validate all incoming data
+- **Business Rules**: Implement business logic validation in validators
+- **Error Messages**: Provide clear, user-friendly error messages
+- **Type Safety**: Use proper type hints for all fields
+globs: src/app/schemas/**/*.py,src/app/api/**/*.py
+---

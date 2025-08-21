@@ -1,0 +1,35 @@
+# FastAPI Development Guidelines
+
+## API Structure
+- **Versioning**: All APIs should be under `/api/v1/` prefix
+- **Router Pattern**: Use FastAPI routers for organizing endpoints
+- **Response Envelope**: Always use [src/app/core/response.py](mdc:src/app/core/response.py) for consistent responses
+
+## Endpoint Patterns
+- **Async Functions**: All endpoint functions should be async
+- **Type Hints**: Use comprehensive type hints with Pydantic schemas
+- **Dependencies**: Leverage FastAPI dependency injection system
+- **Error Handling**: Use custom exception handlers from [src/app/core/exceptions/](mdc:src/app/core/exceptions/)
+
+## Response Format
+Use the standardized response envelope:
+```python
+from .core.response import build_success_response, build_error_response
+
+@app.get("/example")
+async def example_endpoint() -> dict[str, object]:
+    return build_success_response({"data": "example"})
+```
+
+## API Documentation
+- **OpenAPI**: FastAPI auto-generates docs at `/docs`
+- **Descriptions**: Add docstrings to all endpoints
+- **Examples**: Include example requests/responses where helpful
+- **Tags**: Use tags to group related endpoints
+
+## Testing
+- **Integration Tests**: Test full API endpoints in [tests/integration/](mdc:tests/integration/)
+- **Fixtures**: Use [tests/conftest.py](mdc:tests/conftest.py) for common test setup
+- **Async Testing**: Use pytest-asyncio for testing async endpoints
+globs: src/app/api/**/*.py,src/app/main.py
+---

@@ -1,0 +1,39 @@
+# Frontend Project Overview
+
+## Project Structure
+This is a modern Next.js 15 frontend application built with TypeScript and Tailwind CSS:
+
+### Core Technologies
+- **Next.js 15**: React framework with App Router and Turbo mode
+- **React 19**: Latest React with modern features
+- **TypeScript 5.8**: Strict type checking and modern syntax
+- **Tailwind CSS 4.0**: Utility-first CSS framework with CSS variables
+- **Zod**: Runtime type validation and schema definition
+
+### Project Architecture
+- **App Router**: Uses Next.js 13+ App Router pattern
+- **Type Safety**: Full TypeScript coverage with strict configuration
+- **Environment Validation**: T3 Env for type-safe environment variables
+- **Package Manager**: PNPM for fast, efficient dependency management
+
+### Key Directories
+- **Entry Point**: [src/app/page.tsx](mdc:src/app/page.tsx) - Main homepage
+- **Layout**: [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout with metadata
+- **Environment**: [src/env.js](mdc:src/env.js) - Type-safe environment configuration
+- **Styles**: [src/styles/globals.css](mdc:src/styles/globals.css) - Global CSS and Tailwind imports
+- **Configuration**: [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration
+
+### Development Tools
+- **ESLint**: Next.js + TypeScript ESLint configuration
+- **Prettier**: Code formatting with Tailwind CSS plugin
+- **Type Checking**: Strict TypeScript compilation
+- **Linting**: ESLint with Next.js and TypeScript rules
+
+## Architecture Principles
+- **Type Safety First**: Comprehensive TypeScript coverage
+- **Modern React**: Use latest React 19 features and patterns
+- **Performance**: Next.js Turbo mode and optimizations
+- **Accessibility**: Built-in Next.js accessibility features
+- **SEO**: Metadata API and server-side rendering
+alwaysApply: true
+---

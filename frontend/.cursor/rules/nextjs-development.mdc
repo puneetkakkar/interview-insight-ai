@@ -1,0 +1,69 @@
+# Next.js Development Guidelines
+
+## App Router Structure
+- **File-based Routing**: Use Next.js 13+ App Router file conventions
+- **Layouts**: Create reusable layouts in [src/app/layout.tsx](mdc:src/app/layout.tsx)
+- **Pages**: Define routes with [src/app/page.tsx](mdc:src/app/page.tsx) files
+- **API Routes**: Use [src/app/api/](mdc:src/app/api/) directory for API endpoints
+
+## Component Patterns
+- **Server Components**: Default to Server Components for better performance
+- **Client Components**: Use `"use client"` directive only when needed
+- **Metadata**: Export metadata objects for SEO optimization
+- **Layouts**: Use nested layouts for complex page structures
+
+## File Naming Conventions
+- **Page Routes**: `page.tsx` for route pages
+- **Layouts**: `layout.tsx` for shared layouts
+- **Loading**: `loading.tsx` for loading states
+- **Error**: `error.tsx` for error boundaries
+- **Not Found**: `not-found.tsx` for 404 pages
+
+## Example Page Pattern
+```tsx
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Page Title",
+  description: "Page description for SEO",
+};
+
+export default function PageName() {
+  return (
+    <main>
+      {/* Page content */}
+    </main>
+  );
+}
+```
+
+## Example Layout Pattern
+```tsx
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Layout Title",
+  description: "Layout description",
+};
+
+export default function LayoutName({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      {/* Layout wrapper */}
+      {children}
+    </div>
+  );
+}
+```
+
+## Performance Best Practices
+- **Server Components**: Use Server Components by default
+- **Image Optimization**: Use Next.js Image component
+- **Font Optimization**: Use Next.js font optimization
+- **Bundle Analysis**: Monitor bundle size with build analysis
+globs: src/app/**/*.tsx,src/app/**/*.ts,src/app/**/*.jsx,src/app/**/*.js
+---

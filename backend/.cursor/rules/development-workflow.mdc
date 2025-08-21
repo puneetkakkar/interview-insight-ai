@@ -1,0 +1,51 @@
+# Development Workflow Guidelines
+
+## Project Setup
+- **Environment**: Use UV for dependency management
+- **Virtual Environment**: Create with `uv venv`
+- **Dependencies**: Install with `uv pip install -e .[dev]`
+- **Environment Variables**: Copy [env.example](mdc:env.example) to `.env`
+
+## Common Commands
+Use the [Makefile](mdc:Makefile) for common operations:
+
+### Development
+- `make dev-up` - Start development environment with Docker
+- `make dev-down` - Stop development environment
+- `make dev-logs` - View development logs
+- `make dev-shell` - Access development container shell
+
+### Code Quality
+- `make format` - Format code with Ruff
+- `make lint` - Run linting checks
+- `make type-check` - Run MyPy type checking
+- `make test` - Run all tests
+- `make test-cov` - Run tests with coverage
+
+### Database
+- `make db-migrate` - Run database migrations
+- `make db-upgrade` - Upgrade database to latest version
+- `make db-downgrade` - Downgrade database
+- `make db-reset` - Reset database (development only)
+
+## Development Workflow
+1. **Feature Branch**: Create feature branch from main
+2. **Development**: Use Docker environment for consistent development
+3. **Testing**: Write tests for new functionality
+4. **Quality**: Run linting and type checking
+5. **Commit**: Use conventional commit messages
+6. **Review**: Submit pull request for review
+
+## Environment Management
+- **Development**: Local development with hot reload
+- **Testing**: Isolated test environment with separate database
+- **Production**: Production-optimized environment
+- **Docker**: Use appropriate Docker environment for each stage
+
+## Troubleshooting
+- **Database Issues**: Check Docker logs and connection settings
+- **Dependency Issues**: Clear UV cache and reinstall
+- **Test Failures**: Ensure test database is running and clean
+- **Linting Errors**: Use `make format` to auto-fix many issues
+alwaysApply: false
+---

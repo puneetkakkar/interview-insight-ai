@@ -1,0 +1,94 @@
+# React and TypeScript Development Guidelines
+
+## React 19 Patterns
+- **Modern Hooks**: Use latest React hooks and patterns
+- **Server Components**: Prefer Server Components for static content
+- **Client Components**: Use `"use client"` only for interactive components
+- **Performance**: Leverage React's built-in optimizations
+
+## TypeScript Best Practices
+- **Strict Mode**: Project uses strict TypeScript configuration from [tsconfig.json](mdc:tsconfig.json)
+- **Type Imports**: Use `import type` for type-only imports
+- **Generic Types**: Leverage TypeScript generics for reusable components
+- **Type Safety**: Ensure all props and state are properly typed
+
+## Component Patterns
+- **Function Components**: Use function components with TypeScript
+- **Props Interface**: Define clear props interfaces for all components
+- **Children Props**: Properly type children props with `React.ReactNode`
+- **Event Handlers**: Type event handlers with proper event types
+
+## Example Component Pattern
+```tsx
+import { type ReactNode } from "react";
+
+interface ComponentProps {
+  title: string;
+  children?: ReactNode;
+  onClick?: () => void;
+}
+
+export default function ComponentName({
+  title,
+  children,
+  onClick,
+}: ComponentProps) {
+  return (
+    <div>
+      <h1>{title}</h1>
+      {children}
+      {onClick && <button onClick={onClick}>Click me</button>}
+    </div>
+  );
+}
+```
+
+## Hook Patterns
+- **Custom Hooks**: Create reusable custom hooks for complex logic
+- **Type Safety**: Ensure hooks return properly typed values
+- **Dependencies**: Properly manage useEffect and useMemo dependencies
+- **State Management**: Use appropriate state management patterns
+
+## Example Hook Pattern
+```tsx
+import { useState, useEffect, useCallback } from "react";
+
+interface UseDataReturn {
+  data: string[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
+}
+
+export function useData(): UseDataReturn {
+  const [data, setData] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Fetch logic here
+      setData([]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+```
+
+## Type Safety Guidelines
+- **No Any**: Avoid `any` type, use proper typing
+- **Union Types**: Use union types for multiple possible values
+- **Optional Properties**: Mark optional props with `?`
+- **Readonly**: Use `readonly` for immutable props
+globs: src/**/*.tsx,src/**/*.ts
+---

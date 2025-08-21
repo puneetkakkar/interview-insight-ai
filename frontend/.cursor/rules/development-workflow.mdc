@@ -1,0 +1,59 @@
+# Frontend Development Workflow Guidelines
+
+## Project Setup
+- **Package Manager**: Use PNPM for dependency management
+- **Dependencies**: Install with `pnpm install`
+- **Environment**: Copy environment variables to `.env.local`
+- **Development**: Start with `pnpm dev` for development server
+
+## Available Scripts
+From [package.json](mdc:package.json):
+
+### Development
+- `pnpm dev` - Start development server with Turbo mode
+- `pnpm build` - Build for production
+- `pnpm start` - Start production server
+- `pnpm preview` - Preview production build
+
+### Code Quality
+- `pnpm lint` - Run ESLint checks
+- `pnpm lint:fix` - Auto-fix ESLint issues
+- `pnpm typecheck` - Run TypeScript type checking
+- `pnpm check` - Run lint and type check together
+
+### Formatting
+- `pnpm format:check` - Check code formatting
+- `pnpm format:write` - Auto-format code with Prettier
+
+## Development Workflow
+1. **Setup**: Install dependencies with `pnpm install`
+2. **Development**: Use `pnpm dev` for local development
+3. **Quality**: Run `pnpm check` before committing
+4. **Formatting**: Use `pnpm format:write` for consistent code
+5. **Building**: Test build with `pnpm build`
+
+## Environment Configuration
+- **T3 Env**: Uses [@t3-oss/env-nextjs](mdc:src/env.js) for type-safe environment variables
+- **Server Variables**: Define in `server` section of env config
+- **Client Variables**: Prefix with `NEXT_PUBLIC_` for client access
+- **Validation**: Environment variables are validated at build time
+
+## File Organization
+- **App Router**: Follow Next.js 13+ App Router conventions
+- **Components**: Organize reusable components in dedicated directories
+- **Types**: Define TypeScript interfaces and types in component files
+- **Styles**: Use Tailwind CSS classes and CSS variables
+
+## Performance Optimization
+- **Turbo Mode**: Development server uses Next.js Turbo for faster builds
+- **Server Components**: Use Server Components by default
+- **Image Optimization**: Use Next.js Image component
+- **Font Optimization**: Leverage Next.js font optimization
+
+## Troubleshooting
+- **Type Errors**: Run `pnpm typecheck` to identify issues
+- **Linting Issues**: Use `pnpm lint:fix` to auto-resolve
+- **Build Failures**: Check environment variables and dependencies
+- **Performance**: Monitor bundle size and use Next.js analytics
+alwaysApply: false
+---

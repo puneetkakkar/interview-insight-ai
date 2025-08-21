@@ -1,0 +1,76 @@
+# Environment and Configuration Guidelines
+
+## Environment Variable Management
+- **T3 Env**: Uses [@t3-oss/env-nextjs](mdc:src/env.js) for type-safe environment variables
+- **Schema Validation**: Environment variables are validated with Zod schemas
+- **Type Safety**: Full TypeScript support for environment variables
+- **Runtime Validation**: Environment variables are validated at build and runtime
+
+## Environment Configuration
+The environment configuration is defined in [src/env.js](mdc:src/env.js):
+
+### Server Variables
+```typescript
+server: {
+  NODE_ENV: z.enum(["development", "test", "production"]),
+  // Add other server-side variables here
+}
+```
+
+### Client Variables
+```typescript
+client: {
+  // NEXT_PUBLIC_CLIENTVAR: z.string(),
+  // Prefix with NEXT_PUBLIC_ for client access
+}
+```
+
+### Runtime Environment
+```typescript
+runtimeEnv: {
+  NODE_ENV: process.env.NODE_ENV,
+  // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+}
+```
+
+## Environment Variable Usage
+- **Server Components**: Access server variables directly from env object
+- **Client Components**: Use NEXT_PUBLIC_ prefixed variables
+- **API Routes**: Access server variables in API handlers
+- **Validation**: Environment variables are automatically validated
+
+## Example Usage Pattern
+```typescript
+import { env } from "@/env";
+
+// Server component or API route
+export default function ServerComponent() {
+  const nodeEnv = env.NODE_ENV;
+  
+  return (
+    <div>
+      Environment: {nodeEnv}
+    </div>
+  );
+}
+```
+
+## Configuration Files
+- **TypeScript**: [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration
+- **ESLint**: [eslint.config.js](mdc:eslint.config.js) - Linting rules
+- **Prettier**: [prettier.config.js](mdc:prettier.config.js) - Code formatting
+- **Next.js**: [next.config.js](mdc:next.config.js) - Next.js configuration
+
+## Environment Setup
+1. **Development**: Create `.env.local` for local development
+2. **Production**: Set environment variables in deployment platform
+3. **Validation**: Environment variables are validated at build time
+4. **Security**: Server variables are never exposed to the client
+
+## Best Practices
+- **Type Safety**: Always use the env object instead of process.env
+- **Validation**: Let T3 Env handle validation and type checking
+- **Client Variables**: Only expose necessary variables with NEXT_PUBLIC_ prefix
+- **Documentation**: Document all environment variables in env.js
+globs: src/env.js,src/**/*.tsx,src/**/*.ts
+---

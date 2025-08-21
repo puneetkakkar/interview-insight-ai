@@ -1,0 +1,194 @@
+# Project Setup and Onboarding
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Python 3.11+**: Latest Python with pip/uv
+- **Node.js 18+**: Latest LTS version
+- **Docker**: Docker Desktop or Docker Engine
+- **Git**: Version control system
+- **Editor**: VS Code with Cursor extension recommended
+
+### Initial Setup
+1. **Clone Repository**: `git clone <repository-url>`
+2. **Navigate**: `cd frai-coding-boilerplate`
+3. **Backend Setup**: Follow backend setup instructions
+4. **Frontend Setup**: Follow frontend setup instructions
+5. **Environment**: Configure environment variables
+
+## 🔧 Backend Setup
+
+### Python Environment
+```bash
+cd backend
+# Create virtual environment
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+uv pip install -e .[dev]
+```
+
+### Database Setup
+```bash
+# Start development environment
+make dev-up
+
+# Run migrations
+make db-migrate
+make db-upgrade
+```
+
+### Environment Variables
+```bash
+# Copy example environment file
+cp env.example .env
+
+# Edit .env with your configuration
+# Update database credentials, secret keys, etc.
+```
+
+### Verify Backend
+```bash
+# Check if backend is running
+curl http://localhost:8000/
+
+# View API documentation
+open http://localhost:8000/docs
+```
+
+## 🎨 Frontend Setup
+
+### Node.js Dependencies
+```bash
+cd frontend
+# Install dependencies
+pnpm install
+
+# Create environment file
+cp .env.example .env.local  # if exists
+```
+
+### Development Server
+```bash
+# Start development server
+pnpm dev
+
+# Verify frontend is running
+open http://localhost:3000
+```
+
+### Environment Configuration
+```bash
+# Edit .env.local with your configuration
+# Add any NEXT_PUBLIC_ variables needed
+```
+
+## 🐳 Docker Setup
+
+### Development Environment
+```bash
+# Start all services
+cd backend
+make dev-up
+
+# Check services
+docker ps
+
+# View logs
+make dev-logs
+```
+
+### Production Environment
+```bash
+# Start production environment
+cd backend
+make prod-up
+
+# Check production services
+docker ps
+```
+
+## 🧪 Testing Setup
+
+### Backend Testing
+```bash
+cd backend
+# Run all tests
+make test
+
+# Run with coverage
+make test-cov
+
+# Run specific test file
+pytest tests/unit/test_items.py
+```
+
+### Frontend Testing
+```bash
+cd frontend
+# Run linting
+pnpm lint
+
+# Run type checking
+pnpm typecheck
+
+# Run tests (if configured)
+pnpm test
+```
+
+## 📚 Development Workflow
+
+### Daily Development
+1. **Start Services**: `make dev-up` (backend) + `pnpm dev` (frontend)
+2. **Make Changes**: Edit code with hot reload
+3. **Test Changes**: Run relevant tests
+4. **Quality Checks**: Lint and format code
+5. **Commit Changes**: Use conventional commits
+
+### Code Quality
+```bash
+# Backend
+cd backend
+make format    # Format code
+make lint      # Lint code
+make typecheck # Type checking
+
+# Frontend
+cd frontend
+pnpm format:write  # Format code
+pnpm lint          # Lint code
+pnpm typecheck     # Type checking
+```
+
+## 🔍 Troubleshooting
+
+### Common Issues
+- **Port Conflicts**: Check if ports 8000, 3000, 5433 are available
+- **Database Connection**: Verify PostgreSQL is running
+- **Dependencies**: Clear cache and reinstall dependencies
+- **Environment Variables**: Check .env file configuration
+
+### Getting Help
+- **Documentation**: Check README files in each directory
+- **API Docs**: Backend API documentation at `/docs`
+- **Logs**: Check Docker logs for service issues
+- **Issues**: Create GitHub issues for bugs or questions
+
+## 📖 Next Steps
+
+### Learning Resources
+- **FastAPI**: Official documentation and tutorials
+- **Next.js**: React framework documentation
+- **SQLAlchemy**: Python ORM documentation
+- **Tailwind CSS**: Utility-first CSS framework
+
+### Project Structure
+- **Backend**: [backend/README.md](mdc:backend/README.md)
+- **Frontend**: [frontend/README.md](mdc:frontend/README.md)
+- **Docker**: [backend/docker/README.md](mdc:backend/docker/README.md)
+- **API**: Backend API documentation at `/docs`
+description:
+globs:
+alwaysApply: false
+---

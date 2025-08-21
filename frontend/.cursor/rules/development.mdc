@@ -1,0 +1,51 @@
+---
+globs: **/*.{ts,tsx,js,jsx}
+---
+# Frontend Development Guidelines
+
+## Next.js & React Standards
+- Use Next.js 15 App Router patterns
+- Implement React 19 features and best practices
+- Use TypeScript for type safety
+- Follow modern React patterns with hooks and functional components
+
+## Project Structure
+- **Pages**: Create pages in [src/app/](mdc:src/app/)
+- **Layout**: Use the root layout in [src/app/layout.tsx](mdc:src/app/layout.tsx)
+- **Styling**: Use Tailwind CSS for styling
+- **Configuration**: Modify [next.config.js](mdc:next.config.js) for Next.js settings
+
+## Styling & UI
+- Use Tailwind CSS v4 for styling
+- Follow the design system in [src/styles/globals.css](mdc:src/styles/globals.css)
+- Use modern CSS features and responsive design
+- Implement consistent component styling patterns
+
+## Code Quality
+- Use ESLint for linting (configured in [eslint.config.js](mdc:eslint.config.js))
+- Use Prettier for code formatting (configured in [prettier.config.js](mdc:prettier.config.js))
+- Run `pnpm lint` for linting checks
+- Run `pnpm format:write` for auto-formatting
+
+## Testing
+- Write tests in [tests/](mdc:tests/)
+- Use Jest for test runner
+- Use React Testing Library for component testing
+- Test component behavior, not implementation details
+
+## Development Commands
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm lint` - Run linting
+- `pnpm format:write` - Format code
+- `pnpm typecheck` - Run TypeScript type checking
+
+## Package Management
+- Use pnpm as package manager (configured in [package.json](mdc:package.json))
+- Install dependencies with `pnpm add <package>`
+- Use `pnpm install` to install all dependencies
+
+## Environment Configuration
+- Configure environment variables in [src/env.js](mdc:src/env.js)
+- Use the `@t3-oss/env-nextjs` package for type-safe environment variables
+- Follow the environment configuration pattern

@@ -1,0 +1,53 @@
+# Backend Development Guidelines
+
+## Python & FastAPI Standards
+- Use Python 3.11+ features and type hints
+- Follow FastAPI best practices with async/await patterns
+- Use Pydantic V2 for data validation and serialization
+- Implement proper error handling with custom exceptions
+
+## Project Structure
+- **Models**: Define SQLAlchemy models in [src/app/models/](mdc:src/app/models/)
+- **Schemas**: Create Pydantic schemas in [src/app/schemas/](mdc:src/app/schemas/)
+- **Repositories**: Implement data access in [src/app/repositories/](mdc:src/app/repositories/)
+- **API Routes**: Add endpoints in [src/app/api/v1/](mdc:src/app/api/v1/)
+
+## Database & ORM
+- Use SQLAlchemy 2.0 async patterns
+- Implement repository pattern for data access
+- Use Alembic for database migrations
+- Follow the base repository pattern in [src/app/repositories/base.py](mdc:src/app/repositories/base.py)
+
+## API Development
+- Use versioned API routes in [src/app/api/v1/](mdc:src/app/api/v1/)
+- Follow RESTful conventions for endpoint design
+- Use the response envelope pattern from [src/app/core/response.py](mdc:src/app/core/response.py)
+- Implement proper error handling with custom exceptions from [src/app/core/exceptions/](mdc:src/app/core/exceptions/)
+
+## Code Quality
+- Use Ruff for linting and formatting (configured in [pyproject.toml](mdc:pyproject.toml))
+- Run `make format` for auto-formatting
+- Run `make lint` for code quality checks
+- Use MyPy for type checking
+
+## Testing
+- Write unit tests in [tests/unit/](mdc:tests/unit/)
+- Write integration tests in [tests/integration/](mdc:tests/integration/)
+- Use pytest with async support
+- Follow the test structure in [tests/conftest.py](mdc:tests/conftest.py)
+
+## Configuration
+- Use environment variables via [src/app/core/config.py](mdc:src/app/core/config.py)
+- Follow the configuration pattern in [env.example](mdc:env.example)
+- Use Pydantic Settings for configuration management
+
+## Development Commands
+- `make dev-up` - Start development environment
+- `make test` - Run tests
+- `make format` - Format code
+- `make lint` - Lint code
+- `make migrate` - Run database migrations
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,76 @@
+# Code Quality and Linting Guidelines
+
+## ESLint Configuration
+- **Next.js Rules**: Uses [eslint.config.js](mdc:eslint.config.js) with Next.js core web vitals
+- **TypeScript ESLint**: Full TypeScript linting with strict rules
+- **Auto-fix**: Use `pnpm lint:fix` to automatically fix issues
+- **Type Checking**: ESLint runs with TypeScript type checking
+
+## Prettier Configuration
+- **Formatting**: Use [prettier.config.js](mdc:prettier.config.js) for consistent formatting
+- **Tailwind Plugin**: Includes Tailwind CSS class sorting
+- **Auto-format**: Use `pnpm format:write` to format all files
+- **Check Format**: Use `pnpm format:check` to verify formatting
+
+## TypeScript Configuration
+- **Strict Mode**: Enabled in [tsconfig.json](mdc:tsconfig.json)
+- **Type Checking**: Run `pnpm typecheck` for type validation
+- **Path Aliases**: Use `@/*` for src directory imports
+- **Modern Syntax**: Target ES2022 with modern module resolution
+
+## Code Style Guidelines
+- **Import Organization**: Use type imports with `import type`
+- **Consistent Naming**: Follow React and TypeScript naming conventions
+- **Component Structure**: Organize components with clear interfaces
+- **Error Handling**: Proper error handling and type safety
+
+## Running Quality Checks
+- **Lint**: `pnpm lint` - Run ESLint checks
+- **Lint Fix**: `pnpm lint:fix` - Auto-fix ESLint issues
+- **Type Check**: `pnpm typecheck` - Run TypeScript compilation
+- **Format Check**: `pnpm format:check` - Check code formatting
+- **Format Write**: `pnpm format:write` - Auto-format code
+- **Full Check**: `pnpm check` - Run lint and type check
+
+## ESLint Rules
+- **TypeScript**: Strict TypeScript rules enabled
+- **React**: Next.js and React best practices
+- **Import Sorting**: Consistent import organization
+- **Unused Variables**: Warn about unused variables (ignore `_` prefixed)
+- **Async Functions**: Proper async/await usage
+
+## Example Code Style
+```tsx
+import { type ReactNode } from "react";
+import { type Metadata } from "next";
+
+interface ComponentProps {
+  title: string;
+  children?: ReactNode;
+}
+
+export const metadata: Metadata = {
+  title: "Component Title",
+  description: "Component description",
+};
+
+export default function ComponentName({
+  title,
+  children,
+}: ComponentProps) {
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold">{title}</h1>
+      {children}
+    </div>
+  );
+}
+```
+
+## Best Practices
+- **Consistent Formatting**: Let Prettier handle all formatting
+- **Type Safety**: Use TypeScript features for better code quality
+- **Import Organization**: Group imports logically (React, Next.js, third-party, local)
+- **Component Structure**: Keep components focused and single-purpose
+globs: src/**/*.tsx,src/**/*.ts,src/**/*.jsx,src/**/*.js
+---
