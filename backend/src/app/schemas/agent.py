@@ -1,7 +1,8 @@
+from typing_extensions import TypedDict
 from pydantic import BaseModel, Field, SerializeAsAny
-from typing import Any, Literal, NotRequired, TypedDict
+from typing import Any, Literal, NotRequired
 
-from app.schemas.language_models import (
+from .language_models import (
     AllModelEnum,
     AnthropicModelName,
     OpenAIModelName,
@@ -31,7 +32,7 @@ class UserInput(BaseModel):
     model: SerializeAsAny[AllModelEnum] | None = Field(
         title="Model",
         description="LLM Model to use for the agent.",
-        default=OpenAIModelName.GPT_4O_MINI,
+        default=AnthropicModelName.HAIKU_35,
         examples=[OpenAIModelName.GPT_4O_MINI, AnthropicModelName.HAIKU_35],
     )
     thread_id: str | None = Field(

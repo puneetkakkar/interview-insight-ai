@@ -4,10 +4,9 @@ from typing import Any, Optional
 from pydantic import Field, ConfigDict
 from pydantic_settings import BaseSettings
 
-from app.schemas.language_models import (
+from src.app.schemas.language_models import (
     AllModelEnum,
     FakeModelName,
-    Provider,
     OpenAIModelName,
     AnthropicModelName,
 )
@@ -73,7 +72,9 @@ class LanguageModelSettings(BaseSettings):
         default=None, description="Anthropic API key"
     )
     OPENAI_API_KEY: Optional[str] = Field(default=None, description="OpenAI API key")
-    
+    OPENWEATHERMAP_API_KEY: Optional[str] = Field(
+        default=None, description="OpenWeatherMap API key"
+    )
 
     @property
     def has_anthropic_api_key(self) -> bool:
@@ -85,32 +86,26 @@ class LanguageModelSettings(BaseSettings):
         """Check if OpenAI API key is available."""
         return bool(self.OPENAI_API_KEY)
 
+    @property
+    def available_models(self) -> set:
+        """Get available models based on API keys."""
+        models = set()
+
+        if self.ANTHROPIC_API_KEY:
+            models.update(set(AnthropicModelName))
+
+        if self.OPENAI_API_KEY:
+            models.update(set(OpenAIModelName))
+
+        if not models:  # If no API keys, add fake model for testing
+            models.add(FakeModelName.FAKE)
+
+        return models
+
     def model_post_init(self, __context: Any) -> None:
-        api_keys = {
-            Provider.ANTHROPIC: self.ANTHROPIC_API_KEY,
-            Provider.OPENAI: self.OPENAI_API_KEY,
-        }
-
-        active_keys = [k for k, v in api_keys.items() if v]
-        if not active_keys:
+        """Validate that at least one API key is provided."""
+        if not self.ANTHROPIC_API_KEY and not self.OPENAI_API_KEY:
             raise ValueError("At least one LLM API key must be provided.")
-
-        for provider in active_keys:
-            match provider:
-                case Provider.OPENAI:
-                    if self.DEFAULT_MODEL is None:
-                        self.DEFAULT_MODEL = OpenAIModelName.GPT_4O_MINI
-                    self.AVAILABLE_MODELS.update(set(OpenAIModelName))
-                case Provider.ANTHROPIC:
-                    if self.DEFAULT_MODEL is None:
-                        self.DEFAULT_MODEL = AnthropicModelName.HAIKU_3
-                    self.AVAILABLE_MODELS.update(set(AnthropicModelName))
-                case Provider.FAKE:
-                    if self.DEFAULT_MODEL is None:
-                        self.DEFAULT_MODEL = FakeModelName.FAKE
-                    self.AVAILABLE_MODELS.update(set(FakeModelName))
-                case _:
-                    raise ValueError(f"Unknown provider: {provider}")
 
 
 class Settings(AppSettings, DatabaseSettings, LanguageModelSettings):

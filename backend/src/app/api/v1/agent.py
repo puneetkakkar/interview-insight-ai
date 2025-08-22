@@ -5,57 +5,31 @@ This module provides endpoints for:
 - Getting agent information
 """
 
+import json
+from pathlib import Path
+import pickle
 from typing import Dict, Any
 from uuid import UUID, uuid4
 from fastapi import APIRouter, HTTPException, status
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, messages_to_dict
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command
 from pydantic import BaseModel, Field
 
-from app.agents.agent import DEFAULT_AGENT, AgentGraph
-from app.schemas.agent import ChatMessage, UserInput
+from src.app.agents.agent import DEFAULT_AGENT, AgentGraph
+from src.app.schemas.agent import ChatMessage, UserInput
 
-from app.core.response import build_success_response, build_error_response
-from app.ai.agents import get_agent, get_all_agent_info, invoke_agent
-from app.ai.rag import query_rag, add_documents_to_rag
-from app.core import logger
-from app.utils import langchain_to_chat_message
+from src.app.core.response import build_success_response, build_error_response
+from src.app.agents import get_agent, get_all_agent_info
+from src.app.core import logger
+from src.app.utils import (
+    langchain_to_chat_message,
+    transform_langgraph_error_response,
+)
 
-router = APIRouter(prefix="/agents", tags=["agents"])
+from src.data import cached_response
 
-
-# class AgentQueryRequest(BaseModel):
-#     """Request model for agent queries."""    
-
-#     query: str = Field(
-#         ..., description="The query to send to the agent", min_length=1, max_length=1000
-#     )
-
-
-# class RAGQueryRequest(BaseModel):
-#     """Request model for RAG queries."""
-
-#     question: str = Field(
-#         ...,
-#         description="The question to ask the RAG system",
-#         min_length=1,
-#         max_length=1000,
-#     )
-#     k: int = Field(
-#         default=3, description="Number of documents to retrieve", ge=1, le=10
-#     )
-
-
-# class DocumentAddRequest(BaseModel):
-#     """Request model for adding documents to RAG."""
-
-#     documents: list[str] = Field(
-#         ..., description="List of documents to add", min_items=1
-#     )
-#     metadata: list[Dict[str, Any]] = Field(
-#         default=None, description="Optional metadata for documents"
-#     )
+router = APIRouter(prefix="/agent", tags=["agents"])
 
 
 @router.get("/")
@@ -72,42 +46,6 @@ async def list_agents() -> Dict[str, Any]:
             message="Failed to retrieve agent information",
             details=str(e),
         )
-
-
-# @router.post("/{agent_name}/invoke")
-# async def invoke_agent_endpoint(
-#     agent_name: str,
-#     request: AgentQueryRequest
-# ) -> Dict[str, Any]:
-#     """Invoke a specific agent with a query."""
-#     try:
-#         # Validate agent exists
-#         if agent_name not in [agent["name"] for agent in get_all_agent_info()]:
-#             raise HTTPException(
-#                 status_code=status.HTTP_404_NOT_FOUND,
-#                 detail=f"Agent '{agent_name}' not found"
-#             )
-
-#         # Invoke the agent
-#         response = await invoke_agent(agent_name, request.query)
-
-#         return build_success_response(
-#             data={
-#                 "agent": agent_name,
-#                 "query": request.query,
-#                 "response": response
-#             },
-#             message="Agent invoked successfully"
-#         )
-
-#     except HTTPException:
-#         raise
-#     except Exception as e:
-#         return build_error_response(
-#             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             message="Failed to invoke agent",
-#             details=str(e)
-#         )
 
 
 async def _handle_input(
@@ -163,7 +101,9 @@ async def _handle_input(
 
 @router.post("/{agent_id}/invoke")
 @router.post("/invoke")
-async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT) -> ChatMessage:
+async def invoke(
+    user_input: UserInput, agent_id: str = DEFAULT_AGENT
+) -> Dict[str, Any]:
     """
     Invoke an agent with user input to retrieve a final response.
 
@@ -176,92 +116,40 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT) -> ChatMe
     kwargs, run_id = await _handle_input(user_input, agent)
 
     try:
-        response_events: list[tuple[str, Any]] = await agent.ainvoke(**kwargs, stream_mode=["updates", "values"])  # type: ignore # fmt: skip
-        response_type, response = response_events[-1]
+        # TODO: Uncomment this when using real LangGraph API
+        # response_events: list[tuple[str, Any]] = await agent.ainvoke(**kwargs, stream_mode=["updates", "values"])
+        # response_type, response = response_events[-1]
+
+        # TODO: Remove this once we have a real response
+        response_type = "values"
+        response = cached_response
+
         if response_type == "values":
             # Normal response, the agent completed successfully
             output = langchain_to_chat_message(response["messages"][-1])
+            output.run_id = str(run_id)
+            return build_success_response(
+                data=output, message="Agent invoked successfully"
+            )
         elif response_type == "updates" and "__interrupt__" in response:
             # The last thing to occur was an interrupt
             # Return the value of the first interrupt as an AIMessage
             output = langchain_to_chat_message(
                 AIMessage(content=response["__interrupt__"][0].value)
             )
+            output.run_id = str(run_id)
+            return build_success_response(
+                data=output,
+                message="Agent processing interrupted - user input required",
+            )
         else:
             raise ValueError(f"Unexpected response type: {response_type}")
 
-        output.run_id = str(run_id)
-        return output
     except Exception as e:
         logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=500, detail="Unexpected error")
-
-
-# @router.post("/rag/query")
-# async def rag_query(request: RAGQueryRequest) -> Dict[str, Any]:
-#     """Query the RAG system."""
-#     try:
-#         response = await query_rag(request.question, request.k)
-
-#         return build_success_response(
-#             data={
-#                 "question": request.question,
-#                 "response": response,
-#                 "k": request.k
-#             },
-#             message="RAG query processed successfully"
-#         )
-
-#     except Exception as e:
-#         return build_error_response(
-#             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             message="Failed to process RAG query",
-#             details=str(e)
-#         )
-
-
-# @router.post("/rag/documents")
-# async def add_documents(request: DocumentAddRequest) -> Dict[str, Any]:
-#     """Add documents to the RAG system."""
-#     try:
-#         await add_documents_to_rag(request.documents, request.metadata)
-
-#         return build_success_response(
-#             data={
-#                 "documents_added": len(request.documents),
-#                 "metadata_provided": request.metadata is not None
-#             },
-#             message="Documents added to RAG system successfully"
-#         )
-
-#     except Exception as e:
-#         return build_error_response(
-#             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             message="Failed to add documents to RAG system",
-#             details=str(e)
-#         )
-
-
-# @router.get("/rag/info")
-# async def rag_info() -> Dict[str, Any]:
-#     """Get information about the RAG system."""
-#     try:
-#         from ...ai.rag import get_rag_pipeline
-#         pipeline = get_rag_pipeline()
-#         doc_count = await pipeline.get_document_count()
-
-#         return build_success_response(
-#             data={
-#                 "document_count": doc_count,
-#                 "vector_store_type": "ChromaDB (in-memory)",
-#                 "embedding_model": "sentence-transformers/all-MiniLM-L6-v2"
-#             },
-#             message="RAG system information retrieved successfully"
-#         )
-
-#     except Exception as e:
-#         return build_error_response(
-#             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             message="Failed to retrieve RAG information",
-#             details=str(e)
-#         )
+        error_details = transform_langgraph_error_response(str(e))
+        return build_error_response(
+            code=error_details["code"],
+            message=error_details["message"],
+            details=error_details["details"],
+        )

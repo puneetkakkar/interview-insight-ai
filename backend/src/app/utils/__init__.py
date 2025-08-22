@@ -3,9 +3,9 @@ from langchain_core.messages import (
     AIMessage,
     HumanMessage,
     ToolMessage,
-    LangchainChatMessage,
 )
-from app.schemas.agent import ChatMessage
+from typing import Any, Dict
+from ..schemas.agent import ChatMessage
 
 
 def convert_message_content_to_string(content: str | list[str | dict]) -> str:
@@ -47,15 +47,40 @@ def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
                 tool_call_id=message.tool_call_id,
             )
             return tool_message
-        case LangchainChatMessage():
-            if message.role == "custom":
-                custom_message = ChatMessage(
-                    type="custom",
-                    content="",
-                    custom_data=message.content[0],
-                )
-                return custom_message
-            else:
-                raise ValueError(f"Unsupported chat message role: {message.role}")
         case _:
             raise ValueError(f"Unsupported message type: {message.__class__.__name__}")
+
+
+def transform_langgraph_error_response(error_message: str) -> Dict[str, Any]:
+    """Transform LangGraph API error response to standard error format."""
+    # Parse common error patterns
+    if "credit balance is too low" in error_message:
+        return {
+            "code": 402,  # Payment Required
+            "message": "Insufficient credits to access the AI service",
+            "details": "Your credit balance is too low to access the Anthropic API. Please upgrade your plan or purchase more credits."
+        }
+    elif "Error code: 400" in error_message:
+        return {
+            "code": 400,  # Bad Request
+            "message": "Invalid request to AI service",
+            "details": error_message
+        }
+    elif "Error code: 401" in error_message:
+        return {
+            "code": 401,  # Unauthorized
+            "message": "Authentication failed with AI service",
+            "details": error_message
+        }
+    elif "Error code: 429" in error_message:
+        return {
+            "code": 429,  # Too Many Requests
+            "message": "Rate limit exceeded for AI service",
+            "details": error_message
+        }
+    else:
+        return {
+            "code": 500,  # Internal Server Error
+            "message": "Unexpected error occurred while processing request",
+            "details": error_message
+        }
