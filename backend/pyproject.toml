@@ -21,6 +21,16 @@ dependencies = [
     "greenlet>=2.0.2",
     "python-json-logger>=2.0.7",
     "gunicorn>=21.2.0",
+    "numexpr>=2.11.0",
+    # AI and LangGraph dependencies
+    "langgraph>=0.3.0",
+    "langchain>=0.3.0",
+    "langchain-anthropic>=0.3.0",
+    "langchain-community>=0.3.0",
+    "langchain-core>=0.3.0",
+    "chromadb>=0.5.0",
+    "sentence-transformers>=3.0.0",
+    "torch>=2.0.0",
 ]
 
 [project.optional-dependencies]
