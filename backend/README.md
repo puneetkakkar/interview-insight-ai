@@ -18,6 +18,14 @@ A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V
 - **Health Checks**: Built-in health monitoring endpoints
 - **Exception Handling**: Centralized error handling with custom exceptions
 
+### 🤖 AI Features
+
+- **LangGraph Multi-Agent System**: Lightweight multi-agent architecture using LangGraph v0.3
+- **Claude Integration**: Anthropic Claude 3.5 Sonnet integration via API
+- **RAG Pipeline**: Retrieval-Augmented Generation with ChromaDB in-memory vector store
+- **Research Agent**: Pre-configured research assistant with calculator and web search tools
+- **Extensible Architecture**: Easy to add new agents and tools via Claude prompts
+
 ## 🏗️ Architecture
 
 The project follows a clean, layered architecture:
@@ -42,6 +50,23 @@ src/
 - **API Routes**: RESTful endpoints with proper error handling
 - **Dependencies**: FastAPI dependency injection system
 - **Configuration**: Environment-based settings management
+
+### AI Architecture
+
+The AI module provides a lightweight, extensible foundation for AI-powered features:
+
+```
+src/app/ai/
+├── __init__.py      # Module initialization
+├── agents.py        # Multi-agent system with LangGraph
+└── rag.py          # RAG pipeline with ChromaDB
+```
+
+- **Multi-Agent System**: Dictionary-based agent registry with LangGraph integration
+- **Research Agent**: Pre-configured agent with calculator and web search tools
+- **RAG Pipeline**: In-memory vector store with sentence transformers embeddings
+- **Claude Integration**: Anthropic API integration for natural language generation
+- **Extensible Design**: Easy to add new agents, tools, and capabilities
 
 ## 📋 Prerequisites
 
@@ -95,6 +120,18 @@ Or using pip:
 pip install -r requirements.txt
 ```
 
+### 4. AI Configuration
+
+For AI features, you'll need an Anthropic API key:
+
+1. Get your API key from [Anthropic Console](https://console.anthropic.com/)
+2. Add it to your `.env` file:
+```bash
+ANTHROPIC_API_KEY=your-anthropic-api-key-here
+```
+
+**Note**: AI features work without an API key in development mode using mocked responses for testing.
+
 ## 🚀 Quick Start
 
 ### Development Environment
@@ -133,6 +170,36 @@ Once the application is running, you can access:
 - **Health Check**: http://localhost:8000/health
 - **API Info**: http://localhost:8000/info
 
+### 🤖 AI API Endpoints
+
+The AI module provides the following endpoints:
+
+#### Agents
+- `GET /api/v1/agent/` - List all available agents
+- `POST /api/v1/agent/{agent_name}/invoke` - Invoke a specific agent
+
+#### RAG System
+- `POST /api/v1/agent/rag/query` - Query the RAG system
+- `POST /api/v1/agent/rag/documents` - Add documents to RAG
+- `GET /api/v1/agent/rag/info` - Get RAG system information
+
+#### Example Usage
+
+```bash
+# List available agents
+curl http://localhost:8000/api/v1/agent/
+
+# Invoke research agent
+curl -X POST http://localhost:8000/api/v1/agent/research/invoke \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is 2+2?"}'
+
+# Query RAG system
+curl -X POST http://localhost:8000/api/v1/agent/rag/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What is FRAI?", "k": 3}'
+```
+
 ## 🗄️ Database Management
 
 ### Migrations
@@ -168,6 +235,14 @@ postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}
 make test
 ```
 
+### Run AI Tests
+
+```bash
+make test-ai      # Run AI-related tests only
+make test-core    # Run core application tests only
+make test-all     # Run all tests with coverage
+```
+
 ### Run Tests with Coverage
 
 ```bash
@@ -183,6 +258,58 @@ make test-env
 ### Test Coverage Report
 
 After running coverage, you'll find an HTML report in the `htmlcov/` directory.
+
+## 🤖 AI Development
+
+### Adding New Agents
+
+To add a new agent, extend the agents dictionary in `src/app/ai/agents.py`:
+
+```python
+# Add your new agent
+agents["custom"] = Agent(
+    description="A custom agent for specific tasks.",
+    graph=create_custom_agent()
+)
+```
+
+### Adding New Tools
+
+Extend the tools list in your agent creation function:
+
+```python
+def create_custom_agent():
+    # Add your custom tools
+    custom_tools = [your_custom_tool, another_tool]
+    
+    # Create agent with tools
+    agent = StateGraph(AgentState)
+    agent.add_node("tools", ToolNode(custom_tools))
+    # ... rest of agent setup
+```
+
+### Extending RAG Pipeline
+
+The RAG pipeline is designed for easy extension:
+
+```python
+# Add custom document loaders
+await rag_pipeline.add_documents(["Your document content"])
+
+# Customize embeddings
+pipeline.embeddings = YourCustomEmbeddings()
+
+# Add custom retrieval logic
+docs = pipeline.vector_store.similarity_search_with_score(query, k=5)
+```
+
+### Claude Prompt Engineering
+
+Use Claude prompts to extend functionality:
+
+- **Add Database Tools**: "Prompt Claude to add database query tools to the research agent"
+- **Custom RAG**: "Prompt Claude to create a specialized RAG pipeline for technical documentation"
+- **New Agent Types**: "Prompt Claude to design a workflow agent for business processes"
 
 ## 🐳 Docker Commands
 
@@ -248,8 +375,14 @@ frai-be/
 │       └── docker-compose.prod.yml
 ├── src/                            # Source code
 │   └── app/
+│       ├── ai/                     # AI and LangGraph modules
+│       │   ├── __init__.py         # AI module initialization
+│       │   ├── agents.py           # Multi-agent system
+│       │   └── rag.py             # RAG pipeline
 │       ├── api/                    # API endpoints
 │       │   └── v1/                 # API version 1
+│       │       ├── items.py        # Items API
+│       │       └── agent.py        # AI Agent API
 │       ├── core/                   # Core application logic
 │       │   ├── config.py           # Configuration management
 │       │   ├── db/                 # Database setup
@@ -287,6 +420,7 @@ frai-be/
 | `POSTGRES_USER` | PostgreSQL username | `postgres` |
 | `POSTGRES_PASSWORD` | PostgreSQL password | `postgres` |
 | `SECRET_KEY` | JWT secret key | `your-secret-key-here` |
+| `ANTHROPIC_API_KEY` | Anthropic API key for Claude | `None` (optional) |
 
 ### Database Configuration
 

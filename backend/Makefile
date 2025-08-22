@@ -18,6 +18,9 @@ dev-logs: ## Tail development logs
 test: ## Run all tests locally
 	uv run pytest tests/ -v
 
+test-all: ## Run all tests with coverage
+	uv run pytest tests/ --cov=src --cov-report=term-missing --cov-report=html -v
+
 test-env: ## Run tests in dedicated testing environment
 	@echo "Starting testing environment..."
 	docker compose -f docker/test/docker-compose.test.yml up -d --build
