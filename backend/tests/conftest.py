@@ -1,13 +1,11 @@
 import asyncio
 import os
-from typing import AsyncGenerator, Generator
+from typing import Generator
 from unittest.mock import MagicMock
 
 import pytest
-import pytest_asyncio
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.api.v1 import items
 from src.app.core.setup import (
