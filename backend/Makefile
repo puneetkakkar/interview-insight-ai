@@ -26,10 +26,12 @@ test-env: ## Run tests in dedicated testing environment
 	docker compose -f docker/test/docker-compose.test.yml up -d --build
 	@echo "Waiting for containers to be ready..."
 	@sleep 10
+	@echo "Creating virtual environment inside container..."
+	docker compose -f docker/test/docker-compose.test.yml exec -T api-test uv venv
 	@echo "Installing test dependencies..."
 	docker compose -f docker/test/docker-compose.test.yml exec -T api-test uv pip install pytest pytest-asyncio pytest-mock pytest-cov faker aiosqlite
 	@echo "Running tests..."
-	docker compose -f docker/test/docker-compose.test.yml exec -T api-test uv run pytest tests/ -v
+	docker compose -f docker/test/docker-compose.test.yml exec -T api-test uv run --active pytest tests/ --cov=src --cov-report=term-missing --cov-report=html -v
 	@echo "Tests completed. Stopping testing environment..."
 	@$(MAKE) test-down
 
