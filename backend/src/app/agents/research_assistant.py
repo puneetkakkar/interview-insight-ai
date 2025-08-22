@@ -13,8 +13,9 @@ from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.managed import RemainingSteps
 from langgraph.prebuilt import ToolNode
 
-from agents.tools import calculator
-from core import get_model, settings
+from src.app.core.llm import get_model
+from src.app.core.config import settings
+from .tools import calculator
 
 
 class AgentState(MessagesState, total=False):
@@ -31,11 +32,11 @@ tools = [web_search, calculator]
 
 # Add weather tool if API key is set
 # Register for an API key at https://openweathermap.org/api/
-if settings.OPENWEATHERMAP_API_KEY:
-    wrapper = OpenWeatherMapAPIWrapper(
-        openweathermap_api_key=settings.OPENWEATHERMAP_API_KEY.get_secret_value()
-    )
-    tools.append(OpenWeatherMapQueryRun(name="Weather", api_wrapper=wrapper))
+# if settings.OPENWEATHERMAP_API_KEY:
+#     wrapper = OpenWeatherMapAPIWrapper(
+#         openweathermap_api_key=settings.OPENWEATHERMAP_API_KEY.get_secret_value()
+#     )
+#     tools.append(OpenWeatherMapQueryRun(name="Weather", api_wrapper=wrapper))
 
 current_date = datetime.now().strftime("%B %d, %Y")
 instructions = f"""
