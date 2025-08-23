@@ -1,12 +1,7 @@
 "use client";
 
-import { EntityCards } from "@/components/entity-cards";
-import { InteractiveTimeline } from "@/components/interactive-timeline";
-import { SentimentAnalysis } from "@/components/sentiment-analysis";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Textarea } from "@/components/ui/textarea";
 import type {
@@ -14,23 +9,48 @@ import type {
   TranscriptAnalysisResponse,
   TranscriptInput,
 } from "@/types/interview";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   Bot,
-  Clock,
-  FileText,
   ListTree,
   NotepadText,
   Send,
   Sparkles,
-  TrendingUp,
   UploadCloud,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState, Fragment } from "react";
+import { useRouter } from "next/navigation";
+import { Fragment, useEffect, useRef, useState } from "react";
+
+// Data for the process stepper
+const processSteps = [
+  {
+    key: "upload",
+    number: "1",
+    title: "Upload",
+    description: "Drop in raw text or upload a .txt, .docx, or .pdf file.",
+    Icon: UploadCloud,
+  },
+  {
+    key: "analyze",
+    number: "2",
+    title: "Analyze",
+    description:
+      "We auto-extract highlights, entities, and other key insights.",
+    Icon: Bot,
+  },
+  {
+    key: "summarize",
+    number: "3",
+    title: "Summarize",
+    description: "See a timeline of the story with topics and timestamps.",
+    Icon: ListTree,
+  },
+];
 
 export function TranscriptAnalyzer() {
+  const router = useRouter();
   const [state, setState] = useState<InterviewSummaryState>({
     transcript: "",
     summary: null,
@@ -99,10 +119,12 @@ export function TranscriptAnalyzer() {
       if (analysisData.success && analysisData.data) {
         // Persist briefly for the analysis page
         try {
-          sessionStorage.setItem("analysis:summary", JSON.stringify(analysisData.data));
+          sessionStorage.setItem(
+            "analysis:summary",
+            JSON.stringify(analysisData.data),
+          );
         } catch {}
-        // Do not drop loading here; navigate immediately to avoid layout shift
-        window.location.assign("/analysis");
+        router.push("/analysis");
       } else {
         setState((prev) => ({
           ...prev,
@@ -121,36 +143,10 @@ export function TranscriptAnalyzer() {
 
   const handleClear = () => {
     setState({ transcript: "", summary: null, isLoading: false, error: null });
-    try { sessionStorage.removeItem("analysis:summary"); } catch {}
+    try {
+      sessionStorage.removeItem("analysis:summary");
+    } catch {}
   };
-
-  // Data for the process stepper
-  const processSteps = [
-    {
-      key: "upload",
-      number: "1",
-      title: "Upload",
-      description:
-        "Drop in raw text or upload a .txt, .docx, or .pdf file.",
-      Icon: UploadCloud,
-    },
-    {
-      key: "analyze",
-      number: "2",
-      title: "Analyze",
-      description:
-        "We auto-extract highlights, entities, and other key insights.",
-      Icon: Bot,
-    },
-    {
-      key: "summarize",
-      number: "3",
-      title: "Summarize",
-      description:
-        "See a timeline of the story with topics and timestamps.",
-      Icon: ListTree,
-    },
-  ];
 
   return (
     <div className="space-y-16">
@@ -298,28 +294,32 @@ export function TranscriptAnalyzer() {
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 className="max-w-xs text-center"
               >
-                <div className="mb-1 text-md font-semibold text-white">{step.title}</div>
+                <div className="text-md mb-1 font-semibold text-white">
+                  {step.title}
+                </div>
                 <p className="mx-auto max-w-[22rem] text-sm leading-relaxed text-white/75">
-                  {step.title === 'Upload'
-                    ? 'Paste in your interview transcript.'
-                    : step.title === 'Analyze'
-                    ? 'Our AI digs into the conversation.'
-                    : 'See the story unfold in a timeline.'}
+                  {step.title === "Upload"
+                    ? "Paste in your interview transcript."
+                    : step.title === "Analyze"
+                      ? "Our AI digs into the conversation."
+                      : "See the story unfold in a timeline."}
                 </p>
-                <p className="mx-auto max-w-md text-xs leading-relaxed text-white/40">{step.description}</p>
+                <p className="mx-auto max-w-md text-xs leading-relaxed text-white/40">
+                  {step.description}
+                </p>
               </motion.div>
 
               {index < processSteps.length - 1 && (
-                <div className="hidden sm:flex items-center justify-center">
-                  <div className="h-12 w-12 cursor-pointer rounded-full border border-white/20 text-white/70 transition hover:translate-x-0.5 hover:text-white flex items-center justify-center">
+                <div className="hidden items-center justify-center sm:flex">
+                  <div className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/20 text-white/70 transition hover:translate-x-0.5 hover:text-white">
                     <ArrowRight className="h-5 w-5" />
                   </div>
                 </div>
               )}
 
               {index < processSteps.length - 1 && (
-                <div className="sm:hidden -my-2 flex w-full items-center justify-center">
-                  <div className="h-10 w-10 cursor-pointer rounded-full border border-white/15 text-white/60 rotate-90 flex items-center justify-center">
+                <div className="-my-2 flex w-full items-center justify-center sm:hidden">
+                  <div className="flex h-10 w-10 rotate-90 cursor-pointer items-center justify-center rounded-full border border-white/15 text-white/60">
                     <ArrowRight className="h-4 w-4" />
                   </div>
                 </div>
@@ -328,142 +328,6 @@ export function TranscriptAnalyzer() {
           ))}
         </div>
       </section>
-
-      {/* Results Section */}
-      <AnimatePresence>
-        {state.summary && !state.isLoading && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
-          >
-            {/* Summary Header */}
-            <div className="mx-auto w-full max-w-6xl space-y-2 text-center">
-              <motion.h2
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-2xl font-semibold text-slate-900 dark:text-slate-100"
-              >
-                Analysis Results
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="mx-auto max-w-2xl text-sm text-slate-600 dark:text-slate-400"
-              >
-                Your interview has been processed. Review the highlights below.
-              </motion.p>
-            </div>
-
-            {/* Key Metrics */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 md:grid-cols-3"
-            >
-              <Card className="border border-slate-200/80 bg-white/60 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
-                <CardContent className="pt-5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                      Overall Sentiment
-                    </span>
-                    <TrendingUp className="h-4 w-4 text-slate-400" />
-                  </div>
-                  <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                    {state.summary.overall_sentiment}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {state.summary.total_duration && (
-                <Card className="border border-slate-200/80 bg-white/60 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
-                  <CardContent className="pt-5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                        Duration
-                      </span>
-                      <Clock className="h-4 w-4 text-slate-400" />
-                    </div>
-                    <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                      {state.summary.total_duration}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              <Card className="border border-slate-200/80 bg-white/60 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
-                <CardContent className="pt-5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                      Timeline Events
-                    </span>
-                    <FileText className="h-4 w-4 text-slate-400" />
-                  </div>
-                  <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                    {state.summary.timeline.length}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Key Topics */}
-            {state.summary.key_topics.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <Card className="mx-auto w-full max-w-6xl border border-slate-200/80 bg-white/60 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
-                  <CardHeader>
-                    <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                      Key Topics
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {state.summary.key_topics.map((topic, index) => (
-                        <motion.div
-                          key={topic}
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.55 + index * 0.05 }}
-                        >
-                          <Badge
-                            variant="outline"
-                            className="rounded-full border-slate-200 px-3 py-1 text-xs text-slate-700 dark:border-slate-700 dark:text-slate-300"
-                          >
-                            {topic}
-                          </Badge>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-
-            {/* Entity Cards */}
-            <div className="mx-auto w-full max-w-6xl">
-              <EntityCards entities={state.summary.entities} />
-            </div>
-
-            {/* Sentiment Analysis */}
-            <div className="mx-auto w-full max-w-6xl">
-              <SentimentAnalysis sentiment={state.summary.sentiment_analysis} />
-            </div>
-
-            {/* Interactive Timeline */}
-            <div className="mx-auto w-full max-w-6xl">
-              <InteractiveTimeline timeline={state.summary.timeline} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

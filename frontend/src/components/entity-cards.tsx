@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Users, Building, Code, MapPin } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { EntityExtraction } from "@/types/interview";
+import { motion } from "framer-motion";
+import { Building, Code, MapPin, Users } from "lucide-react";
 
 interface EntityCardsProps {
   entities: EntityExtraction;
@@ -20,7 +20,7 @@ const entityTypes = [
     darkBgGradient: "",
     borderColor: "",
     textColor: "",
-    badgeColor: ""
+    badgeColor: "",
   },
   {
     key: "companies" as keyof EntityExtraction,
@@ -31,7 +31,7 @@ const entityTypes = [
     darkBgGradient: "",
     borderColor: "",
     textColor: "",
-    badgeColor: ""
+    badgeColor: "",
   },
   {
     key: "technologies" as keyof EntityExtraction,
@@ -42,7 +42,7 @@ const entityTypes = [
     darkBgGradient: "",
     borderColor: "",
     textColor: "",
-    badgeColor: ""
+    badgeColor: "",
   },
   {
     key: "locations" as keyof EntityExtraction,
@@ -53,13 +53,15 @@ const entityTypes = [
     darkBgGradient: "",
     borderColor: "",
     textColor: "",
-    badgeColor: ""
-  }
+    badgeColor: "",
+  },
 ];
 
 export function EntityCards({ entities }: EntityCardsProps) {
-  const hasEntities = entityTypes.some(type => entities[type.key].length > 0);
-  const availableEntities = entityTypes.filter(type => entities[type.key].length > 0);
+  const hasEntities = entityTypes.some((type) => entities[type.key].length > 0);
+  const availableEntities = entityTypes.filter(
+    (type) => entities[type.key].length > 0,
+  );
 
   if (!hasEntities) {
     return null;
@@ -81,8 +83,12 @@ export function EntityCards({ entities }: EntityCardsProps) {
       className="space-y-6"
     >
       <div className="text-center">
-        <h3 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">Entities</h3>
-        <p className="text-sm text-slate-600 dark:text-slate-400">Automatically identified people, companies, tech, and locations</p>
+        <h3 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">
+          Entities
+        </h3>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          Automatically identified people, companies, tech, and locations
+        </p>
       </div>
 
       <div className={`grid ${getGridCols(availableEntities.length)} gap-6`}>
@@ -98,16 +104,16 @@ export function EntityCards({ entities }: EntityCardsProps) {
               transition={{ delay: 0.7 + index * 0.1 }}
               className="h-full"
             >
-              <Card className="h-full border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
+              <Card className="h-full border border-slate-200/80 bg-white/60 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-100">
-                    <div className="p-2 rounded-md border border-slate-200/80 dark:border-slate-800">
-                      <type.icon className="w-4 h-4 text-slate-500" />
+                    <div className="rounded-md border border-slate-200/80 p-2 dark:border-slate-800">
+                      <type.icon className="h-4 w-4 text-slate-500" />
                     </div>
                     <span>{type.title}</span>
                     <Badge
                       variant="outline"
-                      className="ml-auto rounded-full border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2 py-0.5"
+                      className="ml-auto rounded-full border-slate-200 px-2 py-0.5 text-xs text-slate-600 dark:border-slate-700 dark:text-slate-300"
                     >
                       {entityList.length}
                     </Badge>
@@ -121,11 +127,13 @@ export function EntityCards({ entities }: EntityCardsProps) {
                         key={entity}
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.75 + index * 0.08 + entityIndex * 0.03 }}
+                        transition={{
+                          delay: 0.75 + index * 0.08 + entityIndex * 0.03,
+                        }}
                       >
                         <Badge
                           variant="outline"
-                          className="rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs px-3 py-1"
+                          className="rounded-full border-slate-200 px-3 py-1 text-xs text-slate-700 dark:border-slate-700 dark:text-slate-300"
                         >
                           {entity}
                         </Badge>

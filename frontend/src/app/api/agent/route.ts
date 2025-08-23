@@ -1,6 +1,6 @@
+import { env } from "@/env";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { env } from "@/env";
 
 interface AgentQueryRequest {
   agent_name?: string;
@@ -59,7 +59,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { message, agent_config, agent_name } = body as unknown as AgentQueryRequest;
+    const { message, agent_config, agent_name } =
+      body as unknown as AgentQueryRequest;
 
     const response = await fetch(
       `${env.BACKEND_URL}/api/v1/agent/${agent_name}/invoke`,
