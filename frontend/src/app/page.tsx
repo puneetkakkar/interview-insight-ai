@@ -1,5 +1,4 @@
 import { HeroSection } from "@/components/hero-section";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { TranscriptAnalyzer } from "@/components/transcript-analyzer";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Suspense } from "react";
@@ -7,11 +6,6 @@ import { Suspense } from "react";
 export default function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-slate-50 to-coral-50 dark:from-blue-950 dark:via-black dark:to-slate-950">
-      {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
-
       {/* Hero Section */}
       <HeroSection />
 
