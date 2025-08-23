@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/hero-section";
 import { TranscriptAnalyzer } from "@/components/transcript-analyzer";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Suspense } from "react";
+import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
@@ -15,6 +16,8 @@ export default function Home() {
           <TranscriptAnalyzer />
         </Suspense>
       </main>
+
+      <Footer />
     </div>
   );
 }

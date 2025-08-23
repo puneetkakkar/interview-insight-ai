@@ -23,15 +23,16 @@ export default function AnalysisPage() {
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <button
-            onClick={() => {
-              try { sessionStorage.removeItem("analysis:summary"); } catch {}
-              router.push("/");
-            }}
-            className="rounded-full border border-white/15 px-4 py-1.5 text-sm text-white/80 hover:bg-white/5"
-          >
-            ← Back
+              onClick={() => {
+                try { sessionStorage.removeItem("analysis:summary"); } catch {}
+                router.push("/");
+              }}
+              className="rounded-full border border-white/15 px-3 py-1.5 text-sm text-white/80 hover:bg-white/5 cursor-pointer"
+            >
+              <span className="sm:hidden" aria-hidden>←</span>
+              <span className="hidden items-center gap-2 sm:inline-flex">← <span>Back</span></span>
             </button>
-            <h1 className="text-base font-semibold text-white/90 sm:text-lg">Interview Insights</h1>
+            <h1 className="truncate text-base font-semibold text-white/90 sm:text-lg">Interview Insights</h1>
           </div>
           {summary && (
             <button
@@ -39,7 +40,7 @@ export default function AnalysisPage() {
                 try { sessionStorage.removeItem("analysis:summary"); } catch {}
                 router.push("/");
               }}
-              className="rounded-full bg-[#00A3E0] px-4 py-1.5 text-sm text-black hover:bg-[#14b5f1]"
+              className="rounded-full bg-[#00A3E0] px-3 py-1.5 text-xs sm:text-sm text-black hover:bg-[#14b5f1] cursor-pointer"
             >
               New Analysis
             </button>

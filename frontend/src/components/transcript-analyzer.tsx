@@ -311,7 +311,7 @@ export function TranscriptAnalyzer() {
 
               {index < processSteps.length - 1 && (
                 <div className="hidden sm:flex items-center justify-center">
-                  <div className="h-12 w-12 rounded-full border border-white/20 text-white/70 transition hover:translate-x-0.5 hover:text-white flex items-center justify-center">
+                  <div className="h-12 w-12 cursor-pointer rounded-full border border-white/20 text-white/70 transition hover:translate-x-0.5 hover:text-white flex items-center justify-center">
                     <ArrowRight className="h-5 w-5" />
                   </div>
                 </div>
@@ -319,7 +319,7 @@ export function TranscriptAnalyzer() {
 
               {index < processSteps.length - 1 && (
                 <div className="sm:hidden -my-2 flex w-full items-center justify-center">
-                  <div className="h-10 w-10 rounded-full border border-white/15 text-white/60 flex items-center justify-center">
+                  <div className="h-10 w-10 cursor-pointer rounded-full border border-white/15 text-white/60 rotate-90 flex items-center justify-center">
                     <ArrowRight className="h-4 w-4" />
                   </div>
                 </div>

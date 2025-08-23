@@ -184,6 +184,12 @@ body {
 /* Smooth transitions */
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  cursor: inherit;
+}
+
+/* ensure interactive elements show pointer */
+button, [role="button"], .cursor-pointer {
+  cursor: pointer;
 }
 
 /* Focus styles */
