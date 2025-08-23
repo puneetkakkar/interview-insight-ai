@@ -26,7 +26,7 @@ export function HeroSection() {
   return (
     <section className="relative container mx-auto -mt-8 overflow-hidden px-4 pt-20 pb-32">
       {/* Hero Content */}
-      <div className="relative z-10 container mx-auto">
+      <div className="relative z-10 mx-auto w-full max-w-6xl">
         <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Left Column - Text Content */}
           <motion.div
@@ -52,7 +52,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-3xl leading-tight font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
+                className="text-3xl leading-tight font-bold tracking-tight sm:text-4xl md:text-5xl"
               >
                 <span className="to-coral-700 bg-gradient-to-r bg-clip-text text-transparent dark:text-white">
                   Interview Transcript
@@ -169,8 +169,8 @@ export function HeroSection() {
               <Image
                 src="/images/interview-analyzer-image.svg"
                 alt="Interview Transcript Analyzer"
-                width={1000}
-                height={1000}
+                width={600}
+                height={600}
                 className="h-auto w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl"
                 priority
               />

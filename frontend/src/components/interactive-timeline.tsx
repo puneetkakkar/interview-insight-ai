@@ -43,6 +43,7 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"time" | "confidence">("time");
+  const [expandedByIndex, setExpandedByIndex] = useState<Record<number, boolean>>({});
 
   const categories = useMemo(() => {
     const cats = Array.from(new Set(timeline.map((item) => item.category)));
@@ -87,20 +88,16 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
       className="space-y-6"
     >
       <div className="text-center">
-        <h3 className="mb-2 text-2xl font-bold bg-gradient-to-r from-blue-800 to-coral-700 dark:from-blue-200 dark:to-coral-200 bg-clip-text text-transparent">
-          Interview Timeline
-        </h3>
-        <p className="text-slate-600 dark:text-slate-300">
-          Interactive timeline of events and conversations during the interview
-        </p>
+        <h3 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">Timeline</h3>
+        <p className="text-sm text-slate-600 dark:text-slate-400">Browse interview events and filter by type</p>
       </div>
 
       {/* Filters */}
-      <Card className="glass-strong border-0 shadow-xl">
+      <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg bg-gradient-to-r from-blue-800 to-coral-700 dark:from-blue-200 dark:to-coral-200 bg-clip-text text-transparent">
-            <Filter className="h-5 w-5" />
-            Filter & Sort Timeline
+          <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+            <Filter className="h-4 w-4 text-slate-400" />
+            <span>Filters</span>
           </CardTitle>
         </CardHeader>
 
@@ -113,7 +110,7 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
                 placeholder="Search timeline content..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-2 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 rounded-xl transition-all duration-200"
+                className="pl-10 rounded-md border border-slate-200/80 dark:border-slate-800 focus-visible:ring-0 focus:border-slate-400 dark:focus:border-slate-600 bg-white/80 dark:bg-slate-900/80"
               />
             </div>
 
@@ -122,13 +119,13 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
               value={selectedCategory}
               onValueChange={setSelectedCategory}
             >
-              <SelectTrigger className="w-full sm:w-48 border-2 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 rounded-xl transition-all duration-200">
+              <SelectTrigger className="w-full sm:w-48 rounded-md border border-slate-200/80 dark:border-slate-800 focus:ring-0 focus:border-slate-400 dark:focus:border-slate-600 bg-white/80 dark:bg-slate-900/80">
                 <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
-                <SelectItem value="all" className="hover:bg-blue-50 dark:hover:bg-blue-950/30">All Categories</SelectItem>
+              <SelectContent className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md shadow-lg">
+                <SelectItem value="all" className="hover:bg-slate-50 dark:hover:bg-slate-800">All Categories</SelectItem>
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category} className="hover:bg-blue-50 dark:hover:bg-blue-950/30">
+                  <SelectItem key={category} value={category} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                     {category
                       .replace(/_/g, " ")
                       .replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -144,12 +141,12 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
                 setSortBy(value as "time" | "confidence")
               }
             >
-              <SelectTrigger className="w-full sm:w-48 border-2 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 rounded-xl transition-all duration-200">
+              <SelectTrigger className="w-full sm:w-48 rounded-md border border-slate-200/80 dark:border-slate-800 focus:ring-0 focus:border-slate-400 dark:focus:border-slate-600 bg-white/80 dark:bg-slate-900/80">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
-                <SelectItem value="time" className="hover:bg-blue-50 dark:hover:bg-blue-950/30">Sort by Time</SelectItem>
-                <SelectItem value="confidence" className="hover:bg-blue-50 dark:hover:bg-blue-950/30">Sort by Confidence</SelectItem>
+              <SelectContent className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-md shadow-lg">
+                <SelectItem value="time" className="hover:bg-slate-50 dark:hover:bg-slate-800">Sort by Time</SelectItem>
+                <SelectItem value="confidence" className="hover:bg-slate-50 dark:hover:bg-slate-800">Sort by Confidence</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -164,7 +161,7 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setSearchTerm("")}
-                className="h-auto p-1 text-xs hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+                className="h-auto p-1 text-xs hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md"
               >
                 <X className="w-3 h-3 mr-1" />
                 Clear search
@@ -175,28 +172,26 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
       </Card>
 
       {/* Timeline */}
-      <div className="space-y-6">
-        {filteredAndSortedTimeline.map((entry, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.9 + index * 0.05 }}
-            className="relative"
-          >
-            {/* Timeline line */}
-            {index < filteredAndSortedTimeline.length - 1 && (
-              <div className="absolute top-16 left-6 h-16 w-0.5 bg-gradient-to-b from-blue-300 via-coral-300 to-slate-300 dark:from-blue-600 dark:via-coral-600 dark:to-slate-600" />
-            )}
+      <div className="relative">
+        {/* Continuous rail */}
+        <div className="absolute inset-y-0 left-6 w-px bg-slate-200 dark:bg-slate-700" />
 
-            <Card className="ml-12 glass-strong border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  {/* Timeline dot */}
-                  <div className="absolute top-6 -left-6 flex h-12 w-12 items-center justify-center rounded-full border-4 border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-900 shadow-lg group-hover:border-coral-300 dark:group-hover:border-coral-600 transition-colors duration-200">
-                    <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:text-coral-600 dark:group-hover:text-coral-400 transition-colors duration-200" />
-                  </div>
+        <div className="space-y-6">
+          {filteredAndSortedTimeline.map((entry, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.9 + index * 0.05 }}
+              className="relative pl-14"
+            >
+              {/* Node */}
+              <div className="absolute top-5 left-6 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <Clock className="h-4 w-4 text-slate-500" />
+              </div>
 
+              <Card className="border border-slate-200/80 bg-white/60 shadow-sm hover:shadow-md transition-all duration-200 dark:border-slate-800 dark:bg-slate-900/60">
+                <CardContent className="p-5">
                   <div className="flex-1 space-y-3">
                     {/* Header */}
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -204,7 +199,7 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
                         {entry.timestamp && (
                           <Badge
                             variant="outline"
-                            className="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 font-mono text-xs border-slate-300 dark:border-slate-600 rounded-full"
+                            className="font-mono text-xs rounded-full border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-300"
                           >
                             {entry.timestamp}
                           </Badge>
@@ -213,7 +208,7 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
                         <Badge
                           className={`${categoryColors[
                             entry.category as keyof typeof categoryColors
-                          ] || categoryColors.discussion} border-2 rounded-full font-medium`}
+                          ] || categoryColors.discussion} rounded-full font-medium border`}
                         >
                           {entry.category
                             .replace(/_/g, " ")
@@ -232,20 +227,46 @@ export function InteractiveTimeline({ timeline }: InteractiveTimelineProps) {
                       )}
                     </div>
 
-                    {/* Content */}
-                    <p className="leading-relaxed text-slate-700 dark:text-slate-300">
-                      {entry.content}
-                    </p>
+                    {/* Content with smart truncation */}
+                    {(() => {
+                      const MAX_CHARS = 160;
+                      const isExpanded = !!expandedByIndex[index];
+                      const content = entry.content ?? "";
+                      const isLong = content.length > MAX_CHARS;
+                      const text = isExpanded || !isLong ? content : `${content.slice(0, MAX_CHARS)}…`;
+                      return (
+                        <div>
+                          <p className="break-words leading-relaxed text-slate-700 dark:text-slate-300">
+                            {text}
+                          </p>
+                          {isLong && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto px-0 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                              onClick={() =>
+                                setExpandedByIndex((prev) => ({
+                                  ...prev,
+                                  [index]: !isExpanded,
+                                }))
+                              }
+                            >
+                              {isExpanded ? "Show less" : "Show more"}
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {filteredAndSortedTimeline.length === 0 && (
-        <Card className="glass-strong border-0 shadow-lg py-12 text-center">
+        <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm py-12 text-center">
           <CardContent>
             <div className="space-y-2 text-slate-400 dark:text-slate-600">
               <Search className="mx-auto h-12 w-12" />

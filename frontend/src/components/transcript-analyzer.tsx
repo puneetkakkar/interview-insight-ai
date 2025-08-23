@@ -122,22 +122,23 @@ export function TranscriptAnalyzer() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Card className="glass-strong border-0 shadow-lg">
-          <CardHeader className="pb-6 text-center">
-            <div className="mb-4 flex items-center justify-center gap-3">
-              <div className="to-coral-100 dark:to-coral-900/40 rounded-full bg-gradient-to-br from-blue-100 p-3 dark:from-blue-900/40">
-                <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+        <div className="mx-auto w-full max-w-6xl">
+          <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
+            <CardHeader className="pb-6 text-center">
+              <div className="mb-4 flex items-center justify-center gap-3">
+                <div className="rounded-md border border-slate-200/80 p-2 dark:border-slate-800">
+                  <FileText className="h-4 w-4 text-slate-500" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                  Analyze Your Interview Transcript
+                </CardTitle>
               </div>
-              <CardTitle className="to-coral-700 bg-gradient-to-r from-blue-800 bg-clip-text text-2xl font-bold text-transparent dark:text-white">
-                Analyze Your Interview Transcript
-              </CardTitle>
-            </div>
-            <p className="mx-auto max-w-2xl text-slate-600 dark:text-slate-500">
-              Paste your interview transcript below and let our AI extract
-              valuable insights, timelines, and sentiment analysis to help you
-              understand the conversation better.
-            </p>
-          </CardHeader>
+              <p className="mx-auto max-w-2xl text-sm text-slate-600 dark:text-slate-400">
+                Paste your interview transcript below and let our AI extract
+                valuable insights, timelines, and sentiment analysis to help you
+                understand the conversation better.
+              </p>
+            </CardHeader>
 
           <CardContent className="space-y-6">
             <div className="space-y-4">
@@ -157,20 +158,18 @@ Example format:
                       error: null,
                     }))
                   }
-                  className="max-h-[400px] min-h-[200px] resize-none rounded-xl border-2 border-slate-200 p-4 text-sm leading-relaxed placeholder-slate-400 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/0 dark:border-slate-500/25 dark:focus:border-blue-400/30"
+                  className="max-h-[400px] min-h-[200px] resize-none rounded-md border border-slate-200/80 bg-white/80 p-4 text-sm leading-relaxed placeholder-slate-400 focus-visible:ring-0 focus:border-slate-400 dark:border-slate-800 dark:bg-slate-900/80 dark:focus:border-slate-600"
                   disabled={state.isLoading}
                 />
 
                 {/* Character count and recommendations */}
-                <div className="mt-2 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+                <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-2">
-                    <div
-                      className={`h-2 w-2 rounded-full ${state.transcript.length > 500 ? "bg-green-500" : "bg-amber-500"}`}
-                    />
+                    <div className={`h-1.5 w-1.5 rounded-full ${state.transcript.length > 500 ? "bg-green-500" : "bg-amber-500"}`} />
                     {state.transcript.length} characters
                   </span>
-                  <span className="flex items-center gap-1 text-xs">
-                    <Sparkles className="h-3 w-3" />
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-slate-400" />
                     {state.transcript.length < 500
                       ? "500+ characters recommended"
                       : "Great length!"}
@@ -185,7 +184,7 @@ Example format:
                   onClick={handleSubmit}
                   disabled={state.isLoading || !state.transcript.trim()}
                   size="lg"
-                  className="to-coral-600 hover:to-coral-700 flex-1 rounded-xl bg-white font-semibold text-blue-950 shadow-lg transition-all duration-200 hover:cursor-pointer hover:from-blue-700 hover:via-blue-800 hover:shadow-xl sm:flex-none"
+                  className="flex-1 rounded-md bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 sm:flex-none"
                 >
                   {state.isLoading ? (
                     <>
@@ -206,7 +205,7 @@ Example format:
                     variant="outline"
                     size="lg"
                     disabled={state.isLoading}
-                    className="rounded-xl border-2 border-slate-300 font-medium transition-all duration-200 hover:cursor-pointer hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-900"
+                    className="rounded-md border border-slate-200/80 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
                   >
                     <X className="mr-2 h-4 w-4" />
                     Clear All
@@ -224,7 +223,7 @@ Example format:
               >
                 <Alert
                   variant="destructive"
-                  className="rounded-xl border-2 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/50"
+                  className="rounded-md border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/50"
                 >
                   <AlertDescription className="flex items-center justify-between">
                     <span>{state.error}</span>
@@ -232,7 +231,7 @@ Example format:
                       onClick={handleSubmit}
                       variant="outline"
                       size="sm"
-                      className="ml-3 rounded-lg border-red-300 text-red-600 hover:bg-red-100 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/50"
+                      className="ml-3 rounded-md border-red-300 text-red-600 hover:bg-red-100 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/50"
                     >
                       Retry
                     </Button>
@@ -248,22 +247,22 @@ Example format:
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
-                <Card className="to-coral-50/50 dark:to-coral-950/30 rounded-xl border-2 border-dashed border-blue-300 bg-gradient-to-br from-blue-50/50 p-8 dark:border-blue-700 dark:from-blue-950/30">
+                <Card className="rounded-md border border-dashed border-slate-300/70 bg-white/50 p-8 dark:border-slate-700/70 dark:bg-slate-900/30">
                   <div className="space-y-4 text-center">
                     <div className="flex items-center justify-center gap-3">
                       <LoadingSpinner size="md" className="p-0" />
-                      <span className="text-lg font-medium text-slate-700 dark:text-slate-300">
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                         Analyzing your interview transcript...
                       </span>
                     </div>
 
                     <div className="mx-auto max-w-md space-y-2">
-                      <div className="to-coral-200 dark:to-coral-800 h-3 animate-pulse rounded-full bg-gradient-to-r from-blue-200 dark:from-blue-800" />
-                      <div className="to-coral-200 dark:to-coral-800 h-3 w-4/5 animate-pulse rounded-full bg-gradient-to-r from-blue-200 dark:from-blue-800" />
-                      <div className="to-coral-200 dark:to-coral-800 h-3 w-3/5 animate-pulse rounded-full bg-gradient-to-r from-blue-200 dark:from-blue-800" />
+                      <div className="h-2 animate-pulse rounded bg-slate-200/80 dark:bg-slate-800/60" />
+                      <div className="h-2 w-4/5 animate-pulse rounded bg-slate-200/80 dark:bg-slate-800/60" />
+                      <div className="h-2 w-3/5 animate-pulse rounded bg-slate-200/80 dark:bg-slate-800/60" />
                     </div>
 
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       This may take a few moments while we extract insights,
                       entities, and sentiment analysis...
                     </p>
@@ -272,7 +271,8 @@ Example format:
               </motion.div>
             )}
           </CardContent>
-        </Card>
+          </Card>
+        </div>
       </motion.div>
 
       {/* Results Section */}
@@ -286,80 +286,66 @@ Example format:
             className="space-y-8"
           >
             {/* Summary Header */}
-            <div className="space-y-4 text-center">
+            <div className="mx-auto w-full max-w-6xl space-y-2 text-center">
               <motion.h2
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="to-coral-700 dark:to-coral-200 bg-gradient-to-r from-blue-800 bg-clip-text text-3xl font-bold text-transparent dark:from-blue-200"
+                className="text-2xl font-semibold text-slate-900 dark:text-slate-100"
               >
                 Analysis Results
               </motion.h2>
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="mx-auto max-w-2xl text-slate-600 dark:text-slate-300"
+                className="mx-auto max-w-2xl text-sm text-slate-600 dark:text-slate-400"
               >
-                Your interview transcript has been analyzed and processed.
-                Explore the insights below to understand the conversation
-                better.
+                Your interview has been processed. Review the highlights below.
               </motion.p>
             </div>
 
             {/* Key Metrics */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="grid grid-cols-1 gap-6 md:grid-cols-3"
+              className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 md:grid-cols-3"
             >
-              <Card className="glass-strong border-0 text-center shadow-xl">
-                <CardContent className="pt-6">
-                  <div className="mb-2 flex items-center justify-center">
-                    <div className="rounded-full bg-gradient-to-br from-blue-100 to-blue-200 p-3 dark:from-blue-900/40 dark:to-blue-800/40">
-                      <TrendingUp className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                    </div>
+              <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
+                <CardContent className="pt-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Overall Sentiment</span>
+                    <TrendingUp className="h-4 w-4 text-slate-400" />
                   </div>
-                  <div className="bg-gradient-to-r from-blue-700 to-blue-800 bg-clip-text text-3xl font-bold text-transparent dark:from-blue-300 dark:to-blue-200">
+                  <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
                     {state.summary.overall_sentiment}
-                  </div>
-                  <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                    Overall Sentiment
                   </div>
                 </CardContent>
               </Card>
 
               {state.summary.total_duration && (
-                <Card className="glass-strong border-0 text-center shadow-xl">
-                  <CardContent className="pt-6">
-                    <div className="mb-2 flex items-center justify-center">
-                      <div className="from-coral-100 to-coral-200 dark:from-coral-900/40 dark:to-coral-800/40 rounded-full bg-gradient-to-br p-3">
-                        <Clock className="text-coral-600 dark:text-coral-400 h-8 w-8" />
-                      </div>
+                <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
+                  <CardContent className="pt-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Duration</span>
+                      <Clock className="h-4 w-4 text-slate-400" />
                     </div>
-                    <div className="from-coral-700 to-coral-800 dark:from-coral-300 dark:to-coral-200 bg-gradient-to-r bg-clip-text text-3xl font-bold text-transparent">
+                    <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
                       {state.summary.total_duration}
-                    </div>
-                    <div className="text-coral-600 dark:text-coral-400 text-sm font-medium">
-                      Duration
                     </div>
                   </CardContent>
                 </Card>
               )}
 
-              <Card className="glass-strong border-0 text-center shadow-xl">
-                <CardContent className="pt-6">
-                  <div className="mb-2 flex items-center justify-center">
-                    <div className="rounded-full bg-gradient-to-br from-purple-100 to-purple-200 p-3 dark:from-purple-900/40 dark:to-purple-800/40">
-                      <FileText className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                    </div>
+              <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
+                <CardContent className="pt-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Timeline Events</span>
+                    <FileText className="h-4 w-4 text-slate-400" />
                   </div>
-                  <div className="bg-gradient-to-r from-purple-700 to-purple-800 bg-clip-text text-3xl font-bold text-transparent dark:from-purple-300 dark:to-purple-200">
+                  <div className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
                     {state.summary.timeline.length}
-                  </div>
-                  <div className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                    Timeline Events
                   </div>
                 </CardContent>
               </Card>
@@ -368,28 +354,28 @@ Example format:
             {/* Key Topics */}
             {state.summary.key_topics.length > 0 && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <Card className="glass-strong border-0 shadow-xl">
+                <Card className="mx-auto w-full max-w-6xl border border-slate-200/80 bg-white/60 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                   <CardHeader>
-                    <CardTitle className="to-coral-700 dark:to-coral-200 bg-gradient-to-r from-blue-800 bg-clip-text text-xl text-transparent dark:from-blue-200">
-                      Key Topics Discussed
+                    <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                      Key Topics
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-2">
                       {state.summary.key_topics.map((topic, index) => (
                         <motion.div
                           key={topic}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.6 + index * 0.1 }}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.55 + index * 0.05 }}
                         >
                           <Badge
-                            variant="secondary"
-                            className="to-coral-100 dark:to-coral-900/30 rounded-full border-2 border-blue-200 bg-gradient-to-r from-blue-100 px-4 py-2 text-sm font-medium text-blue-700 dark:border-blue-700 dark:from-blue-900/30 dark:text-blue-300"
+                            variant="outline"
+                            className="rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1 text-xs"
                           >
                             {topic}
                           </Badge>
@@ -402,13 +388,19 @@ Example format:
             )}
 
             {/* Entity Cards */}
-            <EntityCards entities={state.summary.entities} />
+            <div className="mx-auto w-full max-w-6xl">
+              <EntityCards entities={state.summary.entities} />
+            </div>
 
             {/* Sentiment Analysis */}
-            <SentimentAnalysis sentiment={state.summary.sentiment_analysis} />
+            <div className="mx-auto w-full max-w-6xl">
+              <SentimentAnalysis sentiment={state.summary.sentiment_analysis} />
+            </div>
 
             {/* Interactive Timeline */}
-            <InteractiveTimeline timeline={state.summary.timeline} />
+            <div className="mx-auto w-full max-w-6xl">
+              <InteractiveTimeline timeline={state.summary.timeline} />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
