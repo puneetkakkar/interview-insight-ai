@@ -199,3 +199,65 @@ body {
 .glass-strong {
   @apply backdrop-blur-xl bg-white/90 dark:bg-gray-950 border border-white/20 dark:border-slate-600/30;
 }
+
+/* Animated accent border used for the transcript input wrapper */
+.animated-border {
+  position: relative;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, rgba(1, 62, 81, 0.35), rgba(0,163,224,0.05) 25%, rgba(255,255,255,0.06) 50%, rgba(0,163,224,0.05) 95%, rgba(1, 62, 81, 0.35));
+  z-index: 1;
+  overflow: visible;
+}
+
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px; /* border thickness */
+  border-radius: 0.75rem;
+  pointer-events: none;
+  z-index: 0;
+
+  background: 
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      #00A3E0 20%,
+      #00A3E0 25%,
+      transparent 40%,
+      transparent 100%
+    );
+  background-size: 400% 400%;
+  background-repeat: repeat;
+
+  /* Mask so the background is only visible on border */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+
+  animation: border-shimmer 8s linear infinite;
+}
+
+@keyframes border-shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 400% 0%;
+  }
+}
+
+/* Utility: hide native scrollbars while keeping scroll behavior */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.no-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
