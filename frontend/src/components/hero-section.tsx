@@ -23,8 +23,9 @@ export function HeroSection() {
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
             Turn Conversations into Clarity
           </h1>
-          <p className="mx-auto max-w-3xl text-base sm:text-lg md:text-xl text-white/70">
-            Transform your interview transcripts into actionable insights with our AI-powered analysis platform
+          <p className="mx-auto max-w-3xl text-base text-white/70 sm:text-lg md:text-xl">
+            Transform your interview transcripts into actionable insights with
+            our AI-powered analysis platform
           </p>
         </motion.div>
       </div>

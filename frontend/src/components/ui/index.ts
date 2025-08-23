@@ -1,29 +1,16 @@
+export { Alert, AlertDescription, AlertTitle } from "./alert";
+export { Badge, badgeVariants } from "./badge";
 export { Button, buttonVariants } from "./button";
-export { Label } from "./label";
+export { ButtonLoader, Spinner } from "./button-loader";
 export {
-  Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-  SelectLabel,
-  SelectItem,
-  SelectSeparator,
-  SelectScrollUpButton,
-  SelectScrollDownButton,
-} from "./select";
-export { Textarea } from "./textarea";
-export {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
-  CardContent,
+  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
 } from "./card";
 export { Input } from "./input";
-export { Badge, badgeVariants } from "./badge";
+export { Label } from "./label";
+export {
+  Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectScrollDownButton, SelectScrollUpButton, SelectSeparator, SelectTrigger, SelectValue
+} from "./select";
 export { Separator } from "./separator";
-export { Alert, AlertTitle, AlertDescription } from "./alert";
-export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
-export { ButtonLoader, Spinner } from "./button-loader";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+export { Textarea } from "./textarea";
+

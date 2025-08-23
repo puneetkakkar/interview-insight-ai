@@ -9,15 +9,15 @@ interface ButtonLoaderProps {
   text?: string;
 }
 
-export function ButtonLoader({ 
-  size = "default", 
+export function ButtonLoader({
+  size = "default",
   className,
-  text = "Loading..." 
+  text = "Loading...",
 }: ButtonLoaderProps) {
   const sizeClasses = {
     sm: "h-3 w-3",
-    default: "h-4 w-4", 
-    lg: "h-5 w-5"
+    default: "h-4 w-4",
+    lg: "h-5 w-5",
   };
 
   return (
@@ -28,14 +28,14 @@ export function ButtonLoader({
   );
 }
 
-export function Spinner({ 
-  size = "default", 
-  className 
+export function Spinner({
+  size = "default",
+  className,
 }: Omit<ButtonLoaderProps, "text">) {
   const sizeClasses = {
     sm: "h-3 w-3",
     default: "h-4 w-4",
-    lg: "h-5 w-5"
+    lg: "h-5 w-5",
   };
 
   return (
