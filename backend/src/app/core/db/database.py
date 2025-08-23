@@ -28,8 +28,8 @@ def initialize_database() -> None:
         # For in-memory, we'll use sync engine and create tables immediately
         from ..db.models import Base
         Base.metadata.create_all(bind=engine)
-        # Set async_engine to None to indicate in-memory mode
-        async_engine = None
+        # Store the sync engine for in-memory mode
+        async_engine = engine
         async_session = None
     else:
         # Use PostgreSQL
@@ -49,22 +49,52 @@ def initialize_database() -> None:
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency to get database session."""
     if settings.is_memory_storage:
-        # For in-memory storage, return a mock session
-        # This allows the application to run without database setup
-        from unittest.mock import AsyncMock
-        mock_session = AsyncMock()
+        # For in-memory storage, create a sync session and wrap it
+        from sqlalchemy.orm import sessionmaker
+        
+        # Create a sync session factory
+        sync_session_factory = sessionmaker(bind=async_engine)
+        
+        # Create a sync session
+        sync_session = sync_session_factory()
+        
+        # Create a mock async session that delegates to sync session
+        class SyncToAsyncSession:
+            def __init__(self, sync_session):
+                self.sync_session = sync_session
+            
+            async def execute(self, query):
+                # Execute the query synchronously
+                result = self.sync_session.execute(query)
+                return result
+            
+            async def commit(self):
+                self.sync_session.commit()
+            
+            async def refresh(self, obj):
+                self.sync_session.refresh(obj)
+            
+            async def close(self):
+                self.sync_session.close()
+            
+            def add(self, obj):
+                self.sync_session.add(obj)
+        
+        async_session_wrapper = SyncToAsyncSession(sync_session)
         try:
-            yield mock_session
+            yield async_session_wrapper
         finally:
-            pass
-    elif async_session:
+            await async_session_wrapper.close()
+    else:
+        # Use PostgreSQL async session
+        if async_session is None:
+            raise RuntimeError("Database not initialized. Call initialize_database() first.")
+        
         async with async_session() as session:
             try:
                 yield session
             finally:
                 await session.close()
-    else:
-        raise RuntimeError("Database not initialized. Call initialize_database() first.")
 
 
 async def init_db() -> None:

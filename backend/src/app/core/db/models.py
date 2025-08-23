@@ -36,6 +36,6 @@ class SoftDeleteMixin(MappedAsDataclass):
     is_deleted: Mapped[bool] = mapped_column(
         nullable=False,
         index=True,
-        server_default="false",
+        server_default="0",
         init=False,
     )

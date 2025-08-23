@@ -20,10 +20,10 @@ A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V
 ### 🤖 AI Features
 
 - **LangGraph Multi-Agent System**: Lightweight multi-agent architecture using LangGraph v0.3
-- **Claude Integration**: Anthropic Claude 3.5 Sonnet integration via API
-- **RAG Pipeline**: Retrieval-Augmented Generation with ChromaDB in-memory vector store
-- **Research Agent**: Pre-configured research assistant with calculator and web search tools
-- **Extensible Architecture**: Easy to add new agents and tools via Claude prompts
+- **Claude Integration**: Anthropic Claude 3.5 Haiku integration via API
+- **Research Agent**: Pre-configured research assistant with web search and calculator tools
+- **Extensible Architecture**: Easy to add new agents and tools via LangGraph
+- **Mock Responses**: Development-friendly mock responses when API keys aren't available
 
 ## 🏗️ Architecture
 
@@ -33,10 +33,13 @@ The project follows a clean, layered architecture:
 src/
 ├── app/
 │   ├── api/           # API endpoints and routing
+│   ├── agents/        # AI agents and LangGraph implementation
 │   ├── core/          # Core application configuration
 │   ├── models/        # SQLAlchemy database models (optional)
 │   ├── repositories/  # Data access layer (optional)
-│   └── schemas/       # Pydantic data models
+│   ├── schemas/       # Pydantic data models
+│   └── utils/         # Utility functions
+├── data/              # Mock data and cached responses
 ├── migrations/        # Database migrations (PostgreSQL only)
 └── tests/            # Test suite
 ```
@@ -56,14 +59,15 @@ The AI module provides a lightweight, extensible foundation for AI-powered featu
 
 ```
 src/app/agents/
-├── __init__.py      # Module initialization
-├── agent.py         # Multi-agent system with LangGraph
-└── tools.py         # Research and calculation tools
+├── __init__.py           # Module initialization
+├── agent.py              # Multi-agent system with LangGraph
+├── research_assistant.py # Research agent implementation
+└── tools.py              # Calculator and database search tools
 ```
 
 - **Multi-Agent System**: Dictionary-based agent registry with LangGraph integration
-- **Research Agent**: Pre-configured agent with calculator and web search tools
-- **RAG Pipeline**: In-memory vector store with sentence transformers embeddings
+- **Research Agent**: Pre-configured agent with web search and calculator tools
+- **Tool Integration**: Calculator tool using numexpr, web search via DuckDuckGo
 - **Claude Integration**: Anthropic API integration for natural language generation
 - **Extensible Design**: Easy to add new agents, tools, and capabilities
 
@@ -103,6 +107,10 @@ POSTGRES_PORT=5432
 POSTGRES_DB=frai_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
+
+# AI Settings
+ANTHROPIC_API_KEY=your-anthropic-api-key-here
+OPENAI_API_KEY=your-openai-api-key-here
 
 # Environment
 ENVIRONMENT=development
@@ -199,12 +207,8 @@ The AI module provides the following endpoints:
 
 #### Agents
 - `GET /api/v1/agent/` - List all available agents
-- `POST /api/v1/agent/{agent_name}/invoke` - Invoke a specific agent
-
-#### RAG System
-- `POST /api/v1/agent/rag/query` - Query the RAG system
-- `POST /api/v1/agent/rag/documents` - Add documents to RAG
-- `GET /api/v1/agent/rag/info` - Get RAG system information
+- `POST /api/v1/agent/{agent_id}/invoke` - Invoke a specific agent
+- `POST /api/v1/agent/invoke` - Invoke the default agent
 
 #### Example Usage
 
@@ -213,14 +217,14 @@ The AI module provides the following endpoints:
 curl http://localhost:8000/api/v1/agent/
 
 # Invoke research agent
-curl -X POST http://localhost:8000/api/v1/agent/research/invoke \
+curl -X POST http://localhost:8000/api/v1/agent/research-assistant/invoke \
   -H "Content-Type: application/json" \
-  -d '{"query": "What is 2+2?"}'
+  -d '{"message": "What is 2+2?", "model": "claude-3-5-haiku-latest"}'
 
-# Query RAG system
-curl -X POST http://localhost:8000/api/v1/agent/rag/query \
+# Invoke default agent
+curl -X POST http://localhost:8000/api/v1/agent/invoke \
   -H "Content-Type: application/json" \
-  -d '{"question": "What is FRAI?", "k": 3}'
+  -d '{"message": "Tell me about Wikipedia"}'
 ```
 
 ## 🗄️ Database Management
@@ -283,18 +287,10 @@ make migrate
 make test
 ```
 
-### Run AI Tests
-
-```bash
-make test-ai      # Run AI-related tests only
-make test-core    # Run core application tests only
-make test-all     # Run all tests with coverage
-```
-
 ### Run Tests with Coverage
 
 ```bash
-make coverage
+make test-all
 ```
 
 ### Run Tests in Docker Environment
@@ -308,6 +304,15 @@ make test-env
 After running coverage, you'll find an HTML report in the `htmlcov/` directory.
 
 ## 🤖 AI Development
+
+### Current Agents
+
+The system currently includes:
+
+- **Research Assistant**: A research agent with web search and calculator capabilities
+  - Web search via DuckDuckGo
+  - Mathematical calculations using numexpr
+  - Claude 3.5 Haiku integration
 
 ### Adding New Agents
 
@@ -336,28 +341,21 @@ def create_custom_agent():
     # ... rest of agent setup
 ```
 
-### Extending RAG Pipeline
+### Supported Language Models
 
-The RAG pipeline is designed for easy extension:
+The system supports multiple language model providers:
 
-```python
-# Add custom document loaders
-await rag_pipeline.add_documents(["Your document content"])
-
-# Customize embeddings
-pipeline.embeddings = YourCustomEmbeddings()
-
-# Add custom retrieval logic
-docs = pipeline.vector_store.similarity_search_with_score(query, k=5)
-```
+- **Anthropic**: Claude 3.5 Haiku, Claude 3 Haiku, Claude Sonnet 4.0
+- **OpenAI**: GPT-4o, GPT-4o Mini
+- **Fake Models**: For testing without API keys
 
 ### Claude Prompt Engineering
 
 Use Claude prompts to extend functionality:
 
 - **Add Database Tools**: "Prompt Claude to add database query tools to the research agent"
-- **Custom RAG**: "Prompt Claude to create a specialized RAG pipeline for technical documentation"
-- **New Agent Types**: "Prompt Claude to design a workflow agent for business processes"
+- **Custom Workflows**: "Prompt Claude to design a workflow agent for business processes"
+- **New Agent Types**: "Prompt Claude to create specialized agents for different domains"
 
 ## 🐳 Docker Commands
 
@@ -365,9 +363,9 @@ The project uses an environment-based Docker structure for better organization:
 
 ```
 docker/
-│── dev/     # Development environment
-│── test/    # Testing environment  
-│── prod/    # Production environment
+├── dev/     # Development environment
+├── test/    # Testing environment  
+└── prod/    # Production environment
 ```
 
 Each environment contains its own Dockerfile and docker-compose.yml for complete isolation.
@@ -422,25 +420,29 @@ frai-be/
 │       ├── Dockerfile.prod         # Production Dockerfile
 │       └── docker-compose.prod.yml
 ├── src/                            # Source code
-│   └── app/
-│       ├── agents/                 # AI and LangGraph modules
-│       │   ├── __init__.py         # AI module initialization
-│       │   ├── agent.py            # Multi-agent system
-│       │   └── tools.py            # Research and calculation tools
-│       ├── api/                    # API endpoints
-│       │   └── v1/                 # API version 1
-│       │       └── agent.py        # AI Agent API
-│       ├── core/                   # Core application logic
-│       │   ├── config.py           # Configuration management
-│       │   ├── db/                 # Database setup
-│       │   ├── exceptions/         # Custom exceptions
-│       │   ├── logger.py           # Logging configuration
-│       │   ├── response.py         # Response formatting
-│       │   └── setup.py            # Application setup
-│       ├── models/                 # Database models (optional)
-│       ├── repositories/           # Data access layer (optional)
-│       ├── schemas/                # Pydantic schemas
-│       └── main.py                 # Application entry point
+│   ├── app/
+│   │   ├── agents/                 # AI and LangGraph modules
+│   │   │   ├── __init__.py         # AI module initialization
+│   │   │   ├── agent.py            # Multi-agent system
+│   │   │   ├── research_assistant.py # Research agent implementation
+│   │   │   └── tools.py            # Calculator and search tools
+│   │   ├── api/                    # API endpoints
+│   │   │   └── v1/                 # API version 1
+│   │   │       └── agent.py        # AI Agent API
+│   │   ├── core/                   # Core application logic
+│   │   │   ├── config.py           # Configuration management
+│   │   │   ├── db/                 # Database setup
+│   │   │   ├── exceptions/         # Custom exceptions
+│   │   │   ├── llm.py              # Language model management
+│   │   │   ├── logger.py           # Logging configuration
+│   │   │   ├── response.py         # Response formatting
+│   │   │   └── setup.py            # Application setup
+│   │   ├── models/                 # Database models (optional)
+│   │   ├── repositories/           # Data access layer (optional)
+│   │   ├── schemas/                # Pydantic schemas
+│   │   └── main.py                 # Application entry point
+│   ├── data/                       # Mock data and cached responses
+│   └── utils/                      # Utility functions
 ├── migrations/                     # Database migrations (PostgreSQL only)
 ├── tests/                          # Test suite
 │   ├── integration/                # Integration tests
@@ -467,8 +469,8 @@ frai-be/
 | `POSTGRES_DB` | PostgreSQL database name (only if STORAGE_TYPE=postgres) | `frai_db` |
 | `POSTGRES_USER` | PostgreSQL username (only if STORAGE_TYPE=postgres) | `postgres` |
 | `POSTGRES_PASSWORD` | PostgreSQL password (only if STORAGE_TYPE=postgres) | `postgres` |
-| `SECRET_KEY` | JWT secret key | `your-secret-key-here` |
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude | `None` (optional) |
+| `OPENAI_API_KEY` | OpenAI API key for GPT models | `None` (optional) |
 
 ### Storage Configuration
 
@@ -483,7 +485,7 @@ The application automatically configures itself based on the `STORAGE_TYPE` sett
 
 1. **Environment Variables**: Set `ENVIRONMENT=production` and `DEBUG=false`
 2. **Storage Type**: Choose between `memory` (for stateless) or `postgres` (for persistent)
-3. **Secrets**: Change default secret keys
+3. **API Keys**: Ensure proper API keys are set for AI features
 4. **CORS**: Restrict allowed origins
 5. **Logging**: Configure production logging levels
 6. **Monitoring**: Add health checks and metrics
@@ -576,7 +578,7 @@ uv run python -m src.app.main
 
 ### Key Benefits for Interviews
 - **No Database Setup**: In-memory storage works immediately
-- **AI Features Ready**: Research agent and RAG system pre-configured
+- **AI Features Ready**: Research agent with web search and calculator pre-configured
 - **Clean Architecture**: Easy to explain and extend
 - **Fast Startup**: Application ready in seconds
 - **Modern Stack**: Shows knowledge of current best practices
