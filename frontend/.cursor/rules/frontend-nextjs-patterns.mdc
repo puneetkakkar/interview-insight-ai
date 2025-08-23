@@ -1,0 +1,53 @@
+# Next.js 15 Development Patterns
+
+## App Router Structure
+- Use the App Router in [src/app/](mdc:frontend/src/app/)
+- Implement proper file-based routing
+- Use `layout.tsx` for shared layouts
+- Use `page.tsx` for page components
+- Use `loading.tsx` for loading states
+- Use `error.tsx` for error boundaries
+
+## Server Components
+- Use React Server Components by default
+- Implement proper data fetching in Server Components
+- Use `use client` directive only when necessary
+- Leverage Server Components for SEO and performance
+
+## API Routes
+- Implement API routes in [src/app/api/](mdc:frontend/src/app/api/)
+- Use proper HTTP methods and status codes
+- Implement proper error handling
+- Use Zod for request/response validation
+- Return proper JSON responses
+
+## Metadata and SEO
+- Implement metadata in layout files
+- Use dynamic metadata for dynamic routes
+- Implement proper Open Graph tags
+- Use structured data for better SEO
+- Implement proper canonical URLs
+
+## Performance Optimization
+- Use Next.js Image component for images
+- Implement proper caching strategies
+- Use dynamic imports for code splitting
+- Implement proper loading states
+- Use React Suspense for async components
+
+## Environment Configuration
+- Use environment variables for configuration
+- Implement proper environment validation
+- Use Next.js built-in environment support
+- Follow security best practices for secrets
+
+## Error Handling
+- Implement proper error boundaries
+- Use Next.js error handling patterns
+- Implement proper logging
+- Provide user-friendly error messages
+- Handle network errors gracefully
+description:
+globs:
+alwaysApply: false
+---

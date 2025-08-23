@@ -1,0 +1,43 @@
+# Database Patterns and Migrations
+
+## SQLAlchemy 2.0 Usage
+- Use async SQLAlchemy 2.0 syntax throughout
+- Database configuration in [src/app/core/db/database.py](mdc:backend/src/app/core/db/database.py)
+- Models defined in [src/app/core/db/models.py](mdc:backend/src/app/core/db/models.py)
+
+## Repository Pattern
+- All data access goes through repository classes
+- Base repository in [src/app/repositories/base.py](mdc:backend/src/app/repositories/base.py)
+- Implement specific repositories for each model
+- Use dependency injection for repository instances
+
+## Database Migrations
+- **Alembic**: Database migration tool configured in [alembic.ini](mdc:backend/alembic.ini)
+- **Migration Commands**:
+  - `make revision`: Create new migration
+  - `make upgrade`: Apply pending migrations
+  - `make migrate`: Create and apply migrations
+- **Migration Files**: Located in [migrations/versions/](mdc:backend/migrations/versions/)
+
+## Environment Configuration
+- Database settings in [src/app/core/config.py](mdc:backend/src/app/core/config.py)
+- Support for PostgreSQL and in-memory storage
+- Test database configuration for isolated testing
+- Environment variables for database credentials
+
+## Testing Database
+- Use in-memory SQLite for unit tests
+- Isolated test database for integration tests
+- Reset database state between test runs
+- Mock database calls when appropriate
+
+## Best Practices
+- Always use transactions for multi-step operations
+- Implement proper error handling for database failures
+- Use connection pooling in production
+- Log database operations for debugging
+- Implement database health checks
+description:
+globs:
+alwaysApply: false
+---

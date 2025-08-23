@@ -1,0 +1,78 @@
+# Backend Quick Reference
+
+## Common Development Tasks
+
+### Starting Development
+```bash
+# Start development environment
+make dev-up
+
+# View logs
+make dev-logs
+
+# Stop environment
+make dev-down
+```
+
+### Running Tests
+```bash
+# Run tests locally
+make test
+
+# Run tests with coverage
+make test-all
+
+# Run tests in Docker
+make test-env
+```
+
+### Code Quality
+```bash
+# Format code
+make format
+
+# Lint code
+make lint
+
+# Run type checking
+uv run mypy src/
+```
+
+### Database Operations
+```bash
+# Create new migration
+make revision
+
+# Apply migrations
+make upgrade
+
+# Create and apply migrations
+make migrate
+```
+
+### Environment Setup
+1. Copy [env.example](mdc:backend/env.example) to `.env`
+2. Set required API keys and database credentials
+3. Use `make dev-up` to start development environment
+
+### Key Files
+- **Configuration**: [src/app/core/config.py](mdc:backend/src/app/core/config.py)
+- **Main App**: [src/app/main.py](mdc:backend/src/app/main.py)
+- **Database**: [src/app/core/db/database.py](mdc:backend/src/app/core/db/database.py)
+- **API Routes**: [src/app/api/v1/](mdc:backend/src/app/api/v1/)
+- **Schemas**: [src/app/schemas/](mdc:backend/src/app/schemas/)
+
+### Dependencies
+- **Package Manager**: uv (see [pyproject.toml](mdc:backend/pyproject.toml))
+- **Python Version**: 3.11+
+- **Key Libraries**: FastAPI, SQLAlchemy 2.0, Pydantic V2, LangGraph
+
+### Testing
+- **Framework**: pytest with async support
+- **Coverage**: pytest-cov with HTML reports
+- **Mocking**: pytest-mock for dependencies
+- **Database**: In-memory SQLite for unit tests
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,50 @@
+# UI Component Development Patterns
+
+## shadcn/ui Integration
+- Follow the configuration in [components.json](mdc:frontend/components.json)
+- Use the "new-york" style variant
+- Implement proper component composition
+- Use Radix UI primitives for accessibility
+
+## Component Structure
+- Place components in [src/components/](mdc:frontend/src/components/)
+- UI components go in [src/components/ui/](mdc:frontend/src/components/ui/)
+- Use TypeScript interfaces for all component props
+- Implement proper prop validation with Zod
+
+## Radix UI Components
+- Use Radix UI primitives for complex interactions
+- Implement proper ARIA attributes
+- Handle keyboard navigation correctly
+- Ensure proper focus management
+
+## Styling with Tailwind CSS
+- Use Tailwind CSS 4.0 utility classes
+- Follow the design system color palette
+- Implement consistent spacing using Tailwind's scale
+- Use CSS variables for theming
+- Implement responsive design patterns
+
+## Component Variants
+- Use `class-variance-authority` for component variants
+- Implement consistent variant patterns
+- Use TypeScript discriminated unions for variant props
+- Follow the established design system
+
+## Accessibility
+- Implement proper semantic HTML
+- Use ARIA labels and descriptions
+- Ensure keyboard navigation works
+- Test with screen readers
+- Follow WCAG guidelines
+
+## Testing Components
+- Test component rendering
+- Test user interactions
+- Test accessibility features
+- Test responsive behavior
+- Use React Testing Library for component tests
+description:
+globs:
+alwaysApply: false
+---

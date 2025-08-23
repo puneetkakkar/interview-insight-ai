@@ -1,0 +1,44 @@
+# API Development Patterns
+
+## FastAPI Structure
+- Main application in [src/app/main.py](mdc:backend/src/app/main.py)
+- API routers in [src/app/api/v1/](mdc:backend/src/app/api/v1/)
+- Dependencies in [src/app/api/dependencies.py](mdc:backend/src/app/api/dependencies.py)
+
+## API Versioning
+- All endpoints under `/api/v1/` prefix
+- Use semantic versioning for breaking changes
+- Maintain backward compatibility when possible
+
+## Request/Response Models
+- Define Pydantic schemas in [src/app/schemas/](mdc:backend/src/app/schemas/)
+- Use consistent response envelope pattern from [src/app/core/response.py](mdc:backend/src/app/core/response.py)
+- Implement proper validation for all inputs
+
+## Error Handling
+- Use custom exception classes from [src/app/core/exceptions/](mdc:backend/src/app/core/exceptions/)
+- Implement global exception handlers
+- Return consistent error response format
+- Log all errors with appropriate context
+
+## Authentication & Authorization
+- Implement JWT-based authentication
+- Use dependency injection for auth requirements
+- Secure sensitive endpoints
+- Implement rate limiting where appropriate
+
+## API Documentation
+- Use FastAPI's automatic OpenAPI generation
+- Add comprehensive docstrings to all endpoints
+- Include example requests/responses
+- Document error codes and responses
+
+## Testing APIs
+- Test all endpoints with pytest
+- Use FastAPI TestClient for integration tests
+- Mock external dependencies
+- Test error scenarios and edge cases
+description:
+globs:
+alwaysApply: false
+---

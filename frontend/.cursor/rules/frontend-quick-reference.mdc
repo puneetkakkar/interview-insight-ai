@@ -1,0 +1,79 @@
+# Frontend Quick Reference
+
+## Common Development Tasks
+
+### Starting Development
+```bash
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Start production server
+pnpm start
+```
+
+### Code Quality
+```bash
+# Run linting
+pnpm lint
+
+# Fix linting issues
+pnpm lint:fix
+
+# Check types
+pnpm typecheck
+
+# Format code
+pnpm format:write
+
+# Check formatting
+pnpm format:check
+```
+
+### Project Structure
+- **Pages**: [src/app/](mdc:frontend/src/app/) - Next.js App Router
+- **Components**: [src/components/](mdc:frontend/src/components/) - Reusable components
+- **UI Components**: [src/components/ui/](mdc:frontend/src/components/ui/) - shadcn/ui components
+- **Utilities**: [src/lib/](mdc:frontend/src/lib/) - Helper functions
+- **Styles**: [src/styles/](mdc:frontend/src/styles/) - Global CSS and Tailwind
+
+### Key Technologies
+- **Framework**: Next.js 15 with App Router
+- **React**: React 19 with Server Components
+- **TypeScript**: 5.8+ with strict mode
+- **Styling**: Tailwind CSS 4.0
+- **Components**: shadcn/ui with Radix UI
+- **Package Manager**: pnpm
+
+### Development Patterns
+- Use Server Components by default
+- Implement proper TypeScript types
+- Follow shadcn/ui component patterns
+- Use Tailwind utilities for styling
+- Implement proper error boundaries
+- Use Zod for validation
+
+### Configuration Files
+- **Next.js**: [next.config.js](mdc:frontend/next.config.js)
+- **TypeScript**: [tsconfig.json](mdc:frontend/tsconfig.json)
+- **Components**: [components.json](mdc:frontend/components.json)
+- **ESLint**: [eslint.config.js](mdc:frontend/eslint.config.js)
+- **Prettier**: [prettier.config.js](mdc:frontend/prettier.config.js)
+- **PostCSS**: [postcss.config.js](mdc:frontend/postcss.config.js)
+
+### Best Practices
+- Implement proper SEO with metadata
+- Use Next.js Image component for optimization
+- Implement responsive design with Tailwind
+- Follow accessibility guidelines
+- Use proper error handling
+- Implement loading states
+description:
+globs:
+alwaysApply: false
+---

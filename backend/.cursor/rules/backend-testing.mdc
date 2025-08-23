@@ -1,0 +1,53 @@
+# Testing Patterns and Practices
+
+## Test Structure
+- **Unit Tests**: [tests/unit/](mdc:backend/tests/unit/) for isolated component testing
+- **Integration Tests**: [tests/integration/](mdc:backend/tests/integration/) for API and database testing
+- **Test Configuration**: [tests/conftest.py](mdc:backend/tests/conftest.py) for shared fixtures
+
+## Testing Framework
+- **Pytest**: Primary testing framework
+- **Pytest-asyncio**: For testing async code
+- **Pytest-mock**: For mocking dependencies
+- **Pytest-cov**: For coverage reporting
+
+## Test Commands
+- `make test`: Run all tests locally
+- `make test-all`: Run tests with coverage
+- `make test-env`: Run tests in isolated Docker environment
+- `make coverage`: Generate coverage report
+
+## Fixtures and Setup
+- Database fixtures for testing
+- Mock external API responses
+- Test data generation with Faker
+- Isolated test environments
+
+## Testing Best Practices
+- Test all business logic functions
+- Mock external dependencies (APIs, databases)
+- Use descriptive test names
+- Test both success and failure scenarios
+- Aim for high test coverage (>80%)
+
+## Database Testing
+- Use in-memory SQLite for unit tests
+- Reset database state between tests
+- Test repository methods thoroughly
+- Verify transaction rollbacks
+
+## API Testing
+- Test all endpoints with FastAPI TestClient
+- Verify response schemas
+- Test error handling
+- Mock external service calls
+
+## Coverage Reporting
+- Generate HTML coverage reports
+- Track coverage trends
+- Focus on critical business logic
+- Exclude test files from coverage
+description:
+globs:
+alwaysApply: false
+---

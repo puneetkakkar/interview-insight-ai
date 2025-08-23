@@ -1,0 +1,41 @@
+# Backend Project Structure Guide
+
+## Project Overview
+This is a production-ready FRAI boilerplate using FastAPI, SQLAlchemy 2.0, Pydantic V2, and LangGraph for AI agents.
+
+## Key Entry Points
+- Main application: [src/app/main.py](mdc:backend/src/app/main.py)
+- Application configuration: [src/app/core/config.py](mdc:backend/src/app/core/config.py)
+- Application setup: [src/app/core/setup.py](mdc:backend/src/app/core/setup.py)
+
+## Core Architecture
+- **FastAPI Application**: RESTful API with automatic OpenAPI documentation
+- **SQLAlchemy 2.0**: Modern async ORM with PostgreSQL support
+- **Pydantic V2**: Data validation and serialization
+- **LangGraph**: AI agent orchestration framework
+- **Alembic**: Database migrations
+
+## Directory Structure
+- `src/app/`: Main application code
+  - `api/v1/`: API endpoints and routers
+  - `agents/`: AI agent implementations
+  - `core/`: Core application logic (config, database, exceptions)
+  - `models/`: SQLAlchemy database models
+  - `repositories/`: Data access layer
+  - `schemas/`: Pydantic data models
+  - `utils/`: Utility functions
+
+## Development Commands
+Use the [Makefile](mdc:backend/Makefile) for common operations:
+- `make dev-up`: Start development environment
+- `make test`: Run tests locally
+- `make format`: Auto-format code with ruff
+- `make lint`: Run linting checks
+- `make migrate`: Create and apply database migrations
+
+## Dependencies
+See [pyproject.toml](mdc:backend/pyproject.toml) for all dependencies and development tools.
+description:
+globs:
+alwaysApply: false
+---

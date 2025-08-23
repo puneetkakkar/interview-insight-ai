@@ -1,0 +1,45 @@
+# Frontend Project Structure Guide
+
+## Project Overview
+This is a modern Next.js 15 frontend application using React 19, TypeScript, Tailwind CSS, and shadcn/ui components for the FRAI AI Boilerplate.
+
+## Key Entry Points
+- Main application: [src/app/page.tsx](mdc:frontend/src/app/page.tsx)
+- Root layout: [src/app/layout.tsx](mdc:frontend/src/app/layout.tsx)
+- App configuration: [next.config.js](mdc:frontend/next.config.js)
+- TypeScript config: [tsconfig.json](mdc:frontend/tsconfig.json)
+
+## Core Architecture
+- **Next.js 15**: App Router with React Server Components
+- **React 19**: Latest React with concurrent features
+- **TypeScript 5.8**: Strict type checking and modern features
+- **Tailwind CSS 4.0**: Utility-first CSS framework
+- **shadcn/ui**: Radix UI-based component library
+- **Zod**: Runtime type validation
+
+## Directory Structure
+- `src/app/`: Next.js App Router pages and layouts
+  - `api/`: API routes for backend communication
+  - `layout.tsx`: Root layout component
+  - `page.tsx`: Home page component
+- `src/components/`: Reusable React components
+  - `ui/`: shadcn/ui components
+  - `navigation.tsx`: Navigation component
+- `src/lib/`: Utility functions and configurations
+- `src/styles/`: Global CSS and Tailwind configuration
+- `public/`: Static assets
+
+## Development Commands
+- `pnpm dev`: Start development server with Turbo
+- `pnpm build`: Build for production
+- `pnpm lint`: Run ESLint
+- `pnpm lint:fix`: Fix ESLint issues
+- `pnpm format:write`: Format code with Prettier
+- `pnpm typecheck`: Run TypeScript type checking
+
+## Dependencies
+See [package.json](mdc:frontend/package.json) for all dependencies and development tools.
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,46 @@
+# Backend Coding Standards
+
+## Python Version
+- Use Python 3.11+ features
+- Follow PEP 8 style guidelines with 120 character line length
+
+## Code Quality Tools
+- **Ruff**: Auto-formatting and linting (configured in [pyproject.toml](mdc:backend/pyproject.toml))
+- **MyPy**: Type checking with strict settings
+- **Pytest**: Testing framework with async support
+
+## Import Organization
+- Use absolute imports from `src.app.*`
+- Group imports: standard library, third-party, local
+- Follow the import order defined in ruff configuration
+
+## Type Hints
+- Always use type hints for function parameters and return values
+- Use `Optional[T]` for nullable values
+- Prefer `dict[str, object]` over `Dict[str, Any]`
+
+## Async/Await
+- Use async/await for database operations and external API calls
+- Use `pytest-asyncio` for testing async code
+- Follow FastAPI async patterns
+
+## Database Patterns
+- Use SQLAlchemy 2.0 async syntax
+- Implement repository pattern in `repositories/` directory
+- Use Alembic for all database schema changes
+- Follow the base repository pattern in [src/app/repositories/base.py](mdc:backend/src/app/repositories/base.py)
+
+## API Design
+- Use Pydantic schemas for request/response models
+- Implement consistent error handling using [src/app/core/exceptions/](mdc:backend/src/app/core/exceptions/)
+- Use the response envelope pattern from [src/app/core/response.py](mdc:backend/src/app/core/response.py)
+
+## Testing
+- Write unit tests for all business logic
+- Use pytest fixtures from [tests/conftest.py](mdc:backend/tests/conftest.py)
+- Mock external dependencies
+- Aim for high test coverage
+description:
+globs:
+alwaysApply: false
+---

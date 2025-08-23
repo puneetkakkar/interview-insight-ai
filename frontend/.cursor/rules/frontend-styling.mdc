@@ -1,0 +1,49 @@
+# Styling and Tailwind CSS Patterns
+
+## Tailwind CSS 4.0 Usage
+- Use utility-first approach with Tailwind CSS
+- Follow the configuration in [components.json](mdc:frontend/components.json)
+- Use the "zinc" base color with CSS variables
+- Implement consistent spacing and typography scales
+
+## CSS Architecture
+- Global styles in [src/styles/globals.css](mdc:frontend/src/styles/globals.css)
+- Use CSS variables for theming
+- Implement proper CSS custom properties
+- Follow BEM-like naming conventions when needed
+
+## Design System
+- Follow the established color palette
+- Use consistent spacing (4px grid system)
+- Implement proper typography scale
+- Use consistent border radius and shadows
+- Follow accessibility guidelines for contrast
+
+## Responsive Design
+- Use Tailwind's responsive prefixes
+- Implement mobile-first design
+- Use proper breakpoints for different screen sizes
+- Test on various device sizes
+- Implement proper touch targets
+
+## Component Styling
+- Use Tailwind utilities for component styles
+- Implement consistent component variants
+- Use CSS-in-JS sparingly and only when necessary
+- Follow the established component patterns
+
+## Dark Mode Support
+- Implement proper dark mode support
+- Use CSS variables for theme switching
+- Ensure proper contrast in both themes
+- Test accessibility in both modes
+
+## Performance
+- Minimize CSS bundle size
+- Use Tailwind's purge feature
+- Implement proper CSS loading strategies
+- Use CSS-in-JS only when necessary
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,37 @@
+# AI Agent Development Patterns
+
+## LangGraph Integration
+This project uses LangGraph for AI agent orchestration. See [src/app/agents/](mdc:backend/src/app/agents/) for implementations.
+
+## Agent Architecture
+- **Base Agent**: Extend [src/app/agents/agent.py](mdc:backend/src/app/agents/agent.py) for new agents
+- **Research Assistant**: Example implementation in [src/app/agents/research_assistant.py](mdc:backend/src/app/agents/research_assistant.py)
+- **Tools**: Common tools in [src/app/agents/tools.py](mdc:backend/src/app/agents/tools.py)
+
+## Language Model Configuration
+- Configure models in [src/app/core/config.py](mdc:backend/src/app/core/config.py)
+- Support for OpenAI, Anthropic, and local models
+- Use environment variables for API keys
+
+## Agent Development Guidelines
+- Implement async methods for all agent operations
+- Use Pydantic schemas for agent inputs/outputs
+- Implement proper error handling and logging
+- Test agents with mock language model responses
+- Use the repository pattern for data persistence
+
+## Tool Integration
+- Tools should be stateless and reusable
+- Implement proper input validation
+- Handle external API rate limits gracefully
+- Log all tool executions for debugging
+
+## Testing Agents
+- Mock external API calls (OpenAI, Anthropic, etc.)
+- Test agent state transitions
+- Verify tool execution flows
+- Test error handling scenarios
+description:
+globs:
+alwaysApply: false
+---

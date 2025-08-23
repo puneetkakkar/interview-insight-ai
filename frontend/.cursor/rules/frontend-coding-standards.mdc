@@ -1,0 +1,52 @@
+# Frontend Coding Standards
+
+## TypeScript Configuration
+- Use TypeScript 5.8+ features
+- Strict mode enabled with `noUncheckedIndexedAccess`
+- Use ES2022 target and ESNext modules
+- Path aliases: `@/*` maps to `./src/*`
+
+## React 19 Best Practices
+- Use React Server Components where possible
+- Implement proper error boundaries
+- Use React hooks correctly (useState, useEffect, etc.)
+- Prefer functional components over class components
+- Use TypeScript for all component props
+
+## Next.js 15 Patterns
+- Use App Router (`src/app/` directory)
+- Implement proper metadata in layout files
+- Use Server Components for data fetching
+- Implement proper loading and error states
+- Use Next.js Image component for optimization
+
+## Component Architecture
+- Follow shadcn/ui patterns in [components.json](mdc:frontend/components.json)
+- Use Radix UI primitives for accessible components
+- Implement proper component composition
+- Use TypeScript interfaces for component props
+- Follow atomic design principles
+
+## Styling Guidelines
+- Use Tailwind CSS 4.0 utility classes
+- Follow the design system in [components.json](mdc:frontend/components.json)
+- Use CSS variables for theming
+- Implement responsive design patterns
+- Use consistent spacing and typography scales
+
+## State Management
+- Use React hooks for local state
+- Implement proper form handling with Zod validation
+- Use React Context for global state when needed
+- Implement proper error handling and loading states
+
+## Code Quality
+- Use ESLint with Next.js configuration
+- Format code with Prettier
+- Run type checking before commits
+- Follow consistent naming conventions
+- Implement proper error boundaries
+description:
+globs:
+alwaysApply: false
+---

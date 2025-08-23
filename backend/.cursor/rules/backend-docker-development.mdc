@@ -1,0 +1,45 @@
+# Docker Development and Deployment
+
+## Docker Structure
+- **Development**: [docker/dev/](mdc:backend/docker/dev/) for local development
+- **Production**: [docker/prod/](mdc:backend/prod/) for production deployment
+- **Testing**: [docker/test/](mdc:backend/test/) for isolated testing
+
+## Development Environment
+- **Start**: `make dev-up` - Builds and starts development containers
+- **Stop**: `make dev-down` - Stops development environment
+- **Logs**: `make dev-logs` - View container logs
+- **Dockerfile**: [docker/dev/Dockerfile.dev](mdc:backend/docker/dev/Dockerfile.dev)
+
+## Production Environment
+- **Start**: `make prod-up` - Deploys production stack
+- **Stop**: `make prod-down` - Stops production environment
+- **Logs**: `make prod-logs` - View production logs
+- **Dockerfile**: [docker/prod/Dockerfile.prod](mdc:backend/prod/Dockerfile.prod)
+
+## Testing Environment
+- **Start**: `make test-env` - Runs tests in isolated containers
+- **Stop**: `make test-down` - Cleans up test environment
+- **Dockerfile**: [docker/test/Dockerfile.test](mdc:backend/test/Dockerfile.test)
+
+## Container Management
+- **Cleanup**: `make clean` - Removes all containers and volumes
+- **Rebuild**: Use `--build` flag when starting containers
+- **Environment Variables**: Configure via [env.example](mdc:backend/env.example)
+
+## Best Practices
+- Use multi-stage builds for production images
+- Implement health checks for all services
+- Use volume mounts for development
+- Separate development and production dependencies
+- Implement proper logging and monitoring
+
+## Database in Docker
+- PostgreSQL for production and development
+- In-memory SQLite for testing
+- Persistent volumes for data storage
+- Migration management via Alembic
+description:
+globs:
+alwaysApply: false
+---

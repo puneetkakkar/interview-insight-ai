@@ -1,0 +1,60 @@
+# Frontend Testing Patterns
+
+## Testing Framework
+- Use Jest as the primary testing framework
+- Use React Testing Library for component testing
+- Implement proper test utilities and helpers
+- Use TypeScript for all test files
+
+## Component Testing
+- Test component rendering and props
+- Test user interactions and events
+- Test component state changes
+- Test accessibility features
+- Test responsive behavior
+
+## Testing Best Practices
+- Write tests that resemble user behavior
+- Use descriptive test names
+- Test both success and failure scenarios
+- Mock external dependencies appropriately
+- Implement proper test isolation
+
+## Test Structure
+- Organize tests by component or feature
+- Use proper describe and it blocks
+- Implement proper test setup and teardown
+- Use test utilities for common operations
+- Follow AAA pattern (Arrange, Act, Assert)
+
+## Mocking Strategies
+- Mock API calls and external services
+- Mock browser APIs when necessary
+- Use proper mock implementations
+- Test error handling scenarios
+- Implement proper mock cleanup
+
+## Accessibility Testing
+- Test keyboard navigation
+- Test screen reader compatibility
+- Test ARIA attributes
+- Test focus management
+- Use accessibility testing tools
+
+## Performance Testing
+- Test component rendering performance
+- Test bundle size impact
+- Test lazy loading implementations
+- Test caching strategies
+- Use performance monitoring tools
+
+## E2E Testing
+- Implement end-to-end tests for critical flows
+- Test user journeys and workflows
+- Test cross-browser compatibility
+- Test responsive design
+- Use proper E2E testing tools
+description:
+globs:
+alwaysApply: false
+---
