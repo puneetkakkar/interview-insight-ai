@@ -1,5 +1,6 @@
 # Database Models
 
-from .item import Item
+# Models will be imported dynamically based on configuration
+# For now, no models are imported by default
 
-__all__ = ["Item"]
+__all__ = []

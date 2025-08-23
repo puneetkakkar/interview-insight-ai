@@ -1,90 +1,48 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from tests.conftest import mock_client
+
 
 class TestAPIResponseEnvelope:
-    """Test consistent API response envelope structure."""
+    """Test API response envelope structure consistency."""
 
-    def test_health_success_envelope(self, mock_client: TestClient):
-        """Test health endpoint returns success envelope."""
+    def test_success_response_envelope_structure(self, mock_client: TestClient):
+        """Test success responses follow consistent envelope structure."""
+        # Test health endpoint
         response = mock_client.get("/health")
         assert response.status_code == 200
         body = response.json()
         assert body["success"] is True
-        assert isinstance(body["data"], dict)
+        assert "data" in body
         assert body["data"]["status"] == "healthy"
+        assert body["data"]["service"] == "FRAI Boilerplate"
 
-    def test_root_success_envelope(self, mock_client: TestClient):
-        """Test root endpoint returns success envelope."""
+    def test_root_endpoint_response_envelope(self, mock_client: TestClient):
+        """Test root endpoint response envelope structure."""
         response = mock_client.get("/")
         assert response.status_code == 200
         body = response.json()
         assert body["success"] is True
-        assert isinstance(body["data"], dict)
+        assert "data" in body
+        assert "message" in body["data"]
         assert "version" in body["data"]
+        assert "docs" in body["data"]
+        assert "health" in body["data"]
+        assert "FRAI" in body["data"]["message"]
 
-    def test_info_success_envelope(self, mock_client: TestClient):
-        """Test info endpoint returns success envelope."""
+    def test_info_endpoint_response_envelope(self, mock_client: TestClient):
+        """Test info endpoint response envelope structure."""
         response = mock_client.get("/info")
         assert response.status_code == 200
         body = response.json()
         assert body["success"] is True
-        assert isinstance(body["data"], dict)
+        assert "data" in body
+        assert "name" in body["data"]
+        assert "version" in body["data"]
+        assert "description" in body["data"]
+        assert "status" in body["data"]
         assert body["data"]["status"] == "running"
-
-    def test_validation_error_envelope(self, mock_client: TestClient):
-        """Test validation errors return consistent error envelope."""
-        # limit must be >= 1; sending 0 triggers validation error
-        response = mock_client.get("/api/v1/items", params={"limit": 0})
-        assert response.status_code == 422
-        body = response.json()
-        assert body["success"] is False
-        assert body["data"] is None
-        assert "error" in body
-        assert body["error"]["code"] == 422
-        assert body["error"]["message"] == "Validation Error"
-        assert isinstance(body["error"]["details"], list)
-        assert any(
-            d.get("type") == "greater_than_equal" or d.get("msg", "").lower().find("greater than or equal") != -1
-            for d in body["error"]["details"]
-        )
-
-    def test_validation_error_missing_required_fields(self, mock_client: TestClient):
-        """Test validation errors for missing required fields."""
-        response = mock_client.post("/api/v1/items/", json={})
-        assert response.status_code == 422
-        body = response.json()
-        assert body["success"] is False
-        assert body["data"] is None
-        assert body["error"]["code"] == 422
-        assert body["error"]["message"] == "Validation Error"
-        assert isinstance(body["error"]["details"], list)
-
-    def test_validation_error_invalid_data_types(self, mock_client: TestClient):
-        """Test validation errors for invalid data types."""
-        response = mock_client.post("/api/v1/items/", json={"title": 123, "price": "invalid"})
-        assert response.status_code == 422
-        body = response.json()
-        assert body["success"] is False
-        assert body["data"] is None
-        assert body["error"]["code"] == 422
-        assert body["error"]["message"] == "Validation Error"
-
-    def test_validation_error_pagination_limits(self, mock_client: TestClient):
-        """Test validation errors for pagination parameter limits."""
-        # Test negative skip
-        response = mock_client.get("/api/v1/items", params={"skip": -1})
-        assert response.status_code == 422
-        body = response.json()
-        assert body["success"] is False
-        assert body["error"]["code"] == 422
-
-        # Test limit too high
-        response = mock_client.get("/api/v1/items", params={"limit": 1001})
-        assert response.status_code == 422
-        body = response.json()
-        assert body["success"] is False
-        assert body["error"]["code"] == 422
 
     def test_response_envelope_structure_consistency(self, mock_client: TestClient):
         """Test all success responses follow consistent envelope structure."""
@@ -112,10 +70,11 @@ class TestAPIResponseEnvelope:
         assert body["success"] is True
         assert body["data"] is not None
 
-    def test_error_envelope_structure_consistency(self, mock_client: TestClient):
-        """Test all error responses follow consistent envelope structure."""
-        # Test validation error
-        response = mock_client.get("/api/v1/items", params={"limit": 0})
+    def test_method_not_allowed_envelope(self, mock_client: TestClient):
+        """Test method not allowed responses follow error envelope structure."""
+        # Test POST to GET-only endpoints
+        response = mock_client.post("/")
+        assert response.status_code == 405
         body = response.json()
         assert "success" in body
         assert "data" in body
@@ -124,4 +83,72 @@ class TestAPIResponseEnvelope:
         assert body["data"] is None
         assert "code" in body["error"]
         assert "message" in body["error"]
-        assert "details" in body["error"]
+        assert body["error"]["code"] == 405
+
+        response = mock_client.post("/info")
+        assert response.status_code == 405
+        body = response.json()
+        assert body["success"] is False
+        assert body["error"]["code"] == 405
+
+        response = mock_client.post("/health")
+        assert response.status_code == 405
+        body = response.json()
+        assert body["success"] is False
+        assert body["error"]["code"] == 405
+
+    def test_error_envelope_structure_consistency(self, mock_client: TestClient):
+        """Test all error responses follow consistent envelope structure."""
+        # Test method not allowed error
+        response = mock_client.post("/")
+        body = response.json()
+        assert "success" in body
+        assert "data" in body
+        assert "error" in body
+        assert body["success"] is False
+        assert body["data"] is None
+        assert "code" in body["error"]
+        assert "message" in body["error"]
+
+    def test_response_content_type_consistency(self, mock_client: TestClient):
+        """Test all responses return consistent content type."""
+        # Test success responses
+        response = mock_client.get("/health")
+        assert response.headers["content-type"] == "application/json"
+        
+        response = mock_client.get("/")
+        assert response.headers["content-type"] == "application/json"
+        
+        response = mock_client.get("/info")
+        assert response.headers["content-type"] == "application/json"
+
+        # Test error responses
+        response = mock_client.post("/")
+        assert response.headers["content-type"] == "application/json"
+
+    def test_response_data_types(self, mock_client: TestClient):
+        """Test response data types are consistent."""
+        # Test health endpoint data types
+        response = mock_client.get("/health")
+        body = response.json()
+        assert isinstance(body["success"], bool)
+        assert isinstance(body["data"], dict)
+        assert isinstance(body["data"]["status"], str)
+        assert isinstance(body["data"]["service"], str)
+
+        # Test root endpoint data types
+        response = mock_client.get("/")
+        body = response.json()
+        assert isinstance(body["success"], bool)
+        assert isinstance(body["data"], dict)
+        assert isinstance(body["data"]["message"], str)
+        assert isinstance(body["data"]["version"], str)
+
+        # Test info endpoint data types
+        response = mock_client.get("/info")
+        body = response.json()
+        assert isinstance(body["success"], bool)
+        assert isinstance(body["data"], dict)
+        assert isinstance(body["data"]["name"], str)
+        assert isinstance(body["data"]["version"], str)
+        assert isinstance(body["data"]["status"], str)

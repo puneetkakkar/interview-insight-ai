@@ -7,7 +7,6 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from src.app.api.v1 import items
 from src.app.core.setup import (
     _configure_cors,
     _configure_exception_handlers,
@@ -60,7 +59,7 @@ def test_app() -> FastAPI:
     _configure_routes(test_app)
 
     # Include API routers
-    test_app.include_router(items.router, prefix="/api/v1")
+    # Note: Items router removed - only agent router available
 
     # Add root endpoint
     @test_app.get("/")
@@ -108,35 +107,4 @@ def mock_db_session() -> MagicMock:
     return mock_session
 
 
-@pytest.fixture
-def sample_item_data() -> dict:
-    """Sample item data for testing."""
-    return {
-        "title": "Test Item",
-        "description": "A test item for testing purposes",
-        "price": 29.99,
-        "is_active": True,
-    }
-
-
-@pytest.fixture
-def sample_item_update_data() -> dict:
-    """Sample item update data for testing."""
-    return {
-        "title": "Updated Test Item",
-        "description": "An updated test item",
-        "price": 39.99,
-        "is_active": False,
-    }
-
-
-@pytest.fixture
-def pagination_params() -> dict:
-    """Sample pagination parameters for testing."""
-    return {"skip": 0, "limit": 10}
-
-
-@pytest.fixture
-def search_params() -> dict:
-    """Sample search parameters for testing."""
-    return {"title": "test", "skip": 0, "limit": 10}
+# Item-related fixtures removed - no longer needed

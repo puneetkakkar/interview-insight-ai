@@ -36,6 +36,12 @@ class AppSettings(BaseSettings):
 class DatabaseSettings(BaseSettings):
     """Database connection settings."""
 
+    # Database storage type
+    STORAGE_TYPE: str = Field(
+        default="postgres", 
+        description="Storage type: 'postgres' or 'memory'"
+    )
+    
     POSTGRES_USER: str = Field(default="postgres", description="PostgreSQL username")
     POSTGRES_PASSWORD: str = Field(
         default="postgres", description="PostgreSQL password"
@@ -60,6 +66,16 @@ class DatabaseSettings(BaseSettings):
     def POSTGRES_TEST_ASYNC_URL(self) -> str:
         """Build async PostgreSQL test database URL."""
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_TEST_DB}"
+    
+    @property
+    def is_memory_storage(self) -> bool:
+        """Check if using in-memory storage."""
+        return self.STORAGE_TYPE.lower() == "memory"
+    
+    @property
+    def is_postgres_storage(self) -> bool:
+        """Check if using PostgreSQL storage."""
+        return self.STORAGE_TYPE.lower() == "postgres"
 
 
 class LanguageModelSettings(BaseSettings):
@@ -104,8 +120,9 @@ class LanguageModelSettings(BaseSettings):
 
     def model_post_init(self, __context: Any) -> None:
         """Validate that at least one API key is provided."""
-        if not self.ANTHROPIC_API_KEY and not self.OPENAI_API_KEY:
-            raise ValueError("At least one LLM API key must be provided.")
+        # Allow running without API keys for development/testing
+        # The application will use mocked responses when no API keys are available
+        pass
 
 
 class Settings(AppSettings, DatabaseSettings, LanguageModelSettings):
@@ -117,8 +134,10 @@ class Settings(AppSettings, DatabaseSettings, LanguageModelSettings):
 
     @property
     def DATABASE_URL(self) -> str:
-        """Get the appropriate database URL based on environment."""
-        if self.ENVIRONMENT == EnvironmentOption.TESTING:
+        """Get the appropriate database URL based on environment and storage type."""
+        if self.is_memory_storage:
+            return "sqlite+aiosqlite:///:memory:"
+        elif self.ENVIRONMENT == EnvironmentOption.TESTING:
             return self.POSTGRES_TEST_ASYNC_URL
         return self.POSTGRES_ASYNC_URL
 

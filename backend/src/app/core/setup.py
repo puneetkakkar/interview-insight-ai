@@ -13,7 +13,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from src.app.agents.agent import get_all_agent_info, get_agent
 
 from .config import settings
-from .db.database import close_db, init_db
+from .db.database import close_db, init_db, initialize_database
 from .logger import logger
 from .response import build_success_response
 from .exceptions.handlers import (
@@ -28,8 +28,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager: startup/shutdown hooks."""
     logger.info("Starting up FastAPI Application...")
     try:
+        # Initialize database based on configuration
+        initialize_database()
         await init_db()
-        logger.info("Database initialized successfully")
+        logger.info(f"Database initialized successfully using {settings.STORAGE_TYPE} storage")
         # Configure agents with both memory components
         agents = get_all_agent_info()
         for a in agents:

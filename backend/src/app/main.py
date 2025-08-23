@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.app.api.v1 import agent, items
+from src.app.api.v1 import agent
 from src.app.core.setup import create_application
 from src.app.core.response import build_success_response
 
@@ -8,7 +8,6 @@ from src.app.core.response import build_success_response
 app = create_application()
 
 # Include API routers
-app.include_router(items.router, prefix="/api/v1")
 app.include_router(agent.router, prefix="/api/v1")
 
 

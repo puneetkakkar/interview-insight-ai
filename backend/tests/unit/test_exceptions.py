@@ -29,11 +29,11 @@ class TestCustomExceptions:
     def test_not_found_exception(self):
         """Test NotFoundException instantiation and properties."""
         # Arrange & Act
-        exc = NotFoundException("Item not found")
+        exc = NotFoundException("Resource not found")
         
         # Assert
         assert exc.status_code == 404
-        assert exc.detail == "Item not found"
+        assert exc.detail == "Resource not found"
         assert isinstance(exc, HTTPException)
 
     def test_not_found_exception_default_message(self):
@@ -111,7 +111,7 @@ class TestExceptionHandlers:
     async def test_http_exception_handler_404(self):
         """Test HTTP exception handler for 404 errors."""
         # Arrange
-        exc = NotFoundException("Item not found")
+        exc = NotFoundException("Resource not found")
         request = MagicMock(spec=Request)
         
         # Act
@@ -122,7 +122,7 @@ class TestExceptionHandlers:
         body = response.body.decode()
         assert "success" in body
         assert "false" in body
-        assert "Item not found" in body
+        assert "Resource not found" in body
 
     @pytest.mark.asyncio
     async def test_http_exception_handler_405(self):
@@ -271,7 +271,7 @@ class TestExceptionHandlers:
     async def test_exception_handler_response_structure(self):
         """Test that exception handlers return proper response structure."""
         # Arrange
-        exc = NotFoundException("Item not found")
+        exc = NotFoundException("Resource not found")
         request = MagicMock(spec=Request)
         
         # Act
@@ -398,7 +398,7 @@ class TestExceptionHandlerEdgeCases:
     async def test_exception_handler_content_type(self):
         """Test that exception handlers return proper content type."""
         # Arrange
-        exc = NotFoundException("Item not found")
+        exc = NotFoundException("Resource not found")
         request = MagicMock(spec=Request)
         
         # Act

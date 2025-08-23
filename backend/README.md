@@ -1,14 +1,13 @@
 # FRAI Boilerplate
 
-A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V2, and PostgreSQL. This project provides a solid foundation for building scalable web APIs with modern Python practices.
+A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V2, and optional database storage. This project provides a solid foundation for building scalable web APIs with modern Python practices, perfect for coding interviews and rapid prototyping.
 
 ## 🚀 Features
 
 - **FastAPI Framework**: Modern, fast web framework with automatic API documentation
 - **SQLAlchemy 2.0**: Latest ORM with async support and type hints
+- **Flexible Storage**: Choose between PostgreSQL or in-memory SQLite storage
 - **Pydantic V2**: Data validation and serialization with improved performance
-- **PostgreSQL**: Robust relational database with async driver support
-- **Alembic**: Database migration management
 - **Docker & Docker Compose**: Containerized development and production environments
 - **Comprehensive Testing**: Unit and integration tests with pytest
 - **Type Hints**: Full type annotation support throughout the codebase
@@ -35,17 +34,17 @@ src/
 ├── app/
 │   ├── api/           # API endpoints and routing
 │   ├── core/          # Core application configuration
-│   ├── models/        # SQLAlchemy database models
-│   ├── repositories/  # Data access layer
+│   ├── models/        # SQLAlchemy database models (optional)
+│   ├── repositories/  # Data access layer (optional)
 │   └── schemas/       # Pydantic data models
-├── migrations/        # Database migrations
+├── migrations/        # Database migrations (PostgreSQL only)
 └── tests/            # Test suite
 ```
 
 ### Key Components
 
-- **Models**: SQLAlchemy models with timestamp and soft delete mixins
-- **Repositories**: Generic CRUD operations with async support
+- **Models**: SQLAlchemy models with timestamp and soft delete mixins (optional)
+- **Repositories**: Generic CRUD operations with async support (optional)
 - **Schemas**: Pydantic models for request/response validation
 - **API Routes**: RESTful endpoints with proper error handling
 - **Dependencies**: FastAPI dependency injection system
@@ -56,10 +55,10 @@ src/
 The AI module provides a lightweight, extensible foundation for AI-powered features:
 
 ```
-src/app/ai/
+src/app/agents/
 ├── __init__.py      # Module initialization
-├── agents.py        # Multi-agent system with LangGraph
-└── rag.py          # RAG pipeline with ChromaDB
+├── agent.py         # Multi-agent system with LangGraph
+└── tools.py         # Research and calculation tools
 ```
 
 - **Multi-Agent System**: Dictionary-based agent registry with LangGraph integration
@@ -71,8 +70,7 @@ src/app/ai/
 ## 📋 Prerequisites
 
 - Python 3.11+
-- Docker and Docker Compose
-- PostgreSQL (if running locally)
+- Docker and Docker Compose (optional, for PostgreSQL)
 - UV package manager (recommended) or pip
 
 ## 🛠️ Installation & Setup
@@ -95,7 +93,11 @@ cp env.example .env
 Edit `.env` with your configuration:
 
 ```env
-# Database Settings
+# Storage Configuration
+# Choose between 'postgres' or 'memory'
+STORAGE_TYPE=memory
+
+# PostgreSQL Settings (only needed if STORAGE_TYPE=postgres)
 POSTGRES_SERVER=localhost
 POSTGRES_PORT=5432
 POSTGRES_DB=frai_db
@@ -134,11 +136,32 @@ ANTHROPIC_API_KEY=your-anthropic-api-key-here
 
 ## 🚀 Quick Start
 
-### Development Environment
+### In-Memory Storage (Recommended for Interviews)
 
-Start the development environment with Docker Compose:
+For coding interviews or quick prototyping, use in-memory storage:
 
 ```bash
+# Set storage type to memory
+echo "STORAGE_TYPE=memory" >> .env
+
+# Start the application
+uv run python -m src.app.main
+```
+
+This will:
+- Start the FastAPI application on port 8000
+- Use SQLite in-memory database (no setup required)
+- Enable auto-reload for development
+
+### PostgreSQL Storage
+
+For production or when you need persistent data:
+
+```bash
+# Set storage type to postgres
+echo "STORAGE_TYPE=postgres" >> .env
+
+# Start with Docker Compose
 make dev-up
 ```
 
@@ -202,7 +225,40 @@ curl -X POST http://localhost:8000/api/v1/agent/rag/query \
 
 ## 🗄️ Database Management
 
-### Migrations
+### Storage Options
+
+The application supports two storage modes:
+
+#### 1. In-Memory Storage (Default for Interviews)
+- **Configuration**: `STORAGE_TYPE=memory`
+- **Database**: SQLite in-memory
+- **Pros**: No setup required, instant startup, perfect for interviews
+- **Cons**: Data is lost on restart, no persistence
+
+#### 2. PostgreSQL Storage
+- **Configuration**: `STORAGE_TYPE=postgres`
+- **Database**: PostgreSQL with async driver
+- **Pros**: Persistent data, production-ready, full SQL features
+- **Cons**: Requires database setup, slower startup
+
+### Switching Storage Types
+
+To switch between storage types:
+
+```bash
+# For in-memory (coding interviews)
+export STORAGE_TYPE=memory
+
+# For PostgreSQL
+export STORAGE_TYPE=postgres
+
+# Or edit .env file
+echo "STORAGE_TYPE=memory" > .env
+```
+
+### PostgreSQL Migrations
+
+When using PostgreSQL, you can manage migrations:
 
 Create a new migration:
 ```bash
@@ -217,14 +273,6 @@ make upgrade
 Create and apply migrations in one command:
 ```bash
 make migrate
-```
-
-### Database Connection
-
-The application automatically connects to PostgreSQL using the settings in your `.env` file. The database URL is constructed as:
-
-```
-postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}
 ```
 
 ## 🧪 Testing
@@ -263,7 +311,7 @@ After running coverage, you'll find an HTML report in the `htmlcov/` directory.
 
 ### Adding New Agents
 
-To add a new agent, extend the agents dictionary in `src/app/ai/agents.py`:
+To add a new agent, extend the agents dictionary in `src/app/agents/agent.py`:
 
 ```python
 # Add your new agent
@@ -375,13 +423,12 @@ frai-be/
 │       └── docker-compose.prod.yml
 ├── src/                            # Source code
 │   └── app/
-│       ├── ai/                     # AI and LangGraph modules
+│       ├── agents/                 # AI and LangGraph modules
 │       │   ├── __init__.py         # AI module initialization
-│       │   ├── agents.py           # Multi-agent system
-│       │   └── rag.py             # RAG pipeline
+│       │   ├── agent.py            # Multi-agent system
+│       │   └── tools.py            # Research and calculation tools
 │       ├── api/                    # API endpoints
 │       │   └── v1/                 # API version 1
-│       │       ├── items.py        # Items API
 │       │       └── agent.py        # AI Agent API
 │       ├── core/                   # Core application logic
 │       │   ├── config.py           # Configuration management
@@ -390,11 +437,11 @@ frai-be/
 │       │   ├── logger.py           # Logging configuration
 │       │   ├── response.py         # Response formatting
 │       │   └── setup.py            # Application setup
-│       ├── models/                 # Database models
-│       ├── repositories/           # Data access layer
+│       ├── models/                 # Database models (optional)
+│       ├── repositories/           # Data access layer (optional)
 │       ├── schemas/                # Pydantic schemas
 │       └── main.py                 # Application entry point
-├── migrations/                     # Database migrations
+├── migrations/                     # Database migrations (PostgreSQL only)
 ├── tests/                          # Test suite
 │   ├── integration/                # Integration tests
 │   ├── unit/                       # Unit tests
@@ -411,31 +458,31 @@ frai-be/
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `STORAGE_TYPE` | Storage type: 'postgres' or 'memory' | `postgres` |
 | `ENVIRONMENT` | Application environment (development/testing/production) | `development` |
 | `DEBUG` | Enable debug mode | `true` |
 | `RELOAD` | Enable auto-reload | `true` |
-| `POSTGRES_SERVER` | PostgreSQL server host | `localhost` |
-| `POSTGRES_PORT` | PostgreSQL server port | `5432` |
-| `POSTGRES_DB` | PostgreSQL database name | `frai_db` |
-| `POSTGRES_USER` | PostgreSQL username | `postgres` |
-| `POSTGRES_PASSWORD` | PostgreSQL password | `postgres` |
+| `POSTGRES_SERVER` | PostgreSQL server host (only if STORAGE_TYPE=postgres) | `localhost` |
+| `POSTGRES_PORT` | PostgreSQL server port (only if STORAGE_TYPE=postgres) | `5432` |
+| `POSTGRES_DB` | PostgreSQL database name (only if STORAGE_TYPE=postgres) | `frai_db` |
+| `POSTGRES_USER` | PostgreSQL username (only if STORAGE_TYPE=postgres) | `postgres` |
+| `POSTGRES_PASSWORD` | PostgreSQL password (only if STORAGE_TYPE=postgres) | `postgres` |
 | `SECRET_KEY` | JWT secret key | `your-secret-key-here` |
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude | `None` (optional) |
 
-### Database Configuration
+### Storage Configuration
 
-The application supports multiple database configurations:
+The application automatically configures itself based on the `STORAGE_TYPE` setting:
 
-- **Development**: Uses main database with debug logging
-- **Testing**: Uses separate test database
-- **Production**: Uses main database with production optimizations
+- **`STORAGE_TYPE=memory`**: Uses SQLite in-memory database, perfect for coding interviews
+- **`STORAGE_TYPE=postgres`**: Uses PostgreSQL with full database features
 
 ## 🚀 Deployment
 
 ### Production Considerations
 
 1. **Environment Variables**: Set `ENVIRONMENT=production` and `DEBUG=false`
-2. **Database**: Use production PostgreSQL instance
+2. **Storage Type**: Choose between `memory` (for stateless) or `postgres` (for persistent)
 3. **Secrets**: Change default secret keys
 4. **CORS**: Restrict allowed origins
 5. **Logging**: Configure production logging levels
@@ -449,8 +496,8 @@ make prod-up
 
 The production Docker setup includes:
 - Gunicorn with multiple workers
-- Health checks for database
-- Persistent volume for PostgreSQL data
+- Health checks for database (if using PostgreSQL)
+- Persistent volume for PostgreSQL data (if using PostgreSQL)
 - Optimized container configuration
 
 ## 🧹 Code Quality
@@ -508,11 +555,38 @@ uv update
 
 ### Database Migrations
 
-Always backup your database before running migrations in production.
+Always backup your database before running migrations in production (PostgreSQL only).
 
 ### Security Updates
 
 Keep dependencies updated, especially security-related packages.
+
+## 💡 Coding Interview Tips
+
+This boilerplate is designed to be interview-friendly:
+
+### Quick Start for Interviews
+```bash
+# Clone and setup in under 2 minutes
+git clone <repo>
+cd frai-be
+echo "STORAGE_TYPE=memory" > .env
+uv run python -m src.app.main
+```
+
+### Key Benefits for Interviews
+- **No Database Setup**: In-memory storage works immediately
+- **AI Features Ready**: Research agent and RAG system pre-configured
+- **Clean Architecture**: Easy to explain and extend
+- **Fast Startup**: Application ready in seconds
+- **Modern Stack**: Shows knowledge of current best practices
+
+### Common Interview Extensions
+- Add new API endpoints
+- Implement custom business logic
+- Extend the AI agent system
+- Add authentication/authorization
+- Implement caching strategies
 
 ---
 
