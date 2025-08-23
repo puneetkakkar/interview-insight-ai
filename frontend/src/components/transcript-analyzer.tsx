@@ -69,6 +69,7 @@ export function TranscriptAnalyzer() {
       return;
     }
 
+    // Keep loading while we navigate to avoid flicker
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
@@ -96,11 +97,12 @@ export function TranscriptAnalyzer() {
       const analysisData = data as TranscriptAnalysisResponse;
 
       if (analysisData.success && analysisData.data) {
-        setState((prev) => ({
-          ...prev,
-          summary: analysisData.data,
-          isLoading: false,
-        }));
+        // Persist briefly for the analysis page
+        try {
+          sessionStorage.setItem("analysis:summary", JSON.stringify(analysisData.data));
+        } catch {}
+        // Do not drop loading here; navigate immediately to avoid layout shift
+        window.location.assign("/analysis");
       } else {
         setState((prev) => ({
           ...prev,
@@ -118,12 +120,8 @@ export function TranscriptAnalyzer() {
   };
 
   const handleClear = () => {
-    setState({
-      transcript: "",
-      summary: null,
-      isLoading: false,
-      error: null,
-    });
+    setState({ transcript: "", summary: null, isLoading: false, error: null });
+    try { sessionStorage.removeItem("analysis:summary"); } catch {}
   };
 
   // Data for the process stepper
@@ -303,7 +301,7 @@ export function TranscriptAnalyzer() {
                 <div className="mb-1 text-md font-semibold text-white">{step.title}</div>
                 <p className="mx-auto max-w-[22rem] text-sm leading-relaxed text-white/75">
                   {step.title === 'Upload'
-                    ? 'Paste or upload your interview transcript.'
+                    ? 'Paste in your interview transcript.'
                     : step.title === 'Analyze'
                     ? 'Our AI digs into the conversation.'
                     : 'See the story unfold in a timeline.'}
@@ -329,20 +327,6 @@ export function TranscriptAnalyzer() {
             </Fragment>
           ))}
         </div>
-        {/* <div className="mt-6 grid grid-cols-1 gap-6 sm:hidden">
-          {processSteps.map((step) => (
-            <div key={`${step.key}-desc`} className="text-center">
-              <p className="mx-auto max-w-md text-sm leading-relaxed text-white/70">{step.description}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 hidden grid-cols-3 gap-8 sm:grid">
-          {processSteps.map((step) => (
-            <div key={`${step.key}-desc-desktop`} className="text-center">
-              <p className="mx-auto max-w-sm text-sm leading-relaxed text-white/70">{step.description}</p>
-            </div>
-          ))}
-        </div> */}
       </section>
 
       {/* Results Section */}

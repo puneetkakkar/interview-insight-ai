@@ -1,0 +1,64 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import type { TranscriptSummary } from "@/types/interview";
+import { AnalysisDashboard } from "@/components/analysis-dashboard";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
+export default function AnalysisPage() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const [summary, setSummary] = useState<TranscriptSummary | null>(null);
+
+  useEffect(() => {
+    const cached = sessionStorage.getItem("analysis:summary");
+    if (cached) setSummary(JSON.parse(cached) as TranscriptSummary);
+  }, [params]);
+
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-50/0 via-slate-50/0 to-coral-50/0 dark:from-blue-950 dark:via-black dark:to-slate-950">
+      <div className="container mx-auto px-4 py-6">
+        {/* Top header with back + action */}
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+            onClick={() => {
+              try { sessionStorage.removeItem("analysis:summary"); } catch {}
+              router.push("/");
+            }}
+            className="rounded-full border border-white/15 px-4 py-1.5 text-sm text-white/80 hover:bg-white/5"
+          >
+            ← Back
+            </button>
+            <h1 className="text-base font-semibold text-white/90 sm:text-lg">Interview Insights</h1>
+          </div>
+          {summary && (
+            <button
+              onClick={() => {
+                try { sessionStorage.removeItem("analysis:summary"); } catch {}
+                router.push("/");
+              }}
+              className="rounded-full bg-[#00A3E0] px-4 py-1.5 text-sm text-black hover:bg-[#14b5f1]"
+            >
+              New Analysis
+            </button>
+          )}
+        </div>
+
+        {!summary ? (
+          <div className="px-4 py-12 text-center text-white/70">
+            <LoadingSpinner size="md" className="mx-auto" />
+            <p className="mt-3 text-sm">Preparing your analysis...</p>
+          </div>
+        ) : (
+          <div className="py-2">
+            <AnalysisDashboard summary={summary} />
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+
