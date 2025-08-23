@@ -4,7 +4,8 @@ import { TimelineAccordion } from "@/components/timeline-accordion";
 import type { TranscriptSummary } from "@/types/interview";
 import { motion } from "framer-motion";
 import { Building2, Cpu, Users } from "lucide-react";
-import { useState } from "react";
+import { ExpandableList } from "./expandable-lists";
+import { Chips } from "./ui/chips";
 
 interface AnalysisDashboardProps {
   summary: TranscriptSummary;
@@ -71,19 +72,22 @@ export function AnalysisDashboard({ summary }: AnalysisDashboardProps) {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-medium tracking-wide text-white/60 uppercase">
-                <Users className="h-3.5 w-3.5" /> People
+                <Users className="h-3.5 w-3.5" />
+                People
               </div>
               <Chips items={entities.people} />
             </div>
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-medium tracking-wide text-white/60 uppercase">
-                <Building2 className="h-3.5 w-3.5" /> Company
+                <Building2 className="h-3.5 w-3.5" />
+                Company
               </div>
               <Chips items={entities.companies} />
             </div>
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-medium tracking-wide text-white/60 uppercase">
-                <Cpu className="h-3.5 w-3.5" /> Technologies
+                <Cpu className="h-3.5 w-3.5" />
+                Tech
               </div>
               <Chips items={entities.technologies} />
             </div>
@@ -98,92 +102,6 @@ export function AnalysisDashboard({ summary }: AnalysisDashboardProps) {
           <TimelineAccordion entries={timeline} />
         </div>
       </div>
-    </div>
-  );
-}
-
-function ExpandableList({
-  title,
-  items,
-  delay = 0,
-}: {
-  title: string;
-  items: string[];
-  delay?: number;
-}) {
-  const MAX = 6;
-  const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? items : items.slice(0, MAX);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 + delay }}
-      className="rounded-2xl border border-white/10 bg-black/30 p-5"
-    >
-      <div className="mb-3 flex items-center justify-between">
-        <div className="text-lg font-semibold text-white">{title}</div>
-        {items.length > MAX && (
-          <button
-            onClick={() => setShowAll((v) => !v)}
-            className="text-xs text-[#00A3E0] hover:underline"
-          >
-            {showAll ? "Show less" : `Show ${items.length - MAX} more`}
-          </button>
-        )}
-      </div>
-      <ul className="space-y-2 text-sm text-white/80">
-        {visible.length > 0 ? (
-          visible.map((h, idx) => (
-            <li key={idx} className="list-disc pl-4 marker:text-white/40">
-              {h}
-            </li>
-          ))
-        ) : (
-          <li className="text-white/50">No {title.toLowerCase()} detected</li>
-        )}
-      </ul>
-    </motion.div>
-  );
-}
-
-function Chips({ items }: { items: string[] }) {
-  const MAX = 8;
-  const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? items : items.slice(0, MAX);
-
-  if (items.length === 0)
-    return <span className="text-xs text-white/50">—</span>;
-
-  return (
-    <div>
-      <div className="flex flex-wrap gap-1.5">
-        {visible.map((txt) => (
-          <span
-            key={txt}
-            className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-white/80"
-          >
-            {txt}
-          </span>
-        ))}
-        {items.length > MAX && !showAll && (
-          <button
-            onClick={() => setShowAll(true)}
-            className="rounded-full border border-white/15 px-2 py-0.5 text-xs text-white/70 hover:bg-white/5"
-          >
-            +{items.length - MAX}
-          </button>
-        )}
-      </div>
-      {showAll && items.length > MAX && (
-        <button
-          onClick={() => setShowAll(false)}
-          className="mt-2 text-xs text-[#00A3E0] hover:underline"
-        >
-          Show less
-        </button>
-      )}
     </div>
   );
 }
