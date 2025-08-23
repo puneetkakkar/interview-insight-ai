@@ -4,6 +4,7 @@ from langgraph.pregel import Pregel
 
 from src.app.schemas import AgentInfo
 from .research_assistant import research_assistant
+from .transcript_analyzer import transcript_analyzer
 
 DEFAULT_AGENT = "research-assistant"
 
@@ -22,6 +23,10 @@ agents: dict[str, Agent] = {
     "research-assistant": Agent(
         description="A research assistant with web search and calculator.",
         graph=research_assistant,
+    ),
+    "transcript-analyzer": Agent(
+        description="An interview transcript analyzer that extracts insights, creates timelines, and identifies key entities.",
+        graph=transcript_analyzer,
     )
 }
 
