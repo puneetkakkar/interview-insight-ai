@@ -32,12 +32,8 @@ export function SentimentAnalysis({ sentiment }: SentimentAnalysisProps) {
       className="space-y-6"
     >
       <div className="text-center">
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-coral-700 dark:from-blue-200 dark:to-coral-200 bg-clip-text text-transparent mb-2">
-          Sentiment Analysis
-        </h3>
-        <p className="text-slate-600 dark:text-slate-300">
-          Key positive moments and areas for improvement identified in the interview
-        </p>
+        <h3 className="mb-1 text-xl font-semibold text-slate-900 dark:text-slate-100">Sentiment</h3>
+        <p className="text-sm text-slate-600 dark:text-slate-400">Highlights and areas to improve</p>
       </div>
 
       <div className={`grid ${getGridCols()} gap-6`}>
@@ -49,37 +45,29 @@ export function SentimentAnalysis({ sentiment }: SentimentAnalysisProps) {
             transition={{ delay: 0.8 }}
             className="h-full"
           >
-            <Card className="glass-strong border-0 shadow-xl h-full hover:shadow-2xl transition-all duration-300 group">
+            <Card className="h-full border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-emerald-700 dark:text-emerald-300">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/40 dark:to-emerald-800/40 group-hover:scale-110 transition-transform duration-200">
-                    <CheckCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+                  <div className="p-2 rounded-md border border-slate-200/80 dark:border-slate-800">
+                    <CheckCircle className="w-4 h-4 text-emerald-600" />
                   </div>
-                  <span className="font-semibold">Highlights & Strengths</span>
-                  <Badge 
-                    variant="secondary" 
-                    className="ml-auto bg-gradient-to-r from-emerald-100 to-emerald-200 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-700 dark:text-emerald-300 border-0"
-                  >
+                  <span>Highlights</span>
+                  <Badge variant="outline" className="ml-auto rounded-full border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2 py-0.5">
                     {sentiment.highlights.length}
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2.5">
                 {sentiment.highlights.map((highlight, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9 + index * 0.1 }}
-                    className="flex items-start gap-3 p-4 bg-gradient-to-r from-emerald-50/80 to-emerald-100/60 dark:from-emerald-900/30 dark:to-emerald-800/20 rounded-xl border-2 border-emerald-200/50 dark:border-emerald-700/30 hover:border-emerald-300 dark:hover:border-emerald-600 transition-colors duration-200"
+                    transition={{ delay: 0.9 + index * 0.06 }}
+                    className="flex items-start gap-2 rounded-md border border-emerald-200/40 dark:border-emerald-800/40 bg-emerald-50/40 dark:bg-emerald-900/10 p-3"
                   >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="p-1.5 rounded-full bg-emerald-100 dark:bg-emerald-800/50">
-                        <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                    </div>
-                    <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed font-medium">
+                    <TrendingUp className="mt-0.5 h-3.5 w-3.5 text-emerald-600" />
+                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                       {highlight}
                     </p>
                   </motion.div>
@@ -97,37 +85,29 @@ export function SentimentAnalysis({ sentiment }: SentimentAnalysisProps) {
             transition={{ delay: 0.8 }}
             className="h-full"
           >
-            <Card className="glass-strong border-0 shadow-xl h-full hover:shadow-2xl transition-all duration-300 group">
+            <Card className="h-full border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-amber-700 dark:text-amber-300">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-800/40 group-hover:scale-110 transition-transform duration-200">
-                    <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+                  <div className="p-2 rounded-md border border-slate-200/80 dark:border-slate-800">
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
                   </div>
-                  <span className="font-semibold">Areas for Improvement</span>
-                  <Badge 
-                    variant="secondary" 
-                    className="ml-auto bg-gradient-to-r from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-800/40 text-amber-700 dark:text-amber-300 border-0"
-                  >
+                  <span>Areas for Improvement</span>
+                  <Badge variant="outline" className="ml-auto rounded-full border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2 py-0.5">
                     {sentiment.lowlights.length}
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2.5">
                 {sentiment.lowlights.map((lowlight, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9 + index * 0.1 }}
-                    className="flex items-start gap-3 p-4 bg-gradient-to-r from-amber-50/80 to-amber-100/60 dark:from-amber-900/30 dark:to-amber-800/20 rounded-xl border-2 border-amber-200/50 dark:border-amber-700/30 hover:border-amber-300 dark:hover:border-amber-600 transition-colors duration-200"
+                    transition={{ delay: 0.9 + index * 0.06 }}
+                    className="flex items-start gap-2 rounded-md border border-amber-200/40 dark:border-amber-800/40 bg-amber-50/40 dark:bg-amber-900/10 p-3"
                   >
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="p-1.5 rounded-full bg-amber-100 dark:bg-amber-800/50">
-                        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      </div>
-                    </div>
-                    <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-amber-600" />
+                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                       {lowlight}
                     </p>
                   </motion.div>
@@ -146,21 +126,20 @@ export function SentimentAnalysis({ sentiment }: SentimentAnalysisProps) {
           transition={{ delay: 1.0 }}
           className="text-center"
         >
-          <Card className="glass border-0 shadow-lg">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+          <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 shadow-sm">
+            <CardContent className="pt-5">
+              <div className="mb-1 flex items-center justify-center gap-2">
+                <Sparkles className="w-4 h-4 text-slate-400" />
+                <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Analysis Insight
                 </span>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                {hasHighlights && hasLowlights 
-                  ? `Found ${sentiment.highlights.length} positive aspects and ${sentiment.lowlights.length} areas for improvement`
-                  : hasHighlights 
-                    ? `Identified ${sentiment.highlights.length} key strengths and positive moments`
-                    : `Found ${sentiment.lowlights.length} areas that could be improved for future interviews`
-                }
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {hasHighlights && hasLowlights
+                  ? `Found ${sentiment.highlights.length} strengths and ${sentiment.lowlights.length} areas to improve`
+                  : hasHighlights
+                    ? `Identified ${sentiment.highlights.length} key strengths`
+                    : `Found ${sentiment.lowlights.length} improvement opportunities`}
               </p>
             </CardContent>
           </Card>
