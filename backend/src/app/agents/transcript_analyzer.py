@@ -18,13 +18,14 @@ from .tools import (
     transcript_parser,
     entity_extractor,
     sentiment_analyzer,
-    content_categorizer
+    content_categorizer,
+    timeline_consolidator,
 )
 
 
 class TranscriptAnalyzerState(MessagesState, total=False):
     """State for transcript analyzer agent."""
-    
+
     remaining_steps: RemainingSteps
     transcript_text: str
     parsed_segments: str | None
@@ -37,68 +38,86 @@ class TranscriptAnalyzerState(MessagesState, total=False):
 # Tools available to the transcript analyzer
 tools = [
     transcript_parser,
-    entity_extractor, 
+    entity_extractor,
     sentiment_analyzer,
-    content_categorizer
+    content_categorizer,
+    timeline_consolidator,
 ]
 
 current_date = datetime.now().strftime("%B %d, %Y")
 
 instructions = f"""
-You are an expert interview transcript analyzer. Your job is to process interview transcripts and provide comprehensive analysis including:
-
-1. **Timeline Generation**: Create a chronological timeline of interview events with timestamps and categories
-2. **Entity Extraction**: Identify people, companies, technologies, and locations mentioned
-3. **Sentiment Analysis**: Extract highlights and lowlights from the interview
-4. **Content Categorization**: Classify content into interview phases (introduction, problem description, solution discussion, etc.)
+You are an expert interview transcript analyzer. Your job is to process interview transcripts using the available tools.
 
 Today's date is {current_date}.
 
-**IMPORTANT INSTRUCTIONS:**
+**CRITICAL INSTRUCTIONS - FOLLOW EXACTLY:**
 
-1. **Always use the tools provided** - don't try to parse or analyze content manually
-2. **Process in the correct order**:
-   - First use TranscriptParser to extract timestamps and segments
-   - Then use EntityExtractor on the full transcript text
-   - Use SentimentAnalyzer on the full transcript text
-   - Finally use ContentCategorizer on each segment to build the timeline
+1. **MANDATORY TOOL USAGE** - You MUST use ALL the tools in this exact order. Never skip tools or provide direct analysis:
+   
+   STEP 1: Use TranscriptParser on the full transcript text
+   STEP 2: Use EntityExtractor on the full transcript text  
+   STEP 3: Use SentimentAnalyzer on the full transcript text
+   STEP 4: For each segment from TranscriptParser, use ContentCategorizer to get its category
+   STEP 5: Use TimelineConsolidator on the timeline JSON from step 4 to merge consecutive similar events
+   
+   **IMPORTANT**: Process the ENTIRE transcript - do not stop early. Ensure complete coverage from start to finish.
+   
+2. **FINAL JSON OUTPUT** - After using ALL tools, provide ONLY a JSON response with this exact structure:
+   ```json
+   {{
+     "entities": {{
+       "people": ["extracted names"],
+       "companies": ["extracted companies"], 
+       "technologies": ["extracted tech"],
+       "locations": ["extracted locations"]
+     }},
+     "sentiment_analysis": {{
+       "highlights": ["positive moments"],
+       "lowlights": ["concerning moments"]
+     }},
+     "timeline": [
+       {{
+         "timestamp": "00:01:30",
+         "category": "Introduction",
+         "content": "timeline event description",
+         "confidence_score": 0.9
+       }}
+     ],
+     "overall_sentiment": "Positive",
+     "key_topics": ["Topic1", "Topic2"],
+     "total_duration": "45:30"
+   }}
+   ```
 
-3. **Output Format**: Your final response should be a structured JSON containing:
-   - entities: {{people: [], companies: [], technologies: [], locations: []}}
-   - sentiment_analysis: {{highlights: [], lowlights: []}}
-   - timeline: [{{timestamp: "00:01:30", category: "introduction", content: "...", confidence_score: 0.9}}]
-   - overall_sentiment: "Positive"/"Mixed"/"Negative"
-   - key_topics: ["Topic1", "Topic2"]
-   - total_duration: "45:30" (if determinable)
+3. **NO NARRATIVE SUMMARIES** - Do not provide explanatory text, analysis, or commentary. Only use tools and provide the final JSON.
 
-4. **Categories to use**: introduction, problem_description, solution_discussion, coding, testing, questions, conclusion, discussion
+4. **JSON ONLY** - Your final response must be ONLY the JSON object above, nothing else.
 
-5. **Be thorough but concise** - focus on the most important insights
-
-6. **Handle missing timestamps** - if no timestamps are found, create logical time intervals
-
-Remember: The user cannot see the tool responses, so always provide a complete final analysis in your response.
+REMEMBER: Use every tool, then respond with JSON only. No explanations, no summaries, just structured JSON data.
 """
 
 
-def wrap_model(model: BaseChatModel) -> RunnableSerializable[TranscriptAnalyzerState, AIMessage]:
+def wrap_model(
+    model: BaseChatModel,
+) -> RunnableSerializable[TranscriptAnalyzerState, AIMessage]:
     """Wrap the model with transcript analysis instructions."""
     bound_model = model.bind_tools(tools)
-    
+
     def preprocess_state(state: TranscriptAnalyzerState) -> list:
         """Preprocess state to include transcript context."""
         system_msg = SystemMessage(content=instructions)
-        
+
         # Add transcript text to context if available
         if state.get("transcript_text"):
             context_msg = SystemMessage(
                 content=f"TRANSCRIPT TO ANALYZE:\n\n{state['transcript_text']}\n\n"
-                       f"Please analyze this transcript using the available tools."
+                f"Please analyze this transcript using the available tools."
             )
             return [system_msg, context_msg] + state["messages"]
-        
+
         return [system_msg] + state["messages"]
-    
+
     preprocessor = RunnableLambda(preprocess_state, name="TranscriptStateModifier")
     return preprocessor | bound_model  # type: ignore[return-value]
 
@@ -121,17 +140,17 @@ async def acall_model(
                 )
             ]
         }
-    
+
     return {"messages": [response]}
 
 
 def should_run_tools(state: TranscriptAnalyzerState) -> str:
     """Determine if tools should be run based on the last message."""
     last_message = state["messages"][-1]
-    
+
     if not isinstance(last_message, AIMessage):
         raise TypeError(f"Expected AIMessage, got {type(last_message)}")
-    
+
     if hasattr(last_message, "tool_calls") and last_message.tool_calls:
         return "tools"
     return "done"
@@ -150,9 +169,7 @@ transcript_analyzer_graph.set_entry_point("model")
 # Add edges
 transcript_analyzer_graph.add_edge("tools", "model")
 transcript_analyzer_graph.add_conditional_edges(
-    "model",
-    should_run_tools,
-    {"tools": "tools", "done": END}
+    "model", should_run_tools, {"tools": "tools", "done": END}
 )
 
 # Compile the graph

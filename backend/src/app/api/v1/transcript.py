@@ -49,6 +49,8 @@ async def _handle_transcript_input(
     config = RunnableConfig(
         configurable=configurable,
         run_id=run_id,
+        # Increase recursion limit for longer transcripts with many segments
+        recursion_limit=100,
     )
 
     # Check for interrupts that need to be resumed
@@ -109,18 +111,43 @@ def _parse_agent_response_to_summary(response_content) -> TranscriptSummary:
         else:
             response_text = str(response_content)
 
-        # Try to extract JSON from the response text
+        # Try to extract JSON from the response text (improved parsing)
         json_str = None
+
+        # Method 1: Look for JSON code blocks
         if "```json" in response_text:
-            # Extract JSON block
             start_idx = response_text.find("```json") + 7
             end_idx = response_text.find("```", start_idx)
-            json_str = response_text[start_idx:end_idx].strip()
+            if end_idx != -1:
+                json_str = response_text[start_idx:end_idx].strip()
+
+        # Method 2: Look for JSON without code blocks
         elif "{" in response_text and "}" in response_text:
-            # Try to find JSON-like content
             start_idx = response_text.find("{")
             end_idx = response_text.rfind("}") + 1
             json_str = response_text[start_idx:end_idx]
+
+        # Method 3: Try to find JSON in structured content
+        if not json_str and isinstance(response_content, list):
+            for item in response_content:
+                if isinstance(item, dict) and item.get("type") == "text":
+                    text_content = item.get("text", "")
+                    if "{" in text_content and "}" in text_content:
+                        # Look for JSON patterns in the text
+                        start_idx = text_content.find("{")
+                        end_idx = text_content.rfind("}") + 1
+                        potential_json = text_content[start_idx:end_idx]
+
+                        # Validate it's actually JSON by trying to parse it
+                        try:
+                            test_parse = json.loads(potential_json)
+                            if isinstance(test_parse, dict) and (
+                                "entities" in test_parse or "timeline" in test_parse
+                            ):
+                                json_str = potential_json
+                                break
+                        except json.JSONDecodeError:
+                            continue
 
         if json_str:
             # Parse the JSON
@@ -231,55 +258,181 @@ async def analyze_transcript(
         agent: AgentGraph = get_agent(TRANSCRIPT_AGENT_ID)
         kwargs, run_id = await _handle_transcript_input(transcript_input, agent)
 
-        # Invoke the real LangGraph agent
-        # response_events: list[tuple[str, Any]] = await agent.ainvoke(**kwargs, stream_mode=["updates", "values"])
-        # response_type, response = response_events[-1]
+        # Invoke the real LangGraph agent with improved error handling
+        try:
+            logger.info(f"Invoking transcript analyzer agent for run_id: {run_id}")
+            response_events: list[tuple[str, Any]] = await agent.ainvoke(
+                **kwargs, stream_mode=["updates", "values"]
+            )
 
-        response_type = "values"
-        response = {}
+            if not response_events:
+                logger.error("No response events received from agent")
+                raise ValueError("Agent returned no response events")
+
+            response_type, response = response_events[-1]
+            logger.info(f"Agent response type: {response_type}")
+
+        except Exception as agent_error:
+            logger.error(f"Agent invocation failed: {str(agent_error)}")
+            logger.error(f"Agent error type: {type(agent_error)}")
+            raise ValueError(
+                f"Agent processing failed: {str(agent_error)}"
+            ) from agent_error
+
         if response_type == "values":
             # Normal response - parse the agent's analysis
-            # response_content = response["messages"][-1].content
-            # summary = _parse_agent_response_to_summary(response_content)
-            summary = {
-                "entities": {
-                    "people": ["John", "Interviewer"],
-                    "companies": ["TechNova"],
-                    "technologies": [],
-                    "locations": [],
-                },
-                "sentiment_analysis": {
-                    "highlights": [
-                        "Positive initial interaction",
-                        "Willingness to help",
-                    ],
-                    "lowlights": [],
-                },
-                "timeline": [
-                    {
-                        "timestamp": "00:00:00",
-                        "category": "introduction",
-                        "content": "Interviewer thanks John for joining",
-                        "confidence_score": 0.9,
-                    },
-                    {
-                        "timestamp": "00:00:04",
-                        "category": "introduction",
-                        "content": "John responds positively",
-                        "confidence_score": 0.8,
-                    },
-                    {
-                        "timestamp": "00:00:07",
-                        "category": "problem_description",
-                        "content": "Interviewer asks about John's role at TechNova",
-                        "confidence_score": 0.9,
-                    },
-                ],
-                "total_duration": "00:00:07",
-                "key_topics": ["Job Role", "TechNova"],
-                "overall_sentiment": "Positive",
-                "metadata": {"processed": True},
-            }
+            try:
+                if "messages" not in response or not response["messages"]:
+                    logger.error("No messages in agent response")
+                    raise ValueError("Agent response missing messages")
+
+                response_content = response["messages"][-1].content
+                logger.info(f"Agent response content type: {type(response_content)}")
+                logger.info(
+                    f"Agent response content length: {len(str(response_content))}"
+                )
+
+                summary = _parse_agent_response_to_summary(response_content)
+
+                # Save the actual LLM response for future testing
+                with open("actual_llm_response.json", "w") as f:
+                    json.dump(
+                        {
+                            "response_content": response_content,
+                            "parsed_summary": summary,
+                            "run_id": str(run_id),
+                        },
+                        f,
+                        indent=4,
+                        default=str,
+                    )
+
+                logger.info(
+                    "Successfully saved LLM response to actual_llm_response.json"
+                )
+
+            except Exception as parse_error:
+                logger.error(f"Response parsing failed: {str(parse_error)}")
+                raise ValueError(
+                    f"Failed to parse agent response: {str(parse_error)}"
+                ) from parse_error
+
+            # Enhanced mock response showcasing improved functionality
+            # summary = {
+            #     "entities": {
+            #         "people": ["Alex Chen", "Sarah Johnson", "Mike Rodriguez"],
+            #         "companies": ["Google", "Microsoft", "Meta", "TechFlow Solutions"],
+            #         "technologies": [
+            #             "React", "TypeScript", "Node.js", "PostgreSQL", "Docker",
+            #             "Kubernetes", "AWS", "GraphQL", "Jest", "Git", "Redis",
+            #             "Microservices", "REST API"
+            #         ],
+            #         "locations": ["San Francisco", "Remote", "Seattle"]
+            #     },
+            #     "sentiment_analysis": {
+            #         "highlights": [
+            #             "Candidate demonstrated excellent problem-solving skills when designing the scalable architecture",
+            #             "Great communication throughout the system design discussion",
+            #             "Showed strong understanding of React hooks and modern JavaScript patterns",
+            #             "Excellent approach to handling edge cases in the coding challenge",
+            #             "Very thoughtful questions about the team structure and engineering culture"
+            #         ],
+            #         "lowlights": [
+            #             "Needed some guidance on the optimal database indexing strategy",
+            #             "Took a moment to recall the time complexity of the chosen sorting algorithm",
+            #             "Initially overlooked error handling in the API implementation"
+            #         ]
+            #     },
+            #     "timeline": [
+            #         {
+            #             "timestamp": "00:00-02:30",
+            #             "category": "Introduction",
+            #             "content": "Introduction phase covering candidate's background at Google, experience with React and TypeScript, and current role as Senior Frontend Engineer",
+            #             "confidence_score": 0.95,
+            #             "duration": "2m 30s",
+            #             "event_count": 3
+            #         },
+            #         {
+            #             "timestamp": "02:30-08:15",
+            #             "category": "Problem Description",
+            #             "content": "Discussion of the technical challenge: building a real-time chat application with message persistence, user authentication, and scalability requirements for 100K+ concurrent users",
+            #             "confidence_score": 0.92,
+            #             "duration": "5m 45s",
+            #             "event_count": 4
+            #         },
+            #         {
+            #             "timestamp": "08:15-18:30",
+            #             "category": "Solution Discussion",
+            #             "content": "Candidate presented comprehensive architecture using microservices, WebSocket connections, Redis for caching, PostgreSQL for persistence, and Docker containers. Discussion continued with load balancing strategies and database sharding approach",
+            #             "confidence_score": 0.88,
+            #             "duration": "10m 15s",
+            #             "event_count": 7
+            #         },
+            #         {
+            #             "timestamp": "18:30-28:45",
+            #             "category": "Coding Session",
+            #             "content": "Implementation of real-time message handling component in React with TypeScript, including custom hooks for WebSocket management, error boundaries, and optimistic UI updates",
+            #             "confidence_score": 0.85,
+            #             "duration": "10m 15s",
+            #             "event_count": 6
+            #         },
+            #         {
+            #             "timestamp": "28:45-33:20",
+            #             "category": "Testing & Validation",
+            #             "content": "Discussion of testing strategy including unit tests with Jest, integration tests for API endpoints, and load testing for concurrent users. Candidate explained mocking strategies for WebSocket connections",
+            #             "confidence_score": 0.90,
+            #             "duration": "4m 35s",
+            #             "event_count": 3
+            #         },
+            #         {
+            #             "timestamp": "33:20-38:10",
+            #             "category": "Q&A Session",
+            #             "content": "Q&A session with 5 questions covering team collaboration practices, code review processes, handling technical debt, and experience with agile methodologies",
+            #             "confidence_score": 0.93,
+            #             "duration": "4m 50s",
+            #             "event_count": 5
+            #         },
+            #         {
+            #             "timestamp": "38:10-42:00",
+            #             "category": "Technical Discussion",
+            #             "content": "Deep dive into system architecture trade-offs, discussing CAP theorem implications, eventual consistency patterns, and monitoring strategies with Prometheus and Grafana",
+            #             "confidence_score": 0.87,
+            #             "duration": "3m 50s",
+            #             "event_count": 4
+            #         },
+            #         {
+            #             "timestamp": "42:00-45:00",
+            #             "category": "Conclusion",
+            #             "content": "Interview wrap-up with next steps discussion, timeline expectations, and candidate's questions about engineering culture, remote work policies, and professional development opportunities",
+            #             "confidence_score": 0.91,
+            #             "duration": "3m",
+            #             "event_count": 2
+            #         }
+            #     ],
+            #     "total_duration": "45:00",
+            #     "key_topics": [
+            #         "System Architecture Design",
+            #         "Real-time Communication",
+            #         "Microservices Architecture",
+            #         "React/TypeScript Development",
+            #         "Database Design & Scaling",
+            #         "Testing Strategies",
+            #         "DevOps & Containerization",
+            #         "Performance Optimization"
+            #     ],
+            #     "overall_sentiment": "Positive",
+            #     "metadata": {
+            #         "processed_at": "2024-01-15T10:30:00Z",
+            #         "model_used": "enhanced-transcript-analyzer",
+            #         "confidence_threshold": 0.85,
+            #         "consolidation_applied": True,
+            #         "enhanced_entity_extraction": True,
+            #         "human_readable_categories": True,
+            #         "total_segments_processed": 34,
+            #         "consolidated_segments": 8,
+            #         "parsing_format": "enhanced_multi_format"
+            #     }
+            # }
 
             return TranscriptAnalysisResponse(
                 success=True,
@@ -300,11 +453,23 @@ async def analyze_transcript(
 
     except Exception as e:
         logger.error(f"Transcript analysis failed: {e}")
+        logger.error(f"Exception type: {type(e)}")
+        logger.error(f"Full traceback:", exc_info=True)
+
         error_details = transform_langgraph_error_response(str(e))
+
+        # Provide more specific error messages
+        error_message = error_details["message"]
+        if "Agent processing failed" in str(e):
+            error_message = f"LLM agent failed to process transcript: {str(e)}"
+        elif "Failed to parse agent response" in str(e):
+            error_message = f"Could not parse LLM response: {str(e)}"
+        elif "No response events" in str(e):
+            error_message = "LLM agent returned no response - possible timeout or configuration issue"
 
         return TranscriptAnalysisResponse(
             success=False,
-            message=f"Failed to analyze transcript: {error_details['message']}",
+            message=f"Failed to analyze transcript: {error_message}",
             data=None,
             run_id=str(run_id) if "run_id" in locals() else None,
         )

@@ -192,3 +192,4 @@ logs/
 *.tmp
 *.temp
 data/
+test_transcript_fix.py
