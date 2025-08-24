@@ -69,7 +69,7 @@ export function AnalysisDashboard({ summary }: AnalysisDashboardProps) {
           className="rounded-2xl border border-white/10 bg-black/30 p-5"
         >
           <div className="mb-4 text-lg font-semibold text-white">Entities</div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-medium tracking-wide text-white/60 uppercase">
                 <Users className="h-3.5 w-3.5" />
