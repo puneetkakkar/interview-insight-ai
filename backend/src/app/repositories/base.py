@@ -101,15 +101,13 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     
     async def count(self, db: AsyncSession, filters: Optional[dict] = None) -> int:
         """Count records with optional filters."""
-        query = select(self.model)
+        from sqlalchemy import func
+        query = select(func.count(self.model.id))
         
         if filters:
             for field, value in filters.items():
                 if hasattr(self.model, field) and value is not None:
-                    if field == "is_deleted":
-                        query = query.where(getattr(self.model, field) == value)
-                    else:
-                        query = query.where(getattr(self.model, field) == value)
+                    query = query.where(getattr(self.model, field) == value)
         
         result = await db.execute(query)
-        return len(result.scalars().all())
+        return result.scalar() or 0

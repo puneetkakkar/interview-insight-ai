@@ -123,7 +123,6 @@ def transcript_parser_func(transcript_text: str) -> str:
     current_speaker = None
     
     for line_num, line in enumerate(lines):
-        original_line = line
         line = line.strip()
         if not line:
             continue
