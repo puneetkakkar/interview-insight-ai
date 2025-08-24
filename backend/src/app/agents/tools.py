@@ -92,43 +92,185 @@ def transcript_parser_func(transcript_text: str) -> str:
         str: JSON string containing parsed segments with timestamps and content
     """
     import json
+    import re
     
-    # Regex patterns for different timestamp formats
+    # Enhanced regex patterns for different timestamp formats
     timestamp_patterns = [
-        r'(\d{1,2}:\d{2}:\d{2})',  # HH:MM:SS or H:MM:SS
-        r'(\d{1,2}:\d{2})',        # MM:SS or M:SS
+        # Standard formats with optional square brackets or parentheses
+        r'^\s*[\[\(]?(\d{1,2}:\d{2}:\d{2}(?:\.\d{3})?)\s*[\]\)]?\s*[-:\|>]?\s*',  # [HH:MM:SS.mmm] or (HH:MM:SS)
+        r'^\s*[\[\(]?(\d{1,2}:\d{2})\s*[\]\)]?\s*[-:\|>]?\s*',                      # [MM:SS] or (MM:SS)
+        r'^\s*[\[\(]?(\d{2,3}:\d{2})\s*[\]\)]?\s*[-:\|>]?\s*',                      # [MMM:SS] (for long videos)
+        
+        # Timestamp at the beginning with various separators
+        r'^(\d{1,2}:\d{2}:\d{2}(?:\.\d{3})?)\s*[-:\|>]\s*',  # HH:MM:SS.mmm - content
+        r'^(\d{1,2}:\d{2})\s*[-:\|>]\s*',                     # MM:SS - content
+        
+        # Timestamp ranges (start-end)
+        r'^\s*[\[\(]?(\d{1,2}:\d{2}(?::\d{2})?)\s*-\s*\d{1,2}:\d{2}(?::\d{2})?\s*[\]\)]?\s*[-:\|>]?\s*',
+        
+        # SRT subtitle format (just the number part)
+        r'^\d+\s*$',  # Skip SRT sequence numbers
+        
+        # Zoom/Teams meeting format
+        r'^(\d{1,2}:\d{2}:\d{2})\s+[A-Za-z\s]+:\s*',  # HH:MM:SS Speaker Name: content
+        
+        # YouTube format
+        r'^(\d{1,2}:\d{2})\s*(.+?)$',  # MM:SS content (fallback)
     ]
     
     segments = []
     lines = transcript_text.split('\n')
+    current_speaker = None
     
-    for line in lines:
+    for line_num, line in enumerate(lines):
+        original_line = line
         line = line.strip()
         if not line:
+            continue
+        
+        # Skip SRT sequence numbers
+        if re.match(r'^\d+\s*$', line):
+            continue
+        
+        # Skip SRT timing lines (00:00:01,234 --> 00:00:05,678)
+        if '-->' in line and re.search(r'\d{2}:\d{2}:\d{2}', line):
             continue
             
         timestamp = None
         content = line
+        speaker = None
         
         # Try to extract timestamp from the beginning of the line
-        for pattern in timestamp_patterns:
-            match = re.match(pattern, line)
-            if match:
-                timestamp = match.group(1)
-                # Remove timestamp from content
-                content = line[len(timestamp):].strip()
-                # Remove common separators
-                if content.startswith(('-', ':', '|', '>')):
-                    content = content[1:].strip()
+        for i, pattern in enumerate(timestamp_patterns):
+            if i == len(timestamp_patterns) - 1:  # Last pattern is the fallback
+                match = re.match(pattern, line)
+                if match and ':' in match.group(1):
+                    timestamp = match.group(1)
+                    content = match.group(2) if match.lastindex and match.lastindex > 1 else ""
+                    break
+            else:
+                match = re.match(pattern, line)
+                if match:
+                    timestamp = match.group(1)
+                    # Remove timestamp and separators from content
+                    content = re.sub(pattern, '', line).strip()
+                    break
+        
+        # Special handling for speaker identification
+        speaker_patterns = [
+            r'^([A-Z][a-zA-Z\s]+):\s*(.+)$',  # Speaker Name: content
+            r'^([A-Z][a-zA-Z\s]+)\s*-\s*(.+)$',  # Speaker Name - content
+        ]
+        
+        for speaker_pattern in speaker_patterns:
+            speaker_match = re.match(speaker_pattern, content)
+            if speaker_match:
+                potential_speaker = speaker_match.group(1).strip()
+                # Check if it's likely a speaker name (not too long, not common words)
+                if (len(potential_speaker.split()) <= 3 and 
+                    len(potential_speaker) <= 30 and
+                    potential_speaker.lower() not in ['interviewer', 'candidate', 'question', 'answer']):
+                    speaker = potential_speaker
+                    content = speaker_match.group(2).strip()
+                    current_speaker = speaker
                 break
         
-        if content:  # Only add non-empty content
-            segments.append({
+        # If no timestamp found but we have previous context, try to infer
+        if not timestamp and segments and content:
+            # Check if this might be a continuation of previous content
+            last_segment = segments[-1]
+            if (len(content.split()) < 10 and 
+                last_segment.get('timestamp') and
+                not content.lower().startswith(('hello', 'hi', 'good', 'thank', 'so'))):
+                # Likely a continuation, append to previous segment
+                last_segment['content'] += ' ' + content
+                continue
+        
+        # Clean up content
+        content = content.strip()
+        
+        # Remove common transcript artifacts
+        content = re.sub(r'\[inaudible\]', '', content, flags=re.IGNORECASE)
+        content = re.sub(r'\[unclear\]', '', content, flags=re.IGNORECASE)
+        content = re.sub(r'\[background noise\]', '', content, flags=re.IGNORECASE)
+        content = re.sub(r'\s+', ' ', content)  # Normalize whitespace
+        content = content.strip()
+        
+        if content and len(content) > 2:  # Only add non-empty, meaningful content
+            segment = {
                 "timestamp": timestamp,
                 "content": content
-            })
+            }
+            
+            # Add speaker information if identified
+            if speaker or current_speaker:
+                segment["speaker"] = speaker or current_speaker
+            
+            # Add line number for debugging purposes
+            segment["line_number"] = line_num + 1
+            
+            segments.append(segment)
     
-    return json.dumps(segments, indent=2)
+    # Post-processing: merge very short segments with the next one
+    merged_segments = []
+    i = 0
+    while i < len(segments):
+        current = segments[i]
+        
+        # If current segment is very short and next exists, consider merging
+        if (i < len(segments) - 1 and 
+            len(current['content'].split()) <= 3 and
+            not current['content'].endswith(('.', '!', '?'))):
+            
+            next_segment = segments[i + 1]
+            # Merge if they're close in time or no timestamps
+            if (not current.get('timestamp') or not next_segment.get('timestamp') or
+                _timestamps_close(current.get('timestamp'), next_segment.get('timestamp'))):
+                
+                merged_content = current['content'] + ' ' + next_segment['content']
+                merged_segment = {
+                    "timestamp": current.get('timestamp') or next_segment.get('timestamp'),
+                    "content": merged_content.strip()
+                }
+                
+                # Preserve speaker info
+                if current.get('speaker') or next_segment.get('speaker'):
+                    merged_segment["speaker"] = current.get('speaker') or next_segment.get('speaker')
+                
+                merged_segment["line_number"] = current.get('line_number', i + 1)
+                merged_segments.append(merged_segment)
+                i += 2  # Skip both segments
+                continue
+        
+        merged_segments.append(current)
+        i += 1
+    
+    return json.dumps(merged_segments, indent=2)
+
+
+def _timestamps_close(ts1: str, ts2: str, max_diff_seconds: int = 30) -> bool:
+    """Check if two timestamps are close enough to be merged."""
+    if not ts1 or not ts2:
+        return True
+        
+    def parse_time(ts: str) -> int:
+        """Convert timestamp to seconds."""
+        if not ts or ':' not in ts:
+            return 0
+        parts = ts.split(':')
+        try:
+            if len(parts) == 2:  # MM:SS
+                return int(parts[0]) * 60 + int(parts[1])
+            elif len(parts) == 3:  # HH:MM:SS
+                return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+        except ValueError:
+            pass
+        return 0
+    
+    time1 = parse_time(ts1)
+    time2 = parse_time(ts2)
+    
+    return abs(time1 - time2) <= max_diff_seconds
 
 
 def entity_extractor_func(text: str) -> str:
@@ -142,8 +284,8 @@ def entity_extractor_func(text: str) -> str:
     """
     import json
     
-    # Simple pattern-based entity extraction
-    # In production, you might want to use spaCy or similar NLP library
+    # Enhanced pattern-based entity extraction
+    # Comprehensive keyword-based approach for interview transcripts
     
     entities = {
         "people": [],
@@ -152,38 +294,151 @@ def entity_extractor_func(text: str) -> str:
         "locations": []
     }
     
-    # Common tech terms and programming languages
+    # Comprehensive tech terms and programming languages
     tech_keywords = [
-        "python", "javascript", "react", "node", "docker", "kubernetes",
-        "aws", "gcp", "azure", "postgresql", "mongodb", "redis",
-        "fastapi", "django", "flask", "express", "angular", "vue",
-        "typescript", "java", "go", "rust", "c++", "sql"
+        # Programming Languages
+        "python", "javascript", "typescript", "java", "c++", "c#", "go", "rust", 
+        "kotlin", "swift", "php", "ruby", "scala", "r", "matlab", "julia",
+        
+        # Frontend Technologies  
+        "react", "angular", "vue", "svelte", "next.js", "nuxt", "gatsby",
+        "html", "css", "sass", "less", "tailwind", "bootstrap", "material-ui",
+        "jquery", "d3.js", "three.js", "webpack", "vite", "parcel",
+        
+        # Backend & Frameworks
+        "node.js", "express", "fastapi", "django", "flask", "spring boot",
+        "laravel", "rails", "asp.net", "gin", "fiber", "actix", "rocket",
+        "socket.io", "yjs", "crdt", "crdts", "operational transformation",
+        
+        # Databases
+        "postgresql", "mysql", "mongodb", "redis", "elasticsearch", "sqlite",
+        "cassandra", "dynamodb", "firestore", "neo4j", "influxdb", "clickhouse",
+        
+        # Cloud & DevOps
+        "aws", "gcp", "azure", "docker", "kubernetes", "jenkins", "gitlab ci",
+        "github actions", "terraform", "ansible", "vagrant", "helm", "istio",
+        "prometheus", "grafana", "datadog", "splunk",
+        
+        # Data & AI/ML
+        "tensorflow", "pytorch", "scikit-learn", "pandas", "numpy", "jupyter",
+        "apache spark", "hadoop", "kafka", "airflow", "mlflow", "kubeflow",
+        
+        # Testing & Tools
+        "jest", "pytest", "junit", "selenium", "cypress", "postman", "git",
+        "vs code", "intellij", "vim", "emacs", "jira", "confluence", "slack",
+        
+        # Architecture & Concepts
+        "microservices", "api", "rest", "graphql", "grpc", "websockets",
+        "oauth", "jwt", "ssl", "https", "ci/cd", "agile", "scrum", "tdd",
+        "clean architecture", "solid principles", "design patterns"
     ]
     
-    # Look for capitalized words (potential names/companies)
-    words = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', text)
+    # Known major tech companies
+    major_companies = [
+        "google", "microsoft", "amazon", "apple", "meta", "facebook", "netflix",
+        "tesla", "uber", "airbnb", "spotify", "slack", "zoom", "salesforce",
+        "oracle", "ibm", "intel", "nvidia", "amd", "adobe", "twitter", "x",
+        "linkedin", "github", "gitlab", "atlassian", "mongodb", "redis labs",
+        "databricks", "snowflake", "cloudflare", "stripe", "shopify", "square",
+        "paypal", "dropbox", "pinterest", "reddit", "discord", "twitch"
+    ]
     
-    # Extract tech terms (case insensitive)
+    # Common locations and remote work terms
+    location_keywords = [
+        "san francisco", "new york", "seattle", "austin", "boston", "chicago",
+        "los angeles", "denver", "atlanta", "miami", "toronto", "vancouver",
+        "london", "berlin", "amsterdam", "singapore", "sydney", "tokyo",
+        "remote", "hybrid", "on-site", "distributed", "work from home", "wfh"
+    ]
+    
     text_lower = text.lower()
+    
+    # Extract technologies (case insensitive with context)
     for tech in tech_keywords:
         if tech in text_lower:
-            entities["technologies"].append(tech.title())
+            # Add proper casing
+            if tech.lower() in ["javascript", "typescript"]:
+                entities["technologies"].append("JavaScript" if tech == "javascript" else "TypeScript")
+            elif tech.lower() == "c++":
+                entities["technologies"].append("C++")
+            elif tech.lower() == "c#":
+                entities["technologies"].append("C#")
+            elif "." in tech:
+                entities["technologies"].append(tech)  # Keep frameworks as-is (e.g., "Next.js")
+            else:
+                entities["technologies"].append(tech.title())
     
-    # Simple heuristics for people vs companies
-    for word in words:
-        word_parts = word.split()
-        if len(word_parts) == 2 and all(len(part) > 2 for part in word_parts):
-            # Likely a person name (First Last)
-            entities["people"].append(word)
-        elif len(word_parts) == 1 and len(word) > 3:
-            # Could be a company
-            entities["companies"].append(word)
+    # Extract companies (case insensitive)
+    for company in major_companies:
+        if company in text_lower:
+            # Special handling for certain companies
+            if company == "meta" and "facebook" not in text_lower:
+                entities["companies"].append("Meta")
+            elif company == "x" and "twitter" not in text_lower:
+                entities["companies"].append("X (Twitter)")
+            elif company != "meta" and company != "x":  # Avoid duplicates
+                entities["companies"].append(company.title())
     
-    # Remove duplicates and common false positives
+    # Extract locations
+    for location in location_keywords:
+        if location in text_lower:
+            if location in ["remote", "hybrid", "on-site", "distributed", "work from home", "wfh"]:
+                entities["locations"].append(location.title() if location != "wfh" else "WFH")
+            else:
+                entities["locations"].append(location.title())
+    
+    # Enhanced name extraction with better heuristics
+    # Look for capitalized words (potential names/companies)
+    name_patterns = [
+        r'\b[A-Z][a-z]+\s+[A-Z][a-z]+\b',  # First Last
+        r'\b[A-Z][a-z]+\s+[A-Z]\.\s*[A-Z][a-z]+\b',  # First M. Last
+        r'\b[A-Z]\.\s*[A-Z][a-z]+\b',  # F. Last
+    ]
+    
+    for pattern in name_patterns:
+        names = re.findall(pattern, text)
+        for name in names:
+            name = name.strip()
+            # Filter out common false positives and check if it's not already a known company
+            if (name.lower() not in [c.lower() for c in entities["companies"]] and
+                not any(stop in name.lower() for stop in [
+                    'interview', 'question', 'problem', 'solution', 'discussion',
+                    'project', 'system', 'design', 'code', 'test', 'data', 'user'
+                ])):
+                entities["people"].append(name)
+    
+    # Look for additional company patterns (Inc., Corp., LLC, etc.)
+    company_patterns = [
+        r'\b[A-Z][a-zA-Z\s&]+(?:Inc\.?|Corp\.?|LLC|Ltd\.?|Co\.?)\b',
+        r'\b[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*\s+(?:Technologies|Solutions|Systems|Software|Labs|Studios)\b'
+    ]
+    
+    for pattern in company_patterns:
+        companies = re.findall(pattern, text)
+        for company in companies:
+            company = company.strip()
+            if len(company) > 3 and company not in entities["companies"]:
+                entities["companies"].append(company)
+    
+    # Remove duplicates and clean up
     for key in entities:
         entities[key] = list(set(entities[key]))
-        # Remove common words that aren't actually entities
-        entities[key] = [e for e in entities[key] if e.lower() not in ['the', 'and', 'or', 'but', 'this', 'that']]
+        # Enhanced filtering of false positives
+        entities[key] = [e for e in entities[key] if (
+            len(e.strip()) > 1 and
+            e.lower() not in [
+                'the', 'and', 'or', 'but', 'this', 'that', 'with', 'from', 'they',
+                'have', 'been', 'will', 'would', 'could', 'should', 'about', 'through',
+                'during', 'before', 'after', 'above', 'below', 'between', 'among',
+                'interview', 'candidate', 'interviewer', 'question', 'answer', 'time',
+                'first', 'second', 'next', 'last', 'good', 'great', 'nice', 'okay'
+            ] and
+            not e.isdigit()
+        )]
+    
+    # Sort entities for consistent output
+    for key in entities:
+        entities[key] = sorted(entities[key])
     
     return json.dumps(entities, indent=2)
 
@@ -237,25 +492,27 @@ def sentiment_analyzer_func(text: str) -> str:
 
 
 def content_categorizer_func(content: str) -> str:
-    """Categorize content segments into interview phases.
+    """Categorize content segments into interview phases with human-readable names.
     
     Args:
         content (str): Content to categorize
         
     Returns:
-        str: Category name
+        str: Human-readable category name
     """
     content_lower = content.lower()
     
-    # Define categories and their keywords
+    # Define categories and their keywords with human-readable names
     categories = {
-        "introduction": ["introduce", "background", "tell me about yourself", "experience"],
-        "problem_description": ["problem", "challenge", "issue", "requirement", "task"],
-        "solution_discussion": ["solution", "approach", "implement", "design", "architecture"],
-        "coding": ["code", "function", "algorithm", "data structure", "implementation"],
-        "testing": ["test", "debug", "validate", "verify", "edge case"],
-        "questions": ["question", "ask", "clarify", "understand", "explain"],
-        "conclusion": ["conclusion", "final", "summary", "next steps", "feedback"]
+        "Introduction": ["introduce", "background", "tell me about yourself", "experience", "welcome", "hello", "hi", "thank you for joining"],
+        "Problem Description": ["problem", "challenge", "issue", "requirement", "task", "scenario", "case study", "situation"],
+        "Solution Discussion": ["solution", "approach", "implement", "design", "architecture", "strategy", "plan", "methodology"],
+        "Coding Session": ["code", "function", "algorithm", "data structure", "implementation", "programming", "write code", "let's code"],
+        "Testing & Validation": ["test", "debug", "validate", "verify", "edge case", "unit test", "testing", "bug"],
+        "Q&A Session": ["question", "ask", "clarify", "understand", "explain", "any questions", "do you have", "wondering"],
+        "Technical Discussion": ["technical", "architecture", "system", "database", "framework", "technology", "stack"],
+        "Behavioral Questions": ["tell me about a time", "describe a situation", "how do you handle", "teamwork", "leadership"],
+        "Conclusion": ["conclusion", "final", "summary", "next steps", "feedback", "wrap up", "that's all", "thank you"]
     }
     
     # Score each category
@@ -265,10 +522,211 @@ def content_categorizer_func(content: str) -> str:
         if score > 0:
             category_scores[category] = score
     
-    # Return the highest scoring category, or "discussion" as default
+    # Return the highest scoring category, or "Discussion" as default
     if category_scores:
         return max(category_scores.items(), key=lambda x: x[1])[0]
-    return "discussion"
+    return "Discussion"
+
+
+def timeline_consolidator_func(timeline_json: str) -> str:
+    """Consolidate consecutive timeline events with the same category into coherent segments.
+    
+    Args:
+        timeline_json (str): JSON string containing timeline events
+        
+    Returns:
+        str: JSON string containing consolidated timeline events
+    """
+    import json
+    import re
+    from datetime import datetime, timedelta
+    
+    def parse_timestamp(timestamp_str):
+        """Parse timestamp string to seconds for comparison."""
+        if not timestamp_str:
+            return 0
+        
+        # Handle various timestamp formats
+        if ':' not in timestamp_str:
+            return 0
+        
+        parts = timestamp_str.split(':')
+        if len(parts) == 2:  # MM:SS
+            return int(parts[0]) * 60 + int(parts[1])
+        elif len(parts) == 3:  # HH:MM:SS
+            return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+        return 0
+    
+    def format_timestamp_range(start_seconds, end_seconds):
+        """Format timestamp range for display."""
+        def seconds_to_timestamp(seconds):
+            if seconds >= 3600:  # Has hours
+                hours = seconds // 3600
+                minutes = (seconds % 3600) // 60
+                secs = seconds % 60
+                return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+            else:  # Minutes and seconds only
+                minutes = seconds // 60
+                secs = seconds % 60
+                return f"{minutes:02d}:{secs:02d}"
+        
+        if start_seconds == end_seconds:
+            return seconds_to_timestamp(start_seconds)
+        else:
+            return f"{seconds_to_timestamp(start_seconds)}-{seconds_to_timestamp(end_seconds)}"
+    
+    try:
+        timeline_events = json.loads(timeline_json)
+        if not isinstance(timeline_events, list):
+            return timeline_json  # Return as-is if not a list
+        
+        if len(timeline_events) <= 1:
+            return timeline_json  # No consolidation needed
+        
+        consolidated_events = []
+        current_group = []
+        
+        for event in timeline_events:
+            if not isinstance(event, dict):
+                continue
+                
+            timestamp = event.get('timestamp')
+            category = event.get('category', 'Discussion')
+            content = event.get('content', '')
+            confidence = event.get('confidence_score', 0.8)
+            
+            # Start new group if first event or different category
+            if not current_group or current_group[0]['category'] != category:
+                # Process previous group if exists
+                if current_group:
+                    consolidated_events.append(_consolidate_group(current_group))
+                current_group = [event]
+            else:
+                # Check if events are close in time (within 2 minutes)
+                current_timestamp = parse_timestamp(timestamp)
+                last_timestamp = parse_timestamp(current_group[-1].get('timestamp'))
+                
+                if abs(current_timestamp - last_timestamp) <= 120:  # 2 minutes
+                    current_group.append(event)
+                else:
+                    # Too far apart, process current group and start new one
+                    consolidated_events.append(_consolidate_group(current_group))
+                    current_group = [event]
+        
+        # Process final group
+        if current_group:
+            consolidated_events.append(_consolidate_group(current_group))
+        
+        return json.dumps(consolidated_events, indent=2)
+        
+    except (json.JSONDecodeError, KeyError, ValueError) as e:
+        # Return original if parsing fails
+        return timeline_json
+
+
+def _consolidate_group(events):
+    """Helper function to consolidate a group of similar events."""
+    if len(events) == 1:
+        return events[0]
+    
+    # Get timestamp range
+    timestamps = [e.get('timestamp') for e in events if e.get('timestamp')]
+    if timestamps:
+        start_seconds = min(parse_timestamp(ts) for ts in timestamps)
+        end_seconds = max(parse_timestamp(ts) for ts in timestamps)
+        timestamp_range = format_timestamp_range(start_seconds, end_seconds)
+    else:
+        timestamp_range = events[0].get('timestamp')
+    
+    # Combine content intelligently
+    contents = [e.get('content', '') for e in events if e.get('content')]
+    category = events[0].get('category', 'Discussion')
+    
+    # Create meaningful summary based on category
+    if len(contents) == 1:
+        combined_content = contents[0]
+    elif category == "Introduction":
+        combined_content = f"Introduction phase covering {', '.join(contents[:3])}"
+    elif category == "Q&A Session":
+        combined_content = f"Q&A session with {len(contents)} questions and discussions"
+    else:
+        # Combine first and last content with count
+        if len(contents) >= 2:
+            combined_content = f"{contents[0]}. Discussion continued with {len(contents)-1} additional points including {contents[-1]}"
+        else:
+            combined_content = contents[0] if contents else ""
+    
+    # Calculate average confidence
+    confidences = [e.get('confidence_score', 0.8) for e in events]
+    avg_confidence = sum(confidences) / len(confidences)
+    
+    # Calculate duration if possible
+    duration = None
+    if len(timestamps) >= 2:
+        duration_seconds = end_seconds - start_seconds
+        if duration_seconds > 0:
+            if duration_seconds >= 60:
+                minutes = duration_seconds // 60
+                seconds = duration_seconds % 60
+                duration = f"{minutes}m {seconds}s" if seconds > 0 else f"{minutes}m"
+            else:
+                duration = f"{duration_seconds}s"
+    
+    consolidated_event = {
+        "timestamp": timestamp_range,
+        "category": category,
+        "content": combined_content,
+        "confidence_score": round(avg_confidence, 2),
+        "event_count": len(events)
+    }
+    
+    if duration:
+        consolidated_event["duration"] = duration
+    
+    return consolidated_event
+
+
+def parse_timestamp(timestamp_str):
+    """Parse timestamp string to seconds for comparison."""
+    if not timestamp_str:
+        return 0
+    
+    # Handle various timestamp formats and ranges
+    if '-' in timestamp_str:  # Range format like "00:00:00-00:00:04"
+        start_time = timestamp_str.split('-')[0].strip()
+        return parse_timestamp(start_time)
+    
+    if ':' not in timestamp_str:
+        return 0
+    
+    parts = timestamp_str.split(':')
+    try:
+        if len(parts) == 2:  # MM:SS
+            return int(parts[0]) * 60 + int(parts[1])
+        elif len(parts) == 3:  # HH:MM:SS
+            return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+    except ValueError:
+        pass
+    return 0
+
+
+def format_timestamp_range(start_seconds, end_seconds):
+    """Format timestamp range for display."""
+    def seconds_to_timestamp(seconds):
+        if seconds >= 3600:  # Has hours
+            hours = seconds // 3600
+            minutes = (seconds % 3600) // 60
+            secs = seconds % 60
+            return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+        else:  # Minutes and seconds only
+            minutes = seconds // 60
+            secs = seconds % 60
+            return f"{minutes:02d}:{secs:02d}"
+    
+    if start_seconds == end_seconds:
+        return seconds_to_timestamp(start_seconds)
+    else:
+        return f"{seconds_to_timestamp(start_seconds)}-{seconds_to_timestamp(end_seconds)}"
 
 
 # Create tools
@@ -283,3 +741,6 @@ sentiment_analyzer.name = "SentimentAnalyzer"
 
 content_categorizer: BaseTool = tool(content_categorizer_func)
 content_categorizer.name = "ContentCategorizer"
+
+timeline_consolidator: BaseTool = tool(timeline_consolidator_func)
+timeline_consolidator.name = "TimelineConsolidator"

@@ -16,8 +16,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as TranscriptRequest;
 
-    console.log("body", body);
-
     // Forward request to backend API
     const backendResponse = await fetch(
       `${env.BACKEND_URL}/api/v1/transcript/analyze`,
