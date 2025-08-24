@@ -14,7 +14,9 @@ function Chips({ items }: { items: string[] }) {
         {visible.map((txt) => (
           <span
             key={txt}
-            className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-white/80"
+            title={txt}
+            aria-label={txt}
+            className="inline-flex max-w-[9rem] sm:max-w-[12rem] lg:max-w-[14rem] items-center rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs leading-tight text-white/80 overflow-hidden text-ellipsis whitespace-nowrap"
           >
             {txt}
           </span>

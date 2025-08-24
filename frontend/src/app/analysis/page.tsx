@@ -50,7 +50,7 @@ export default function AnalysisPage() {
                 } catch {}
                 router.push("/");
               }}
-              className="cursor-pointer rounded-full bg-[#00A3E0] px-3 py-1.5 text-xs text-black hover:bg-[#14b5f1] sm:text-sm"
+              className="cursor-pointer rounded-full bg-[#00A3E0] px-3 py-1.5 text-xs text-white font-semibold hover:bg-[#14b5f1] sm:text-sm"
             >
               New Analysis
             </button>
