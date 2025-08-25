@@ -92,7 +92,6 @@ def transcript_parser_func(transcript_text: str) -> str:
         str: JSON string containing parsed segments with timestamps and content
     """
     import json
-    import re
     
     # Enhanced regex patterns for different timestamp formats
     timestamp_patterns = [
@@ -537,7 +536,6 @@ def timeline_consolidator_func(timeline_json: str) -> str:
         str: JSON string containing consolidated timeline events
     """
     import json
-    import re
     from datetime import datetime, timedelta
     
     def parse_timestamp(timestamp_str):
@@ -555,24 +553,6 @@ def timeline_consolidator_func(timeline_json: str) -> str:
         elif len(parts) == 3:  # HH:MM:SS
             return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
         return 0
-    
-    def format_timestamp_range(start_seconds, end_seconds):
-        """Format timestamp range for display."""
-        def seconds_to_timestamp(seconds):
-            if seconds >= 3600:  # Has hours
-                hours = seconds // 3600
-                minutes = (seconds % 3600) // 60
-                secs = seconds % 60
-                return f"{hours:02d}:{minutes:02d}:{secs:02d}"
-            else:  # Minutes and seconds only
-                minutes = seconds // 60
-                secs = seconds % 60
-                return f"{minutes:02d}:{secs:02d}"
-        
-        if start_seconds == end_seconds:
-            return seconds_to_timestamp(start_seconds)
-        else:
-            return f"{seconds_to_timestamp(start_seconds)}-{seconds_to_timestamp(end_seconds)}"
     
     try:
         timeline_events = json.loads(timeline_json)
