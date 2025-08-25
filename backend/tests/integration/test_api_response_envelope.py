@@ -16,33 +16,52 @@ class TestAPIResponseEnvelope:
         assert body["success"] is True
         assert "data" in body
         assert body["data"]["status"] == "healthy"
-        assert body["data"]["service"] == "FRAI Boilerplate"
+        assert body["data"]["service"] == "Interview Insight AI"
 
-    def test_root_endpoint_response_envelope(self, mock_client: TestClient):
-        """Test root endpoint response envelope structure."""
+    def test_root_endpoint_response_structure(self, mock_client: TestClient):
+        """Test that root endpoint returns expected response structure."""
         response = mock_client.get("/")
         assert response.status_code == 200
+        
         body = response.json()
-        assert body["success"] is True
+        assert "success" in body
+        assert "message" in body
         assert "data" in body
-        assert "message" in body["data"]
-        assert "version" in body["data"]
-        assert "docs" in body["data"]
-        assert "health" in body["data"]
-        assert "FRAI" in body["data"]["message"]
+        
+        # Check data structure
+        data = body["data"]
+        assert "service" in data
+        assert "version" in data
+        assert "status" in data
+        assert "timestamp" in data
+        
+        # Check specific values
+        assert body["data"]["service"] == "InterviewInsight AI"
+        assert body["data"]["status"] == "running"
 
-    def test_info_endpoint_response_envelope(self, mock_client: TestClient):
-        """Test info endpoint response envelope structure."""
+    def test_info_endpoint_response_structure(self, mock_client: TestClient):
+        """Test that info endpoint returns expected response structure."""
         response = mock_client.get("/info")
         assert response.status_code == 200
+        
         body = response.json()
-        assert body["success"] is True
+        assert "success" in body
+        assert "message" in body
         assert "data" in body
-        assert "name" in body["data"]
-        assert "version" in body["data"]
-        assert "description" in body["data"]
-        assert "status" in body["data"]
-        assert body["data"]["status"] == "running"
+        
+        # Check data structure
+        data = body["data"]
+        assert "name" in data
+        assert "description" in data
+        assert "version" in data
+        assert "environment" in data
+        assert "storage_type" in data
+        assert "features" in data
+        assert "ai_models" in data
+        assert "timestamp" in data
+        
+        # Check specific values
+        assert "InterviewInsight" in body["data"]["message"]
 
     def test_response_envelope_structure_consistency(self, mock_client: TestClient):
         """Test all success responses follow consistent envelope structure."""

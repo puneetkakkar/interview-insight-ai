@@ -1,1 +1,1 @@
-# FRAI Boilerplate Source Package
+# Interview Insight AI Source Package

@@ -1,8 +1,8 @@
 [project]
-name = "frai-boilerplate"
-version = "0.1.0"
-description = "A production-ready FRAI boilerplate using SQLAlchemy 2.0 and Pydantic V2"
-authors = [{ name = "FRAI Boilerplate", email = "dev@example.com" }]
+name = "interview-insight-ai"
+version = "1.0.0"
+description = "A production-ready AI-powered interview transcript analysis platform using FastAPI, SQLAlchemy 2.0, Pydantic V2, and LangGraph"
+authors = [{ name = "InterviewInsight AI", email = "dev@example.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11"

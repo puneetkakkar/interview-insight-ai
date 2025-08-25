@@ -31,9 +31,9 @@ services:
     ports:
       - "5434:5432"
     environment:
-      - POSTGRES_DB=${POSTGRES_TEST_DB:-frai_test_db}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_TEST_DB:-interview_insight_test_db}
     volumes:
       - postgres-data-test:/var/lib/postgresql/data
     healthcheck:

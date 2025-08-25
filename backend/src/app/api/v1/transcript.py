@@ -1,8 +1,7 @@
-"""Transcript Analysis API endpoints for FRAI Boilerplate.
+"""Transcript Analysis API endpoints for InterviewInsight AI.
 
-This module provides endpoints for:
-- Analyzing interview transcripts
-- Extracting timeline, entities, and insights
+This module provides REST API endpoints for analyzing interview transcripts
+using AI-powered agents for timeline extraction, entity recognition, and sentiment analysis.
 """
 
 import json

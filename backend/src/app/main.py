@@ -1,8 +1,10 @@
 from fastapi import FastAPI
+from datetime import datetime
 
 from src.app.api.v1 import agent, transcript
 from src.app.core.setup import create_application
 from src.app.core.response import build_success_response
+from src.app.core.settings import settings
 
 # Create the FastAPI application
 app = create_application()
@@ -14,30 +16,47 @@ app.include_router(transcript.router, prefix="/api/v1")
 
 # Add root endpoint
 @app.get("/")
-async def root() -> dict[str, object]:
+async def root():
     """Root endpoint with basic information."""
-    return build_success_response(
-        {
-            "message": "FRAI Boilerplate",
-            "version": "0.1.0",
-            "docs": "/docs",
-            "health": "/health",
-        }
-    )
+    return {
+        "success": True,
+        "message": "InterviewInsight AI",
+        "data": {
+            "service": "InterviewInsight AI",
+            "version": "1.0.0",
+            "status": "running",
+            "timestamp": datetime.utcnow().isoformat(),
+        },
+    }
 
 
 # Add info endpoint
 @app.get("/info")
-async def info() -> dict[str, object]:
-    """Application information endpoint."""
-    return build_success_response(
-        {
-            "name": "FRAI Boilerplate",
-            "description": "A production-ready FRAI boilerplate",
-            "version": "0.1.0",
-            "status": "running",
-        }
-    )
+async def get_info():
+    """Get detailed application information."""
+    return {
+        "success": True,
+        "message": "Application information retrieved successfully",
+        "data": {
+            "name": "InterviewInsight AI",
+            "description": "A production-ready AI-powered interview transcript analysis platform",
+            "version": "1.0.0",
+            "environment": settings.environment,
+            "storage_type": settings.storage_type,
+            "features": [
+                "Multi-Agent AI System",
+                "Interview Transcript Analysis",
+                "Entity Recognition",
+                "Sentiment Analysis",
+                "Timeline Extraction",
+                "Research Assistant",
+                "Web Search Integration",
+                "Mathematical Calculations",
+            ],
+            "ai_models": settings.available_models,
+            "timestamp": datetime.utcnow().isoformat(),
+        },
+    }
 
 
 if __name__ == "__main__":
