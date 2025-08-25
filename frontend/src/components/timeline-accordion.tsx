@@ -84,27 +84,55 @@ const TimelineRow = memo(function TimelineRow({
 });
 
 function groupByWindow(items: TimelineEntry[]) {
-  const windows: { label: string; items: TimelineEntry[] }[] = [];
-  let current: TimelineEntry[] = [];
-  let currentLabel = "0:00 - 0:05";
+  // Group by real time windows (5 minutes) based on each item's timestamp.
+  // Falls back to the first window for missing/invalid timestamps.
+  const WINDOW_SECONDS = 5 * 60;
 
-  for (const it of items) {
-    current.push(it);
-    if (current.length >= 3) {
-      windows.push({ label: currentLabel, items: current });
-      current = [];
-      const parts = currentLabel.split(" - ");
-      currentLabel = `${parts[1]} - ${bump(parts[1] ?? "0:00")}`;
+  const toSeconds = (ts: string | null): number | null => {
+    if (!ts) return null;
+    const raw = ts.trim();
+    if (!raw) return null;
+    const parts = raw.split(":").map((p) => p.trim());
+    const nums = parts.map((p) => Number(p));
+    if (nums.some((n) => Number.isNaN(n))) return null;
+    if (nums.length === 3) {
+      const [h, m, s] = nums as [number, number, number];
+      return h * 3600 + m * 60 + s;
     }
-  }
-  if (current.length) windows.push({ label: currentLabel, items: current });
-  return windows;
-}
+    if (nums.length === 2) {
+      const [m, s] = nums as [number, number];
+      return m * 60 + s;
+    }
+    if (nums.length === 1) {
+      return (nums as [number])[0] ?? null;
+    }
+    return null;
+  };
 
-function bump(label: string) {
-  // naive bump by 5 minutes for demo; backend already provides timestamps per entry
-  const [minPart] = label.split(":");
-  const mins = parseInt(minPart?.split(" ").pop() ?? "0", 10) + 5;
-  const m = String(mins).padStart(2, "0");
-  return `0:${m}`;
+  const formatTime = (seconds: number) => {
+    const total = Math.max(0, Math.floor(seconds));
+    const minutes = Math.floor(total / 60);
+    const secs = total % 60;
+    return `${minutes}:${String(secs).padStart(2, "0")}`;
+  };
+
+  // Build buckets keyed by bucket start seconds
+  const buckets = new Map<number, TimelineEntry[]>();
+  for (const item of items) {
+    const secs = toSeconds(item.timestamp);
+    const bucketStart = secs == null ? 0 : Math.floor(secs / WINDOW_SECONDS) * WINDOW_SECONDS;
+    const arr = buckets.get(bucketStart) ?? [];
+    arr.push(item);
+    buckets.set(bucketStart, arr);
+  }
+
+  // Sort by bucket start time
+  const sortedStarts = Array.from(buckets.keys()).sort((a, b) => a - b);
+  const windows = sortedStarts.map((start) => {
+    const end = start + WINDOW_SECONDS;
+    const label = `${formatTime(start)} - ${formatTime(end)}`;
+    return { label, items: buckets.get(start) ?? [] };
+  });
+
+  return windows;
 }
