@@ -1,4 +1,4 @@
-# InterviewInsight AI
+# Interview Insight AI
 
 > **AI-Powered Interview Transcript Analysis Platform**
 
