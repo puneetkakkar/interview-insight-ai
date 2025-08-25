@@ -6,6 +6,7 @@ This module provides endpoints for:
 """
 
 import json
+import os
 from typing import Dict, Any
 from uuid import UUID, uuid4
 from fastapi import APIRouter, status
@@ -295,21 +296,22 @@ async def analyze_transcript(
                 summary = _parse_agent_response_to_summary(response_content)
 
                 # Save the actual LLM response for future testing
-                with open("actual_llm_response.json", "w") as f:
-                    json.dump(
-                        {
-                            "response_content": response_content,
-                            "parsed_summary": summary,
-                            "run_id": str(run_id),
-                        },
-                        f,
-                        indent=4,
-                        default=str,
-                    )
+                if os.environ.get("ENV") == "development":
+                    with open("actual_llm_response.json", "w") as f:
+                        json.dump(
+                            {
+                                "response_content": response_content,
+                                "parsed_summary": summary,
+                                "run_id": str(run_id),
+                            },
+                            f,
+                            indent=4,
+                            default=str,
+                        )
 
-                logger.info(
-                    "Successfully saved LLM response to actual_llm_response.json"
-                )
+                    logger.info(
+                        "Successfully saved LLM response to actual_llm_response.json"
+                    )
 
             except Exception as parse_error:
                 logger.error(f"Response parsing failed: {str(parse_error)}")
