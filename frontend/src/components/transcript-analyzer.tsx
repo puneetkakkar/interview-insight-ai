@@ -107,8 +107,6 @@ export function TranscriptAnalyzer() {
 
       const data: unknown = await response.json();
 
-      console.log("response data", data);
-
       if (!response.ok) {
         const errorData = data as { message?: string };
         throw new Error(
