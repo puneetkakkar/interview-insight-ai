@@ -1,8 +1,7 @@
-"""AI Agent API endpoints for FRAI Boilerplate.
+"""AI Agent API endpoints for InterviewInsight AI.
 
-This module provides endpoints for:
-- Invoking AI agents
-- Getting agent information
+This module provides REST API endpoints for interacting with AI agents,
+including the research assistant and transcript analyzer agents.
 """
 
 import json

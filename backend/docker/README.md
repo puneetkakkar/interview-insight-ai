@@ -1,185 +1,282 @@
-# Docker Configuration
+# Docker Configuration for InterviewInsight AI
 
-This directory contains all Docker-related configuration files organized by environment for better maintainability and clarity.
+This directory contains Docker configurations for different environments of the InterviewInsight AI backend application.
 
-## 📁 Directory Structure
+## 🏗️ Architecture
+
+The Docker setup is organized into three distinct environments:
 
 ```
 docker/
-├── README.md                    # This file
-├── dev/                     # Development environment
-│   ├── Dockerfile.dev      # Development Dockerfile
-│   └── docker-compose.dev.yml
-├── test/                    # Testing environment
-│   ├── Dockerfile.test     # Testing Dockerfile
-│   └── docker-compose.test.yml
-└── prod/                    # Production environment
-    ├── Dockerfile.prod      # Production Dockerfile
-    └── docker-compose.prod.yml
+├── dev/     # Development environment
+├── test/    # Testing environment  
+└── prod/    # Production environment
 ```
 
-## 🏗️ Environment Overview
+Each environment has its own:
+- `Dockerfile` - Container image definition
+- `docker-compose.yml` - Service orchestration
+- Environment-specific configurations
+
+## 🚀 Quick Start
+
+### Development Environment
+```bash
+# Start development environment
+make dev-up
+
+# Stop development environment
+make dev-down
+
+# View logs
+make dev-logs
+```
+
+### Production Environment
+```bash
+# Start production environment
+make prod-up
+
+# Stop production environment
+make prod-down
+
+# View logs
+make prod-logs
+```
+
+### Testing Environment
+```bash
+# Start testing environment
+make test-env
+
+# Stop testing environment
+make test-down
+```
+
+## 🔧 Environment Configurations
 
 ### Development Environment (`dev/`)
-- **Purpose**: Local development with hot-reload
-- **Ports**: API on 8000, Database on 5433
+- **Purpose**: Local development and debugging
+- **Ports**: 
+  - FastAPI: 8000
+  - PostgreSQL: 5433
 - **Features**: 
-  - Source code mounted as volumes for live editing
-  - Auto-reload enabled
+  - Hot reload enabled
   - Debug mode enabled
-  - Development dependencies included
+  - Development database
+  - Volume mounting for code changes
 
 ### Testing Environment (`test/`)
-- **Purpose**: Isolated testing with dedicated database
-- **Ports**: API on internal, Database on 5434
+- **Purpose**: Automated testing and CI/CD
+- **Ports**:
+  - FastAPI: 8002
+  - PostgreSQL: 5434
 - **Features**:
-  - Separate test database
-  - No external port exposure for API
-  - Optimized for running tests
-  - Clean environment for each test run
+  - Isolated test database
+  - No volume mounting
+  - Optimized for testing
 
 ### Production Environment (`prod/`)
 - **Purpose**: Production deployment
-- **Ports**: API on 8001, Database on 5436
+- **Ports**:
+  - FastAPI: 8001
+  - PostgreSQL: 5436
 - **Features**:
   - Gunicorn with multiple workers
-  - Production-optimized settings
-  - Health checks and monitoring
-  - Persistent data volumes
+  - Production database
+  - Health checks
+  - Optimized for performance
 
-## 🚀 Usage
+## 🗄️ Database Configuration
 
-### Development
+### Database Names
+- **Development**: Uses `interview_insight_dev_db` database
+- **Testing**: Uses `interview_insight_test_db` database (isolated)
+- **Production**: Uses `interview_insight_db` database
+
+### Database Volumes
+Each environment uses separate Docker volumes to ensure data isolation:
+- `postgres-data-dev` - Development data
+- `postgres-data-test` - Test data
+- `postgres-data-prod` - Production data
+
+## 🐳 Docker Commands
+
+### Make Commands
+The project includes a comprehensive Makefile for Docker operations:
+
 ```bash
+# Development
 make dev-up      # Start development environment
 make dev-down    # Stop development environment
 make dev-logs    # View development logs
-```
 
-### Testing
-```bash
-make test-env    # Run tests in dedicated environment
-make test-down   # Stop testing environment
-```
-
-### Production
-```bash
+# Production
 make prod-up     # Start production environment
 make prod-down   # Stop production environment
 make prod-logs   # View production logs
-```
 
-### Utility
-```bash
+# Testing
+make test-env    # Start testing environment
+make test-down   # Stop testing environment
+
+# Utility
 make clean       # Remove all containers and volumes
+make format      # Format code with ruff
+make lint        # Run linting checks
 ```
 
-## 🔧 Configuration
+### Manual Docker Commands
+```bash
+# Development
+cd docker/dev
+docker-compose up -d
+
+# Production
+cd docker/prod
+docker-compose up -d
+
+# Testing
+cd docker/test
+docker-compose up -d
+```
+
+## 🔧 Customization
 
 ### Environment Variables
-Each environment uses the same `.env` file but with different configurations:
-- `ENVIRONMENT`: Set automatically per environment
-- `DEBUG`: Enabled in dev, disabled in test/prod
-- `RELOAD`: Enabled in dev, disabled in test/prod
+Each environment can be customized using `.env` files:
+
+```bash
+# Development
+cp ../../env.example .env
+# Edit .env with your settings
+
+# Production
+cp ../../env.example .env
+# Edit .env with production settings
+```
+
+### Port Configuration
+To change ports, modify the `docker-compose.yml` files:
+
+```yaml
+ports:
+  - "8000:8000"  # Host:Container
+```
 
 ### Database Configuration
-- **Development**: Uses `frai_db` database
-- **Testing**: Uses `frai_test_db` database (isolated)
-- **Production**: Uses production database with persistent volumes
+Database settings can be modified in the environment files:
 
-### Port Mapping
-- **Development**: API (8000), DB (5433)
-- **Testing**: API (internal), DB (5434)
-- **Production**: API (8001), DB (5436)
-
-## 🐳 Docker Images
-
-### Base Images
-- **Python**: 3.11-slim for all environments
-- **PostgreSQL**: 15 for database
-
-### Multi-stage Builds
-- **Development**: Includes development tools and dependencies
-- **Testing**: Minimal setup for running tests
-- **Production**: Optimized runtime with Gunicorn
-
-## 📋 Best Practices
-
-### Development
-- Use volume mounts for live code editing
-- Enable debug mode and auto-reload
-- Mount source code and tests directories
-
-### Testing
-- Isolate test database from development
-- Use minimal container configuration
-- Ensure clean environment for each test run
-
-### Production
-- Use multi-worker Gunicorn setup
-- Implement health checks
-- Use persistent volumes for data
-- Disable debug features
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-**Port Conflicts**
-```bash
-# Check what's using a port
-lsof -i :8000
-
-# Change ports in docker-compose files if needed
+```yaml
+environment:
+  - POSTGRES_DB=your_database_name
+  - POSTGRES_USER=your_username
+  - POSTGRES_PASSWORD=your_password
 ```
 
-**Database Connection Issues**
-```bash
-# Check container health
-docker compose -f docker/environments/dev/docker-compose.dev.yml ps
+## 📊 Monitoring & Health Checks
 
-# View database logs
-docker compose -f docker/environments/dev/docker-compose.dev.yml logs db-dev
+### Health Endpoints
+- **Application Health**: `/health` - Application status
+- **Database Health**: `/health/db` - Database connectivity
+- **Info Endpoint**: `/info` - Application information
+
+### Logging
+Each environment provides comprehensive logging:
+- **Application Logs**: FastAPI application logs
+- **Database Logs**: PostgreSQL logs
+- **Container Logs**: Docker container logs
+
+## 🚀 Deployment
+
+### Production Deployment
+1. **Environment Setup**:
+   ```bash
+   cd docker/prod
+   cp ../../env.example .env
+   # Edit .env with production values
+   ```
+
+2. **Start Services**:
+   ```bash
+   make prod-up
+   ```
+
+3. **Verify Deployment**:
+   ```bash
+   curl http://localhost:8001/health
+   curl http://localhost:8001/info
+   ```
+
+### Scaling
+The production environment is designed for horizontal scaling:
+- **Gunicorn Workers**: Configurable worker processes
+- **Database**: Ready for read replicas
+- **Load Balancing**: Container-ready for orchestration platforms
+
+## 🔒 Security Considerations
+
+### Production Security
+- **Database**: Use strong passwords and restrict access
+- **Networks**: Isolate containers in production
+- **Secrets**: Use Docker secrets or environment variables
+- **Updates**: Regularly update base images
+
+### Development Security
+- **Local Only**: Development environment binds to localhost
+- **Test Data**: Use non-sensitive test data
+- **Isolation**: Separate development and production environments
+
+## 🧪 Testing with Docker
+
+### Running Tests
+```bash
+# Start test environment
+make test-env
+
+# Run tests
+make test
+
+# Stop test environment
+make test-down
 ```
 
-**Build Issues**
-```bash
-# Clean and rebuild
-make clean
-make dev-up
-```
-
-### Logs and Debugging
-```bash
-# View logs for specific environment
-make dev-logs
-make prod-logs
-
-# View logs for specific service
-docker compose -f docker/environments/dev/docker-compose.dev.yml logs api-dev
-```
+### Test Database
+The test environment provides:
+- Isolated PostgreSQL instance
+- Clean database for each test run
+- No interference with development data
 
 ## 🔄 Maintenance
 
-### Updating Dependencies
+### Regular Tasks
+- **Log Rotation**: Monitor log file sizes
+- **Database Backups**: Regular PostgreSQL backups
+- **Image Updates**: Update base images for security
+- **Volume Cleanup**: Remove unused volumes
+
+### Troubleshooting
 ```bash
-# Rebuild containers after dependency changes
-make dev-down
-make dev-up
+# Check container status
+docker ps
+
+# View logs
+docker logs <container-name>
+
+# Access container shell
+docker exec -it <container-name> /bin/bash
+
+# Check database connectivity
+docker exec -it <container-name> psql -U postgres -d interview_insight_db
 ```
 
-### Database Migrations
-```bash
-# Run migrations in development
-make migrate
-```
+## 📚 Additional Resources
 
-### Cleanup
-```bash
-# Remove all containers and volumes
-make clean
-```
+- [Docker Documentation](https://docs.docker.com/)
+- [Docker Compose Documentation](https://docs.docker.com/compose/)
+- [PostgreSQL Docker Image](https://hub.docker.com/_/postgres)
+- [FastAPI Docker Deployment](https://fastapi.tiangolo.com/deployment/docker/)
 
 ---
 
-**Note**: Always use the Makefile commands for consistency across environments. The environment-specific Docker Compose files are automatically referenced by the Makefile.
+**Happy Containerizing! 🐳**

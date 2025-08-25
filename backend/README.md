@@ -1,9 +1,17 @@
-# FRAI Boilerplate
+# InterviewInsight AI Backend
 
-A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V2, and optional database storage. This project provides a solid foundation for building scalable web APIs with modern Python practices, perfect for coding interviews and rapid prototyping.
+> **FastAPI Backend with Advanced AI/ML Capabilities**
+
+A production-ready FastAPI backend featuring a sophisticated multi-agent AI system powered by LangGraph, SQLAlchemy 2.0, and Pydantic V2. This backend provides enterprise-grade interview transcript analysis capabilities with modern Python practices, perfect for production deployments, rapid prototyping, and showcasing AI development skills.
+
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-red.svg)](https://sqlalchemy.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](../LICENSE)
 
 ## 🚀 Features
 
+### Core Backend Features
 - **FastAPI Framework**: Modern, fast web framework with automatic API documentation
 - **SQLAlchemy 2.0**: Latest ORM with async support and type hints
 - **Flexible Storage**: Choose between PostgreSQL or in-memory SQLite storage
@@ -17,17 +25,21 @@ A minimal, production-ready FastAPI boilerplate using SQLAlchemy 2.0, Pydantic V
 - **Health Checks**: Built-in health monitoring endpoints
 - **Exception Handling**: Centralized error handling with custom exceptions
 
-### 🤖 AI Features
+### 🤖 Advanced AI/ML Features
 
-- **LangGraph Multi-Agent System**: Lightweight multi-agent architecture using LangGraph v0.3
-- **Claude Integration**: Anthropic Claude 3.5 Haiku integration via API
-- **Research Agent**: Pre-configured research assistant with web search and calculator tools
-- **Extensible Architecture**: Easy to add new agents and tools via LangGraph
-- **Mock Responses**: Development-friendly mock responses when API keys aren't available
+- **LangGraph Multi-Agent System**: Advanced multi-agent architecture using LangGraph v0.3 with state management
+- **Multi-LLM Support**: Anthropic Claude and OpenAI GPT integration with automatic provider switching
+- **Agent Ecosystem**: 
+  - **Research Assistant**: Web search and mathematical calculations
+  - **Transcript Analyzer**: Interview transcript analysis with timeline extraction and entity recognition
+- **Advanced Tools**: Web search (DuckDuckGo), calculator (NumExpr), and extensible tool system
+- **Production-Ready AI**: Conversation threading, interrupts, and state persistence
+- **Development-Friendly**: Mock responses and cached data when API keys aren't available
+- **Streaming Support**: Real-time agent responses with stream modes
 
 ## 🏗️ Architecture
 
-The project follows a clean, layered architecture:
+The project follows a clean, layered architecture designed for scalability and maintainability:
 
 ```
 src/
@@ -55,21 +67,29 @@ src/
 
 ### AI Architecture
 
-The AI module provides a lightweight, extensible foundation for AI-powered features:
+The AI module provides a production-ready, extensible foundation for AI-powered applications:
 
 ```
 src/app/agents/
-├── __init__.py           # Module initialization
-├── agent.py              # Multi-agent system with LangGraph
-├── research_assistant.py # Research agent implementation
-└── tools.py              # Calculator and database search tools
+├── __init__.py              # Module initialization and agent registry
+├── agent.py                 # Multi-agent system with LangGraph
+├── research_assistant.py    # Research agent with web search and calculator
+├── transcript_analyzer.py   # Interview transcript analysis agent
+└── tools.py                 # Tool implementations (calculator, search, etc.)
 ```
 
-- **Multi-Agent System**: Dictionary-based agent registry with LangGraph integration
-- **Research Agent**: Pre-configured agent with web search and calculator tools
-- **Tool Integration**: Calculator tool using numexpr, web search via DuckDuckGo
-- **Claude Integration**: Anthropic API integration for natural language generation
-- **Extensible Design**: Easy to add new agents, tools, and capabilities
+**Core AI Components:**
+- **Agent Registry**: Dictionary-based system for managing multiple specialized agents
+- **State Management**: LangGraph StateGraph with persistent conversation threading
+- **Tool Ecosystem**: Modular tools for web search, calculations, and data processing
+- **Multi-LLM Support**: Seamless switching between Anthropic and OpenAI models
+- **Production Features**: Interrupt handling, recursion limits, and error recovery
+- **Development Mode**: Cached responses and mock data for API-less development
+
+**Agent Capabilities:**
+- **Research Assistant**: Web search, mathematical calculations, and general Q&A
+- **Transcript Analyzer**: Extract insights, timelines, entities, and sentiment from interview data
+- **Extensible Framework**: Easy addition of new agents and specialized tools
 
 ## 📋 Prerequisites
 
@@ -83,7 +103,7 @@ src/app/agents/
 
 ```bash
 git clone <repository-url>
-cd frai-be
+cd interview-insight-ai/backend
 ```
 
 ### 2. Environment Configuration
@@ -104,7 +124,7 @@ STORAGE_TYPE=memory
 # PostgreSQL Settings (only needed if STORAGE_TYPE=postgres)
 POSTGRES_SERVER=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=frai_db
+POSTGRES_DB=interview_insight_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 
@@ -203,28 +223,65 @@ Once the application is running, you can access:
 
 ### 🤖 AI API Endpoints
 
-The AI module provides the following endpoints:
+The AI module provides comprehensive endpoints for multi-agent interactions:
 
-#### Agents
-- `GET /api/v1/agent/` - List all available agents
-- `POST /api/v1/agent/{agent_id}/invoke` - Invoke a specific agent
-- `POST /api/v1/agent/invoke` - Invoke the default agent
+#### Agent Management
+- `GET /api/v1/agent/` - List all available agents with descriptions
+- `POST /api/v1/agent/{agent_id}/invoke` - Invoke a specific agent by ID
+- `POST /api/v1/agent/invoke` - Invoke the default research assistant
+
+#### Transcript Analysis
+- `POST /api/v1/transcript/analyze` - Analyze interview transcripts with comprehensive insights
+- `GET /api/v1/transcript/agents` - List transcript-specific agents
 
 #### Example Usage
 
 ```bash
-# List available agents
+# List all available agents
 curl http://localhost:8000/api/v1/agent/
 
-# Invoke research agent
+# Research assistant - web search and calculations
 curl -X POST http://localhost:8000/api/v1/agent/research-assistant/invoke \
   -H "Content-Type: application/json" \
-  -d '{"message": "What is 2+2?", "model": "claude-3-5-haiku-latest"}'
+  -d '{
+    "message": "What is the current population of Tokyo?",
+    "model": "claude-3-5-haiku-latest",
+    "thread_id": "session-123"
+  }'
 
-# Invoke default agent
-curl -X POST http://localhost:8000/api/v1/agent/invoke \
+# Transcript analyzer - extract insights from interview data
+curl -X POST http://localhost:8000/api/v1/transcript/analyze \
   -H "Content-Type: application/json" \
-  -d '{"message": "Tell me about Wikipedia"}'
+  -d '{
+    "transcript_text": "Interviewer: Tell me about your experience with Python...",
+    "model": "claude-3-5-haiku-latest",
+    "custom_categories": ["technical", "behavioral"]
+  }'
+
+# Mathematical calculation
+curl -X POST http://localhost:8000/api/v1/agent/research-assistant/invoke \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Calculate the compound interest for $1000 at 5% for 3 years"}'
+```
+
+#### Response Format
+
+All AI endpoints return structured responses:
+
+```json
+{
+  "success": true,
+  "message": "Agent invoked successfully",
+  "data": {
+    "response": "AI-generated response",
+    "metadata": {
+      "model_used": "claude-3-5-haiku-latest",
+      "tokens_used": 150,
+      "processing_time": 1.2
+    }
+  },
+  "run_id": "uuid-string"
+}
 ```
 
 ## 🗄️ Database Management
@@ -307,47 +364,162 @@ After running coverage, you'll find an HTML report in the `htmlcov/` directory.
 
 ### Current Agents
 
-The system currently includes:
+The system includes two production-ready agents:
 
-- **Research Assistant**: A research agent with web search and calculator capabilities
-  - Web search via DuckDuckGo
-  - Mathematical calculations using numexpr
-  - Claude 3.5 Haiku integration
+#### Research Assistant (`research-assistant`)
+A versatile research agent with comprehensive capabilities:
+- **Web Search**: Real-time web search using DuckDuckGo for current information
+- **Mathematical Calculations**: Advanced calculations using NumExpr for safe expression evaluation  
+- **General Q&A**: Claude-powered responses for general questions and analysis
+- **Multi-turn Conversations**: Maintains context across conversation threads
+
+#### Transcript Analyzer (`transcript-analyzer`) 
+A specialized agent for interview and conversation analysis:
+- **Timeline Extraction**: Automatic timestamp parsing and event categorization
+- **Entity Recognition**: Extraction of people, companies, technologies, and locations
+- **Sentiment Analysis**: Identification of highlights and lowlights in conversations
+- **Topic Modeling**: Key topic identification and categorization
+- **Structured Output**: JSON-formatted analysis results for easy integration
 
 ### Adding New Agents
 
-To add a new agent, extend the agents dictionary in `src/app/agents/agent.py`:
+Create a new agent by following the established pattern:
+
+1. **Create Agent Module**: Add a new file in `src/app/agents/` (e.g., `custom_agent.py`)
 
 ```python
-# Add your new agent
-agents["custom"] = Agent(
-    description="A custom agent for specific tasks.",
+from langchain_core.messages import AIMessage
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.state import CompiledStateGraph
+from langgraph.prebuilt import ToolNode
+
+from .tools import get_calculator_tool
+from src.app.core.llm import get_chat_model
+from src.app.schemas.agent import AgentState
+
+def create_custom_agent() -> CompiledStateGraph:
+    """Create a custom agent with specialized capabilities."""
+    
+    # Define custom tools
+    tools = [get_calculator_tool(), your_custom_tool()]
+    tool_node = ToolNode(tools)
+    
+    # Create state graph
+    graph = StateGraph(AgentState)
+    
+    # Add nodes
+    graph.add_node("agent", lambda state: agent_node(state, tools))
+    graph.add_node("tools", tool_node)
+    
+    # Define workflow
+    graph.add_edge(START, "agent")
+    graph.add_conditional_edges(
+        "agent",
+        should_continue,
+        {"continue": "tools", "end": END}
+    )
+    graph.add_edge("tools", "agent")
+    
+    return graph.compile()
+
+def agent_node(state: AgentState, tools) -> dict:
+    """Custom agent logic."""
+    model = get_chat_model(state["model"])
+    model_with_tools = model.bind_tools(tools)
+    
+    response = model_with_tools.invoke(state["messages"])
+    return {"messages": [response]}
+```
+
+2. **Register Agent**: Add to the registry in `src/app/agents/agent.py`
+
+```python
+from .custom_agent import create_custom_agent
+
+agents["custom-agent"] = Agent(
+    description="A custom agent for specialized tasks.",
     graph=create_custom_agent()
 )
 ```
 
 ### Adding New Tools
 
-Extend the tools list in your agent creation function:
+Create tools using the LangChain tool framework:
 
 ```python
-def create_custom_agent():
-    # Add your custom tools
-    custom_tools = [your_custom_tool, another_tool]
+from langchain_core.tools import Tool
+from typing import Any
+
+def create_custom_tool() -> Tool:
+    """Create a custom tool for agent use."""
     
-    # Create agent with tools
-    agent = StateGraph(AgentState)
-    agent.add_node("tools", ToolNode(custom_tools))
-    # ... rest of agent setup
+    def custom_function(input_data: str) -> str:
+        """Process input and return result."""
+        # Your custom logic here
+        return f"Processed: {input_data}"
+    
+    return Tool(
+        name="custom_tool",
+        description="Describe what this tool does",
+        func=custom_function
+    )
+```
+
+### Advanced Agent Patterns
+
+#### State Management
+```python
+from typing import TypedDict, List
+from langchain_core.messages import BaseMessage
+
+class CustomAgentState(TypedDict):
+    messages: List[BaseMessage]
+    custom_data: dict
+    processing_status: str
+```
+
+#### Interrupt Handling
+```python
+from langgraph.types import Command
+
+def agent_with_interrupts(state: AgentState) -> dict:
+    """Agent that can handle interrupts for user input."""
+    if needs_user_input(state):
+        return Command(goto="human_input")
+    return process_normally(state)
 ```
 
 ### Supported Language Models
 
-The system supports multiple language model providers:
+The system supports multiple language model providers with automatic failover:
 
-- **Anthropic**: Claude 3.5 Haiku, Claude 3 Haiku, Claude Sonnet 4.0
-- **OpenAI**: GPT-4o, GPT-4o Mini
-- **Fake Models**: For testing without API keys
+#### Production Models
+- **Anthropic Claude**:
+  - `claude-3-5-haiku-latest` (Default - Fast, cost-effective)
+  - `claude-3-haiku-20240307` (Stable version)
+  - `claude-sonnet-4-20250514` (Advanced reasoning)
+
+- **OpenAI GPT**:
+  - `gpt-4o-latest` (Latest GPT-4 model)
+  - `gpt-4o-mini` (Lightweight version)
+
+#### Development Models
+- **Fake Models**: `fake-model` for testing without API keys
+- **Cached Responses**: Pre-recorded responses for consistent testing
+
+#### Model Selection Strategy
+```python
+# Automatic provider detection based on available API keys
+available_models = settings.available_models
+
+# Model priority: Claude > OpenAI > Fake (for development)
+if settings.has_anthropic_api_key:
+    default_model = "claude-3-5-haiku-latest"
+elif settings.has_openai_api_key:
+    default_model = "gpt-4o-mini"
+else:
+    default_model = "fake-model"  # Development mode
+```
 
 ### Claude Prompt Engineering
 
@@ -406,7 +578,7 @@ For detailed Docker configuration information, see [docker/README.md](docker/REA
 ## 📁 Project Structure
 
 ```
-frai-be/
+backend/
 │
 ├── docker/                         # Docker configuration
 │   ├── README.md                   # Docker documentation
@@ -466,7 +638,7 @@ frai-be/
 | `RELOAD` | Enable auto-reload | `true` |
 | `POSTGRES_SERVER` | PostgreSQL server host (only if STORAGE_TYPE=postgres) | `localhost` |
 | `POSTGRES_PORT` | PostgreSQL server port (only if STORAGE_TYPE=postgres) | `5432` |
-| `POSTGRES_DB` | PostgreSQL database name (only if STORAGE_TYPE=postgres) | `frai_db` |
+| `POSTGRES_DB` | PostgreSQL database name (only if STORAGE_TYPE=postgres) | `interview_insight_db` |
 | `POSTGRES_USER` | PostgreSQL username (only if STORAGE_TYPE=postgres) | `postgres` |
 | `POSTGRES_PASSWORD` | PostgreSQL password (only if STORAGE_TYPE=postgres) | `postgres` |
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude | `None` (optional) |
@@ -565,13 +737,13 @@ Keep dependencies updated, especially security-related packages.
 
 ## 💡 Coding Interview Tips
 
-This boilerplate is designed to be interview-friendly:
+This backend is designed to be interview-friendly:
 
 ### Quick Start for Interviews
 ```bash
 # Clone and setup in under 2 minutes
 git clone <repo>
-cd frai-be
+cd interview-insight-ai/backend
 echo "STORAGE_TYPE=memory" > .env
 uv run python -m src.app.main
 ```

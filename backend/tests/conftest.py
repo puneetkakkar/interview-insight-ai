@@ -67,7 +67,7 @@ def test_app() -> FastAPI:
         """Root endpoint with basic information."""
         return build_success_response(
             {
-                "message": "FRAI Boilerplate",
+                "message": "Interview Insight AI",
                 "version": "0.1.0",
                 "docs": "/docs",
                 "health": "/health",
@@ -80,8 +80,8 @@ def test_app() -> FastAPI:
         """Application information endpoint."""
         return build_success_response(
             {
-                "name": "FRAI Boilerplate",
-                "description": "A production-ready FRAI boilerplate",
+                "name": "Interview Insight AI",
+                "description": "A production-ready Interview Insight AI",
                 "version": "0.1.0",
                 "status": "running",
             }
@@ -105,6 +105,48 @@ def mock_db_session() -> MagicMock:
     mock_session.rollback = MagicMock()
     mock_session.close = MagicMock()
     return mock_session
+
+
+@pytest.fixture
+def sample_root_response():
+    """Sample response for root endpoint."""
+    return {
+        "success": True,
+        "message": "InterviewInsight AI",
+        "data": {
+            "service": "InterviewInsight AI",
+            "version": "1.0.0",
+            "status": "running",
+            "timestamp": "2024-01-01T00:00:00",
+        },
+    }
+
+@pytest.fixture
+def sample_info_response():
+    """Sample response for info endpoint."""
+    return {
+        "success": True,
+        "message": "Application information retrieved successfully",
+        "data": {
+            "name": "InterviewInsight AI",
+            "description": "A production-ready AI-powered interview transcript analysis platform",
+            "version": "1.0.0",
+            "environment": "development",
+            "storage_type": "memory",
+            "features": [
+                "Multi-Agent AI System",
+                "Interview Transcript Analysis",
+                "Entity Recognition",
+                "Sentiment Analysis",
+                "Timeline Extraction",
+                "Research Assistant",
+                "Web Search Integration",
+                "Mathematical Calculations",
+            ],
+            "ai_models": ["fake-model"],
+            "timestamp": "2024-01-01T00:00:00",
+        },
+    }
 
 
 # Item-related fixtures removed - no longer needed

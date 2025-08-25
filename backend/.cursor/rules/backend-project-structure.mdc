@@ -1,41 +1,32 @@
-# Backend Project Structure Guide
+# Backend Project Structure
 
-## Project Overview
-This is a production-ready FRAI boilerplate using FastAPI, SQLAlchemy 2.0, Pydantic V2, and LangGraph for AI agents.
+This is a production-ready InterviewInsight AI backend using FastAPI, SQLAlchemy 2.0, Pydantic V2, and LangGraph for AI agents.
 
-## Key Entry Points
-- Main application: [src/app/main.py](mdc:backend/src/app/main.py)
-- Application configuration: [src/app/core/config.py](mdc:backend/src/app/core/config.py)
-- Application setup: [src/app/core/setup.py](mdc:backend/src/app/core/setup.py)
+## Project Structure
 
-## Core Architecture
-- **FastAPI Application**: RESTful API with automatic OpenAPI documentation
-- **SQLAlchemy 2.0**: Modern async ORM with PostgreSQL support
-- **Pydantic V2**: Data validation and serialization
-- **LangGraph**: AI agent orchestration framework
-- **Alembic**: Database migrations
+```
+backend/
+├── src/
+│   ├── app/
+│   │   ├── agents/           # AI agents and LangGraph implementation
+│   │   ├── api/              # API endpoints and routing
+│   │   ├── core/             # Core application logic
+│   │   ├── models/           # SQLAlchemy database models
+│   │   ├── repositories/     # Data access layer
+│   │   ├── schemas/          # Pydantic data models
+│   │   └── utils/            # Utility functions
+│   ├── data/                 # Mock data and cached responses
+│   └── migrations/           # Database migrations
+├── tests/                    # Test suite
+├── docker/                   # Docker configurations
+└── pyproject.toml           # Project configuration
+```
 
-## Directory Structure
-- `src/app/`: Main application code
-  - `api/v1/`: API endpoints and routers
-  - `agents/`: AI agent implementations
-  - `core/`: Core application logic (config, database, exceptions)
-  - `models/`: SQLAlchemy database models
-  - `repositories/`: Data access layer
-  - `schemas/`: Pydantic data models
-  - `utils/`: Utility functions
+## Key Components
 
-## Development Commands
-Use the [Makefile](mdc:backend/Makefile) for common operations:
-- `make dev-up`: Start development environment
-- `make test`: Run tests locally
-- `make format`: Auto-format code with ruff
-- `make lint`: Run linting checks
-- `make migrate`: Create and apply database migrations
-
-## Dependencies
-See [pyproject.toml](mdc:backend/pyproject.toml) for all dependencies and development tools.
-description:
-globs:
-alwaysApply: false
----
+- **Agents**: Multi-agent AI system using LangGraph
+- **API**: RESTful endpoints with proper error handling
+- **Core**: Configuration, database setup, and application logic
+- **Models**: SQLAlchemy models with async support
+- **Schemas**: Pydantic models for validation
+- **Testing**: Comprehensive test suite with pytest

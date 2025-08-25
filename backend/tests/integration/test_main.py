@@ -9,7 +9,7 @@ class TestMainEndpoints:
     """Test main application endpoints."""
 
     def test_root_endpoint(self):
-        """Test root endpoint returns correct response structure."""
+        """Test root endpoint returns correct structure and content."""
         # Arrange
         client = TestClient(app)
         
@@ -18,14 +18,18 @@ class TestMainEndpoints:
         
         # Assert
         assert response.status_code == 200
-        body = response.json()
-        assert body["success"] is True
-        assert "data" in body
-        assert "message" in body["data"]
-        assert "FRAI" in body["data"]["message"]
+        
+        data = response.json()
+        assert data["success"] is True
+        assert "InterviewInsight" in data["data"]["message"]
+        assert "data" in data
+        assert "service" in data["data"]
+        assert "version" in data["data"]
+        assert "status" in data["data"]
+        assert "timestamp" in data["data"]
 
     def test_info_endpoint(self):
-        """Test info endpoint returns correct response structure."""
+        """Test info endpoint returns correct structure and content."""
         # Arrange
         client = TestClient(app)
         
@@ -34,12 +38,21 @@ class TestMainEndpoints:
         
         # Assert
         assert response.status_code == 200
-        body = response.json()
-        assert body["success"] is True
-        assert "data" in body
-        assert "name" in body["data"]
-        assert "version" in body["data"]
-        assert "description" in body["data"]
+        
+        data = response.json()
+        assert data["success"] is True
+        assert data["message"] == "Application information retrieved successfully"
+        assert "data" in data
+        
+        info_data = data["data"]
+        assert info_data["name"] == "InterviewInsight AI"
+        assert info_data["description"] == "A production-ready AI-powered interview transcript analysis platform"
+        assert "version" in info_data
+        assert "environment" in info_data
+        assert "storage_type" in info_data
+        assert "features" in info_data
+        assert "ai_models" in info_data
+        assert "timestamp" in info_data
 
     def test_root_endpoint_response_structure(self):
         """Test root endpoint response structure in detail."""
@@ -148,7 +161,7 @@ class TestMainEndpoints:
         assert response.status_code == 200
         body = response.json()
         data = body["data"]
-        assert data["message"] == "FRAI Boilerplate"
+        assert data["message"] == "Interview Insight AI"
         assert data["version"] == "0.1.0"
         assert data["docs"] == "/docs"
         assert data["health"] == "/health"
@@ -165,9 +178,9 @@ class TestMainEndpoints:
         assert response.status_code == 200
         body = response.json()
         data = body["data"]
-        assert data["name"] == "FRAI Boilerplate"
+        assert data["name"] == "Interview Insight AI"
         assert data["version"] == "0.1.0"
-        assert data["description"] == "A production-ready FRAI boilerplate"
+        assert data["description"] == "A production-ready Interview Insight AI"
         assert data["status"] == "running"
 
     def test_root_endpoint_no_optional_fields(self):
