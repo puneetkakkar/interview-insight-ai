@@ -4,7 +4,7 @@ from datetime import datetime
 from src.app.api.v1 import agent, transcript
 from src.app.core.setup import create_application
 from src.app.core.response import build_success_response
-from src.app.core.settings import settings
+from src.app.core import settings
 
 # Create the FastAPI application
 app = create_application()
@@ -20,9 +20,9 @@ async def root():
     """Root endpoint with basic information."""
     return {
         "success": True,
-        "message": "InterviewInsight AI",
+        "message": "Interview Insight AI",
         "data": {
-            "service": "InterviewInsight AI",
+            "service": "Interview Insight AI",
             "version": "1.0.0",
             "status": "running",
             "timestamp": datetime.utcnow().isoformat(),
@@ -38,7 +38,7 @@ async def get_info():
         "success": True,
         "message": "Application information retrieved successfully",
         "data": {
-            "name": "InterviewInsight AI",
+            "name": "Interview Insight AI",
             "description": "A production-ready AI-powered interview transcript analysis platform",
             "version": "1.0.0",
             "environment": settings.environment,
