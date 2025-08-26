@@ -191,5 +191,3 @@ logs/
 # Temporary files
 *.tmp
 *.temp
-data/
-test_transcript_fix.py

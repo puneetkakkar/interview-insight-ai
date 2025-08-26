@@ -1,0 +1,98 @@
+{
+    "cache_key": "57d1863e7cb9569831bec4fcac613ebd",
+    "timestamp": "2025-08-25T20:15:22.819166",
+    "run_id": "07892fa3-0480-46ca-ac7b-894a11fcbe43",
+    "response_content": [
+        {
+            "text": "Based on the systematic analysis, here's the comprehensive JSON output:\n\n```json\n{\n  \"entities\": {\n    \"people\": [\"Sarah Chen\", \"Alex\", \"Mike Thompson\"],\n    \"companies\": [\"TechFlow Solutions\", \"DataViz Inc.\", \"OpenAI\", \"AWS\"],\n    \"technologies\": [\n      \"React\", \"TypeScript\", \"Node.js\", \"Express\", \"PostgreSQL\", \n      \"WebSockets\", \"Redis\", \"RabbitMQ\", \"Kafka\", \"Docker\", \n      \"Kubernetes\", \"TensorFlow.js\", \"SageMaker\", \"JWT\", \"OAuth 2.0\"\n    ],\n    \"locations\": []\n  },\n  \"sentiment_analysis\": {\n    \"highlights\": [\n      \"Excited about TechFlow opportunity\",\n      \"Comprehensive technical knowledge\",\n      \"Strong leadership and team collaboration approach\",\n      \"Passion for continuous learning\"\n    ],\n    \"lowlights\": [\n      \"Complexity of microservices and distributed systems\",\n      \"Challenges in AI service reliability\"\n    ]\n  },\n  \"timeline\": [\n    {\n      \"timestamp\": \"00:00:03\",\n      \"category\": \"Solution Discussion\",\n      \"content\": \"Introduction and greeting\"\n    },\n    {\n      \"timestamp\": \"00:45-03:48\",\n      \"category\": \"Technical Discussion\",\n      \"content\": \"Frontend and backend architecture exploration\",\n      \"confidence_score\": 0.8\n    },\n    {\n      \"timestamp\": \"00:04:48\",\n      \"category\": \"System Design\",\n      \"content\": \"Real-time chat application design challenge\"\n    },\n    {\n      \"timestamp\": \"00:07:48\",\n      \"category\": \"Security Discussion\",\n      \"content\": \"Authentication and security strategies\"\n    }\n  ],\n  \"overall_sentiment\": \"Positive\",\n  \"key_topics\": [\n    \"Full-stack Development\",\n    \"React Architecture\",\n    \"Microservices\",\n    \"AI Integration\",\n    \"Performance Optimization\",\n    \"System Design\",\n    \"DevOps Practices\"\n  ],\n  \"total_duration\": \"15:32\"\n}\n```",
+            "type": "text",
+            "index": 0
+        }
+    ],
+    "parsed_summary": {
+        "entities": {
+            "people": [
+                "Sarah Chen",
+                "Alex",
+                "Mike Thompson"
+            ],
+            "companies": [
+                "TechFlow Solutions",
+                "DataViz Inc.",
+                "OpenAI",
+                "AWS"
+            ],
+            "technologies": [
+                "React",
+                "TypeScript",
+                "Node.js",
+                "Express",
+                "PostgreSQL",
+                "WebSockets",
+                "Redis",
+                "RabbitMQ",
+                "Kafka",
+                "Docker",
+                "Kubernetes",
+                "TensorFlow.js",
+                "SageMaker",
+                "JWT",
+                "OAuth 2.0"
+            ],
+            "locations": []
+        },
+        "sentiment_analysis": {
+            "highlights": [
+                "Excited about TechFlow opportunity",
+                "Comprehensive technical knowledge",
+                "Strong leadership and team collaboration approach",
+                "Passion for continuous learning"
+            ],
+            "lowlights": [
+                "Complexity of microservices and distributed systems",
+                "Challenges in AI service reliability"
+            ]
+        },
+        "timeline": [
+            {
+                "timestamp": "00:00:03",
+                "category": "Solution Discussion",
+                "content": "Introduction and greeting",
+                "confidence_score": 0.8
+            },
+            {
+                "timestamp": "00:45-03:48",
+                "category": "Technical Discussion",
+                "content": "Frontend and backend architecture exploration",
+                "confidence_score": 0.8
+            },
+            {
+                "timestamp": "00:04:48",
+                "category": "System Design",
+                "content": "Real-time chat application design challenge",
+                "confidence_score": 0.8
+            },
+            {
+                "timestamp": "00:07:48",
+                "category": "Security Discussion",
+                "content": "Authentication and security strategies",
+                "confidence_score": 0.8
+            }
+        ],
+        "total_duration": "15:32",
+        "key_topics": [
+            "Full-stack Development",
+            "React Architecture",
+            "Microservices",
+            "AI Integration",
+            "Performance Optimization",
+            "System Design",
+            "DevOps Practices"
+        ],
+        "overall_sentiment": "Positive",
+        "metadata": {
+            "processed": true
+        }
+    },
+    "transcript_hash": "57d1863e7cb9569831bec4fcac613ebd"
+}
