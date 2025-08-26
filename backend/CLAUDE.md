@@ -55,9 +55,11 @@ This is a FastAPI-based AI-powered backend with a clean, layered architecture su
 - Sync-to-async wrapper for in-memory SQLite mode
 
 **Configuration** (`src/app/core/config.py`):
-- Environment-based settings with Pydantic
-- Automatic database URL selection based on storage type
-- API key validation for AI features
+- Environment-based settings with Pydantic BaseSettings
+- Three-tier settings hierarchy: App, Database, LanguageModel combined into Settings
+- Automatic database URL selection: memory → `sqlite+aiosqlite:///:memory:`, postgres → async PostgreSQL
+- API key validation with properties: `has_anthropic_api_key`, `has_openai_api_key`
+- Available models detection based on API keys (`available_models` property)
 
 **AI Agent System** (`src/app/agents/`):
 - Dictionary-based agent registry
@@ -72,17 +74,27 @@ This is a FastAPI-based AI-powered backend with a clean, layered architecture su
 2. `uv run python -m src.app.main`
 3. Access http://localhost:8000/docs
 
+### Development Environment Variables
+The config system supports both .env files and direct environment variables:
+- Settings class hierarchy: `AppSettings`, `DatabaseSettings`, `LanguageModelSettings` combined into `Settings`
+- Property-based configuration validation in `src/app/core/config.py:144-151`
+- Automatic database URL generation based on environment and storage type
+
 ### Adding New Features
 1. Always check `src/app/core/config.py` for configuration patterns
 2. Use existing Pydantic schemas in `src/app/schemas/`
 3. Follow the response format in `src/app/core/response.py`
 4. Add endpoints to appropriate versioned router in `src/app/api/v1/`
+5. **Important**: When adding new models, check if API keys are available via `settings.has_anthropic_api_key` or `settings.has_openai_api_key`
 
 ### AI Agent Development
-- Extend `agents` dict in `src/app/agents/agent.py`
+- Extend `agents` dict in `src/app/agents/agent.py:22-31` (currently has research-assistant and transcript-analyzer)
+- Default agent is `research-assistant` (defined in `src/app/agents/agent.py:9`)
+- Agent registry uses dataclass pattern with `description` and `graph` properties
 - Create new agent modules following `research_assistant.py` pattern
 - Add tools to `src/app/agents/tools.py`
 - Use mocked responses for development without API keys
+- Agent type definitions: `AgentGraph = CompiledStateGraph | Pregel`
 
 ### Database Development
 - For PostgreSQL features: Use repositories pattern in `src/app/repositories/`
@@ -117,6 +129,11 @@ This is a FastAPI-based AI-powered backend with a clean, layered architecture su
 **Package Management**: Uses UV for fast dependency resolution. All commands prefer `uv run` over direct Python execution.
 
 **Code Quality**: 
-- Ruff for linting and formatting (configured in pyproject.toml)
-- MyPy for type checking with strict mode on `src.app.*`
-- 120 character line length
+- Ruff for linting and formatting (configured in pyproject.toml:97-126)
+- Line length: 120 characters, target Python 3.11+
+- MyPy for type checking with strict mode on `src.app.*` (pyproject.toml:133-144)
+- Pytest with asyncio_mode="auto" for testing
+
+**Application Entry Points**:
+- Main app: `src/app/main.py` - includes root "/", "/info", and "/health" endpoints
+- Direct execution: `python -m src.app.main` runs on 0.0.0.0:8000 with auto-reload
