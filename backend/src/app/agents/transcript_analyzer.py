@@ -20,6 +20,8 @@ from .tools import (
     sentiment_analyzer,
     content_categorizer,
     timeline_consolidator,
+    timeline_builder,
+    confidence_scorer,
 )
 
 
@@ -41,6 +43,8 @@ tools = [
     entity_extractor,
     sentiment_analyzer,
     content_categorizer,
+    timeline_builder,
+    confidence_scorer,
     timeline_consolidator,
 ]
 
@@ -57,9 +61,10 @@ Today's date is {current_date}.
    
    STEP 1: Use TranscriptParser on the full transcript text
    STEP 2: Use EntityExtractor on the full transcript text  
-   STEP 3: Use SentimentAnalyzer on the full transcript text
-   STEP 4: For each segment from TranscriptParser, use ContentCategorizer to get its category
-   STEP 5: Use TimelineConsolidator on the timeline JSON from step 4 to merge consecutive similar events
+   STEP 3: Use SentimentAnalyzer on the full transcript text (produce concise highlight/lowlights pointers)
+   STEP 4: Build timeline events from parsed segments using TimelineBuilder (assign categories and initial confidence)
+   STEP 5: Use ConfidenceScorer on the timeline to refine dynamic confidence scores
+   STEP 6: Use TimelineConsolidator on the timeline JSON from step 5 to merge consecutive similar events and create timestamp ranges
    
    **IMPORTANT**: Process the ENTIRE transcript - do not stop early. Ensure complete coverage from start to finish.
    
@@ -78,9 +83,10 @@ Today's date is {current_date}.
      }},
      "timeline": [
        {{
-         "timestamp": "00:01:30",
+         "timestamp": "00:01:30" or "00:01:30-00:02:10",
          "category": "Introduction",
          "content": "timeline event description",
+         "summary": "Interviewer asked about X; Interviewee responded Y",
          "confidence_score": 0.9
        }}
      ],
@@ -90,11 +96,11 @@ Today's date is {current_date}.
    }}
    ```
 
-3. **NO NARRATIVE SUMMARIES** - Do not provide explanatory text, analysis, or commentary. Only use tools and provide the final JSON.
+3. **NO NARRATIVE SUMMARIES** - Do not provide explanatory text, analysis, or commentary outside of the JSON. Only use tools and provide the final JSON.
 
 4. **JSON ONLY** - Your final response must be ONLY the JSON object above, nothing else.
 
-REMEMBER: Use every tool, then respond with JSON only. No explanations, no summaries, just structured JSON data.
+REMEMBER: Use every tool, then respond with JSON only. No explanations outside JSON; provide concise per-event summaries inside each timeline entry.
 """
 
 

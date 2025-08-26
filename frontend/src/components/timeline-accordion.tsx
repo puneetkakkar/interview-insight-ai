@@ -76,7 +76,7 @@ const TimelineRow = memo(function TimelineRow({
         className="overflow-hidden pl-5"
       >
         <p className="pb-3 text-sm leading-relaxed text-white/70">
-          {item.content}
+          {item.summary}
         </p>
       </motion.div>
     </div>
@@ -88,7 +88,8 @@ function groupByWindow(items: TimelineEntry[]) {
   // Falls back to the first window for missing/invalid timestamps.
   const WINDOW_SECONDS = 5 * 60;
 
-  const toSeconds = (ts: string | null): number | null => {
+  // Parse a single timestamp like "hh:mm:ss", "mm:ss", or "ss"
+  const toSecondsSingle = (ts: string | null): number | null => {
     if (!ts) return null;
     const raw = ts.trim();
     if (!raw) return null;
@@ -109,6 +110,29 @@ function groupByWindow(items: TimelineEntry[]) {
     return null;
   };
 
+  // Parse either a single timestamp ("00:00:22") or a range ("00:00:03-00:00:08").
+  // Returns a [startSeconds, endSeconds] tuple. If only one timestamp is present,
+  // both start and end will be that value.
+  const parseTimestampOrRange = (ts: string | null): [number | null, number | null] => {
+    if (!ts) return [null, null];
+    const raw = ts.trim();
+    if (!raw) return [null, null];
+    if (raw.includes("-")) {
+      const [startRaw, endRaw] = raw.split("-").map((p) => p.trim());
+      const start = toSecondsSingle(startRaw ?? null);
+      const end = toSecondsSingle(endRaw ?? null);
+      if (start == null && end == null) return [null, null];
+      // If only one side parses, treat as a single timestamp
+      if (start != null && end == null) return [start, start];
+      if (start == null && end != null) return [end, end];
+      // Ensure start <= end
+      if (start! > end!) return [end!, start!];
+      return [start!, end!];
+    }
+    const single = toSecondsSingle(raw);
+    return [single, single];
+  };
+
   const formatTime = (seconds: number) => {
     const total = Math.max(0, Math.floor(seconds));
     const minutes = Math.floor(total / 60);
@@ -119,11 +143,24 @@ function groupByWindow(items: TimelineEntry[]) {
   // Build buckets keyed by bucket start seconds
   const buckets = new Map<number, TimelineEntry[]>();
   for (const item of items) {
-    const secs = toSeconds(item.timestamp);
-    const bucketStart = secs == null ? 0 : Math.floor(secs / WINDOW_SECONDS) * WINDOW_SECONDS;
-    const arr = buckets.get(bucketStart) ?? [];
-    arr.push(item);
-    buckets.set(bucketStart, arr);
+    const [startSecs, endSecs] = parseTimestampOrRange(item.timestamp);
+
+    if (startSecs == null || endSecs == null) {
+      // Fallback: put in first window
+      const arr = buckets.get(0) ?? [];
+      arr.push(item);
+      buckets.set(0, arr);
+      continue;
+    }
+
+    const firstBucketStart = Math.floor(startSecs / WINDOW_SECONDS) * WINDOW_SECONDS;
+    const lastBucketStart = Math.floor(endSecs / WINDOW_SECONDS) * WINDOW_SECONDS;
+
+    for (let bucketStart = firstBucketStart; bucketStart <= lastBucketStart; bucketStart += WINDOW_SECONDS) {
+      const arr = buckets.get(bucketStart) ?? [];
+      arr.push(item);
+      buckets.set(bucketStart, arr);
+    }
   }
 
   // Sort by bucket start time

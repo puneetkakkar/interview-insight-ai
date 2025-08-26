@@ -1,0 +1,115 @@
+{
+    "cache_key": "aa87a1ca4ea8f3e1957a01a4d581dfaa",
+    "timestamp": "2025-08-26T14:57:20.150822",
+    "run_id": "cfe45ff9-2fdc-4031-8f20-9879fce1740f",
+    "response_content": [
+        {
+            "text": "{\n  \"entities\": {\n    \"people\": [\"Sarah Chen\", \"Alex\"],\n    \"companies\": [\"DataViz Inc\", \"TechFlow Solutions\"],\n    \"technologies\": [\"React\", \"TypeScript\", \"Node.js\", \"Express\", \"PostgreSQL\", \"Redis\", \"WebSocket\", \"Jest\", \"Cypress\", \"ESLint\", \"OpenAI APIs\", \"Microservices\"],\n    \"locations\": []\n  },\n  \"sentiment_analysis\": {\n    \"highlights\": [\n      \"Excitement about TechFlow opportunity\",\n      \"Positive discussion about technical capabilities\",\n      \"Collaborative team culture\"\n    ],\n    \"lowlights\": [\n      \"Initial scaling challenges with concurrent users\",\n      \"Performance issues before optimization\"\n    ]\n  },\n  \"timeline\": [\n    {\n      \"timestamp\": \"00:00:03-00:00:08\",\n      \"category\": \"Introduction\",\n      \"content\": \"Initial greeting and introduction between Sarah and Alex\",\n      \"summary\": \"Sarah Chen introduces herself as Senior Engineering Manager at TechFlow Solutions, Alex expresses excitement about the opportunity\",\n      \"confidence_score\": 0.98\n    },\n    {\n      \"timestamp\": \"00:00:22\",\n      \"category\": \"Professional Background\",\n      \"content\": \"Alex discusses his professional experience in full-stack development\",\n      \"summary\": \"8 years of experience, currently leading a team of 5 developers at DataViz Inc. building a real-time analytics dashboard\",\n      \"confidence_score\": 0.95\n    },\n    {\n      \"timestamp\": \"00:01:22-00:02:10\",\n      \"category\": \"Technical Challenge\",\n      \"content\": \"Discussion of scaling challenges in real-time analytics\",\n      \"summary\": \"Addressed concurrent user handling by implementing distributed architecture, WebSocket connections, and optimizing database queries\",\n      \"confidence_score\": 0.92\n    },\n    {\n      \"timestamp\": \"00:03:00-00:03:15\",\n      \"category\": \"Technology Stack\",\n      \"content\": \"Exploration of TechFlow's tech stack and Alex's experience\",\n      \"summary\": \"TechFlow interested in microservices and AI integration, Alex has relevant experience\",\n      \"confidence_score\": 0.90\n    },\n    {\n      \"timestamp\": \"00:04:00-00:04:08\",\n      \"category\": \"Testing and Quality\",\n      \"content\": \"Discussion of code quality and testing practices\",\n      \"summary\": \"Alex advocates for comprehensive testing, maintains 85% test coverage, uses Jest, Cypress, and ESLint\",\n      \"confidence_score\": 0.93\n    },\n    {\n      \"timestamp\": \"00:05:10-00:05:30\",\n      \"category\": \"Career Development\",\n      \"content\": \"Exploration of team structure and growth opportunities\",\n      \"summary\": \"TechFlow offers collaborative culture, conference attendance, training budgets, and mentorship programs\",\n      \"confidence_score\": 0.91\n    },\n    {\n      \"timestamp\": \"00:06:15-00:06:40\",\n      \"category\": \"Closing\",\n      \"content\": \"Positive conclusion of the interview\",\n      \"summary\": \"Alex expresses interest in contributing to TechFlow's mission, Sarah indicates they'll be in touch\",\n      \"confidence_score\": 0.97\n    }\n  ],\n  \"overall_sentiment\": \"Positive\",\n  \"key_topics\": [\n    \"Full-stack Development\",\n    \"Scalable Web Applications\",\n    \"Real-time Analytics\",\n    \"Microservices\",\n    \"AI Integration\",\n    \"Testing Practices\"\n  ],\n  \"total_duration\": \"00:06:40\"\n}",
+            "type": "text",
+            "index": 0
+        }
+    ],
+    "parsed_summary": {
+        "entities": {
+            "people": [
+                "Sarah Chen",
+                "Alex"
+            ],
+            "companies": [
+                "DataViz Inc",
+                "TechFlow Solutions"
+            ],
+            "technologies": [
+                "React",
+                "TypeScript",
+                "Node.js",
+                "Express",
+                "PostgreSQL",
+                "Redis",
+                "WebSocket",
+                "Jest",
+                "Cypress",
+                "ESLint",
+                "OpenAI APIs",
+                "Microservices"
+            ],
+            "locations": []
+        },
+        "sentiment_analysis": {
+            "highlights": [
+                "Excitement about TechFlow opportunity",
+                "Positive discussion about technical capabilities",
+                "Collaborative team culture"
+            ],
+            "lowlights": [
+                "Initial scaling challenges with concurrent users",
+                "Performance issues before optimization"
+            ]
+        },
+        "timeline": [
+            {
+                "timestamp": "00:00:03-00:00:08",
+                "category": "Introduction",
+                "content": "Initial greeting and introduction between Sarah and Alex",
+                "summary": "Sarah Chen introduces herself as Senior Engineering Manager at TechFlow Solutions, Alex expresses excitement about the opportunity",
+                "confidence_score": 0.98
+            },
+            {
+                "timestamp": "00:00:22",
+                "category": "Professional Background",
+                "content": "Alex discusses his professional experience in full-stack development",
+                "summary": "8 years of experience, currently leading a team of 5 developers at DataViz Inc. building a real-time analytics dashboard",
+                "confidence_score": 0.95
+            },
+            {
+                "timestamp": "00:01:22-00:02:10",
+                "category": "Technical Challenge",
+                "content": "Discussion of scaling challenges in real-time analytics",
+                "summary": "Addressed concurrent user handling by implementing distributed architecture, WebSocket connections, and optimizing database queries",
+                "confidence_score": 0.92
+            },
+            {
+                "timestamp": "00:03:00-00:03:15",
+                "category": "Technology Stack",
+                "content": "Exploration of TechFlow's tech stack and Alex's experience",
+                "summary": "TechFlow interested in microservices and AI integration, Alex has relevant experience",
+                "confidence_score": 0.9
+            },
+            {
+                "timestamp": "00:04:00-00:04:08",
+                "category": "Testing and Quality",
+                "content": "Discussion of code quality and testing practices",
+                "summary": "Alex advocates for comprehensive testing, maintains 85% test coverage, uses Jest, Cypress, and ESLint",
+                "confidence_score": 0.93
+            },
+            {
+                "timestamp": "00:05:10-00:05:30",
+                "category": "Career Development",
+                "content": "Exploration of team structure and growth opportunities",
+                "summary": "TechFlow offers collaborative culture, conference attendance, training budgets, and mentorship programs",
+                "confidence_score": 0.91
+            },
+            {
+                "timestamp": "00:06:15-00:06:40",
+                "category": "Closing",
+                "content": "Positive conclusion of the interview",
+                "summary": "Alex expresses interest in contributing to TechFlow's mission, Sarah indicates they'll be in touch",
+                "confidence_score": 0.97
+            }
+        ],
+        "total_duration": "00:06:40",
+        "key_topics": [
+            "Full-stack Development",
+            "Scalable Web Applications",
+            "Real-time Analytics",
+            "Microservices",
+            "AI Integration",
+            "Testing Practices"
+        ],
+        "overall_sentiment": "Positive",
+        "metadata": {
+            "processed": true
+        }
+    },
+    "transcript_hash": "aa87a1ca4ea8f3e1957a01a4d581dfaa"
+}

@@ -11,6 +11,7 @@ export interface TimelineEntry {
   timestamp: string | null;
   category: string;
   content: string;
+  summary: string;
   confidence_score?: number;
 }
 
