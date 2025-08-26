@@ -1,4 +1,5 @@
 import math
+from typing import Any
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 import numexpr
@@ -121,6 +122,29 @@ def transcript_parser_func(transcript_text: str) -> str:
     lines = transcript_text.split('\n')
     current_speaker = None
     
+    def normalize_timestamp_format(raw_ts: str | None) -> str | None:
+        """Normalize timestamps to HH:MM:SS where possible.
+        - Accepts MM:SS and HH:MM:SS
+        - Pads with zeros
+        - Returns None if invalid
+        """
+        if not raw_ts or ":" not in raw_ts:
+            return None
+        try:
+            parts = [int(p) for p in raw_ts.split(":")]
+            if len(parts) == 2:
+                minutes, seconds = parts
+                hours = 0
+            elif len(parts) == 3:
+                hours, minutes, seconds = parts
+            else:
+                return None
+            if minutes < 0 or seconds < 0 or seconds >= 60 or minutes >= 600:
+                return None
+            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        except Exception:
+            return None
+    
     for line_num, line in enumerate(lines):
         line = line.strip()
         if not line:
@@ -195,8 +219,9 @@ def transcript_parser_func(transcript_text: str) -> str:
         content = content.strip()
         
         if content and len(content) > 2:  # Only add non-empty, meaningful content
+            normalized_ts = normalize_timestamp_format(timestamp)
             segment = {
-                "timestamp": timestamp,
+                "timestamp": normalized_ts or timestamp,
                 "content": content
             }
             
@@ -479,9 +504,23 @@ def sentiment_analyzer_func(text: str) -> str:
         negative_score = sum(1 for word in negative_keywords if word in sentence_lower)
         
         if positive_score > negative_score and positive_score > 0:
-            highlights.append(sentence.strip())
+            # Summarize to a concise pointer (extract key phrase)
+            snippet = sentence
+            # Prefer clause after keywords like "achieved", "solved", etc.
+            for kw in ["achieved", "solved", "successful", "impressed", "great", "excellent"]:
+                if kw in sentence_lower:
+                    idx = sentence_lower.find(kw)
+                    snippet = sentence[idx: idx + 140]
+                    break
+            highlights.append(snippet.strip())
         elif negative_score > positive_score and negative_score > 0:
-            lowlights.append(sentence.strip())
+            snippet = sentence
+            for kw in ["struggle", "failed", "issue", "problem", "confused", "unclear"]:
+                if kw in sentence_lower:
+                    idx = sentence_lower.find(kw)
+                    snippet = sentence[idx: idx + 140]
+                    break
+            lowlights.append(snippet.strip())
     
     return json.dumps({
         "highlights": highlights[:5],  # Top 5 highlights
@@ -606,7 +645,13 @@ def timeline_consolidator_func(timeline_json: str) -> str:
 def _consolidate_group(events):
     """Helper function to consolidate a group of similar events."""
     if len(events) == 1:
-        return events[0]
+        # Ensure single event has a summary
+        single = events[0]
+        speakers = [e.get('speaker') for e in events if e.get('speaker')]
+        summary_text = _generate_dialogue_summary([single.get('content', '')], speakers)
+        if summary_text:
+            single['summary'] = summary_text
+        return single
     
     # Get timestamp range
     timestamps = [e.get('timestamp') for e in events if e.get('timestamp')]
@@ -651,11 +696,16 @@ def _consolidate_group(events):
             else:
                 duration = f"{duration_seconds}s"
     
+    # Generate concise dialogue summary (interviewer vs interviewee)
+    speakers = [e.get('speaker') for e in events if e.get('speaker')]
+    summary_text = _generate_dialogue_summary(contents, speakers)
+
     consolidated_event = {
         "timestamp": timestamp_range,
         "category": category,
         "content": combined_content,
         "confidence_score": round(avg_confidence, 2),
+        "summary": summary_text,
         "event_count": len(events)
     }
     
@@ -708,6 +758,107 @@ def format_timestamp_range(start_seconds, end_seconds):
         return f"{seconds_to_timestamp(start_seconds)}-{seconds_to_timestamp(end_seconds)}"
 
 
+def _generate_dialogue_summary(contents: list[str], speakers: list[str]) -> str:
+    """Create a brief summary capturing what happened between interviewer and interviewee.
+    Heuristics:
+    - If two distinct speakers exist, assume first = Interviewer, second = Interviewee
+    - Extract short key phrases from first and last utterances
+    - Fall back to concise concatenation
+    """
+    unique_speakers = []
+    for s in speakers:
+        if s and s not in unique_speakers:
+            unique_speakers.append(s)
+        if len(unique_speakers) == 2:
+            break
+    # Extract head and tail content snippets
+    head = contents[0] if contents else ""
+    tail = contents[-1] if contents else ""
+    def trim(text: str) -> str:
+        text = re.sub(r"\s+", " ", text).strip()
+        return text[:180]
+    head_snippet = trim(head)
+    tail_snippet = trim(tail)
+    if len(unique_speakers) == 2:
+        interviewer, interviewee = unique_speakers[0], unique_speakers[1]
+        return (
+            f"{interviewer} asked/discussed: '{head_snippet}'. "
+            f"{interviewee} responded/expanded: '{tail_snippet}'."
+        )
+    elif len(unique_speakers) == 1:
+        return f"{unique_speakers[0]} discussed: '{head_snippet}'."
+    else:
+        # No speaker info
+        if head_snippet and tail_snippet and head_snippet != tail_snippet:
+            return f"Discussion progressed from '{head_snippet}' to '{tail_snippet}'."
+        return head_snippet
+
+
+def _score_timeline_event_confidence(event: dict) -> float:
+    """Compute a dynamic confidence score based on heuristics."""
+    base_score = 0.6
+    timestamp_bonus = 0.15 if event.get("timestamp") else 0.0
+    speaker_bonus = 0.05 if event.get("speaker") else 0.0
+    length_bonus = 0.1 if len(str(event.get("content", "")).split()) >= 12 else 0.0
+    category_bonus = 0.1 if event.get("category") and event.get("category") != "Discussion" else 0.0
+    score = base_score + timestamp_bonus + speaker_bonus + length_bonus + category_bonus
+    return max(0.3, min(0.98, round(score, 2)))
+
+
+def timeline_builder_func(parsed_segments_json: str) -> str:
+    """Build initial timeline events from parsed segments JSON.
+    - Assign categories using ContentCategorizer
+    - Compute dynamic confidence per event
+    - Preserve speaker when available
+    """
+    import json
+    try:
+        segments = json.loads(parsed_segments_json)
+        if not isinstance(segments, list):
+            return json.dumps([], indent=2)
+        timeline_events: list[dict] = []
+        for seg in segments:
+            if not isinstance(seg, dict):
+                continue
+            content = seg.get("content", "")
+            if not content:
+                continue
+            category = content_categorizer_func(content)
+            # content_categorizer_func returns a plain string
+            if category and category.startswith('{'):
+                try:
+                    category = json.loads(category)
+                except Exception:
+                    category = str(category)
+            event: dict[str, Any] = {
+                "timestamp": seg.get("timestamp"),
+                "category": category if isinstance(category, str) else str(category),
+                "content": content,
+            }
+            if seg.get("speaker"):
+                event["speaker"] = seg.get("speaker")
+            event["confidence_score"] = _score_timeline_event_confidence(event)
+            timeline_events.append(event)
+        return json.dumps(timeline_events, indent=2)
+    except Exception:
+        return json.dumps([], indent=2)
+
+
+def confidence_scorer_func(timeline_json: str) -> str:
+    """Recalculate/normalize confidence scores for timeline events."""
+    import json
+    try:
+        events = json.loads(timeline_json)
+        if not isinstance(events, list):
+            return timeline_json
+        for e in events:
+            if isinstance(e, dict):
+                e["confidence_score"] = _score_timeline_event_confidence(e)
+        return json.dumps(events, indent=2)
+    except Exception:
+        return timeline_json
+
+
 # Create tools
 transcript_parser: BaseTool = tool(transcript_parser_func)
 transcript_parser.name = "TranscriptParser"
@@ -723,3 +874,10 @@ content_categorizer.name = "ContentCategorizer"
 
 timeline_consolidator: BaseTool = tool(timeline_consolidator_func)
 timeline_consolidator.name = "TimelineConsolidator"
+
+# Timeline builder and confidence scorer tools
+timeline_builder: BaseTool = tool(timeline_builder_func)
+timeline_builder.name = "TimelineBuilder"
+
+confidence_scorer: BaseTool = tool(confidence_scorer_func)
+confidence_scorer.name = "ConfidenceScorer"

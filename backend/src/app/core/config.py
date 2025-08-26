@@ -33,6 +33,7 @@ class AppSettings(BaseSettings):
     DEBUG: bool = Field(default=True, description="Debug mode")
     RELOAD: bool = Field(default=True, description="Auto-reload mode")
     LOG_LEVEL: str = Field(default="INFO", description="Log level")
+    DEBUG_TOOLS_OUTPUT: bool = Field(default=False, description="Save debug output for each tool execution")
 
     @property
     def IS_TESTING(self) -> bool:

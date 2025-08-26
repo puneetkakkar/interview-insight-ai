@@ -6,6 +6,8 @@ using AI-powered agents for timeline extraction, entity recognition, and sentime
 
 import json
 import os
+import asyncio
+import random
 import hashlib
 from datetime import datetime
 from pathlib import Path
@@ -136,6 +138,36 @@ def _should_use_cache(transcript_input: TranscriptInput) -> bool:
         return False
 
     return True
+
+
+async def _simulate_llm_latency_for_cache(transcript_text: str) -> None:
+    """Simulate LLM latency when serving cached responses.
+    Uses a simple token size heuristic to determine delay duration.
+    Triggered only when cache is enabled to provide realistic UX feedback.
+    """
+    try:
+        # Approximate token count: ~1.3 tokens per word as a rough heuristic
+        # Cap to avoid extreme sleeps for very large inputs during development
+        words = max(1, len([w for w in transcript_text.split() if w.strip()]))
+        approx_tokens = int(min(8000, max(50, words * 1.3)))
+
+        # Base latency + per-token component (values tuned for dev UX)
+        base_seconds = 0.4
+        per_token_seconds = 0.0015  # 1.5 ms per token
+        estimated_seconds = base_seconds + per_token_seconds * approx_tokens
+
+        # Clamp to reasonable dev bounds and add small jitter to feel natural
+        clamped = max(0.75, min(5.0, estimated_seconds))
+        jitter_scale = 1 + (random.random() - 0.5) * 0.2  # +/-10%
+        delay = clamped * jitter_scale
+
+        logger.info(
+            f"Simulating LLM latency for cached response: tokens≈{approx_tokens}, delay≈{delay:.2f}s"
+        )
+        await asyncio.sleep(delay)
+    except Exception as e:
+        # Fallback: do not block if estimation fails
+        logger.warning(f"Latency simulation skipped due to error: {e}")
 
 
 async def _handle_transcript_input(
@@ -284,6 +316,7 @@ def _parse_agent_response_to_summary(response_content) -> TranscriptSummary:
                         "timestamp": item.get("timestamp"),
                         "category": item.get("category", "discussion"),
                         "content": str(item.get("content", "")),
+                        "summary": item.get("summary"),
                         "confidence_score": item.get("confidence_score", 0.8),
                     }
                     for item in timeline
@@ -377,6 +410,8 @@ async def analyze_transcript(
                 logger.info(
                     f"Using cached response for transcript analysis (cache key: {cache_key})"
                 )
+                # Simulate realistic LLM latency only when cache is enabled
+                await _simulate_llm_latency_for_cache(transcript_input.transcript_text)
                 return TranscriptAnalysisResponse(
                     success=True,
                     message="Transcript analyzed successfully (from cache)",

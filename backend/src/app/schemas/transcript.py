@@ -57,6 +57,14 @@ class TimelineEntry(BaseModel):
         examples=["Candidate introduces their background in full-stack development"]
     )
     
+    summary: str | None = Field(
+        description="Brief dialogue summary for this time window (interviewer vs interviewee)",
+        default=None,
+        examples=[
+            "Interviewer asked about system design; Interviewee outlined a scalable approach"
+        ]
+    )
+    
     confidence_score: float | None = Field(
         description="Confidence score for the categorization (0.0 to 1.0)",
         ge=0.0,
