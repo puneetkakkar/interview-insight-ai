@@ -60,7 +60,7 @@ const TimelineRow = memo(function TimelineRow({
         className="flex w-full items-center justify-between py-2 text-left"
       >
         <div className="flex items-center gap-3">
-          <span className="rounded bg-white/10 px-2 py-0.5 text-xs text-white/70">
+          <span className="rounded bg-white/10 px-2 py-0.5 text-xs text-white/70 whitespace-nowrap inline-block">
             {item.timestamp ?? "—"}
           </span>
           <span className="font-medium text-white/90">{item.category}</span>
