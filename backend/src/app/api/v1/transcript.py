@@ -152,12 +152,12 @@ async def _simulate_llm_latency_for_cache(transcript_text: str) -> None:
         approx_tokens = int(min(8000, max(50, words * 1.3)))
 
         # Base latency + per-token component (values tuned for dev UX)
-        base_seconds = 0.4
-        per_token_seconds = 0.0015  # 1.5 ms per token
+        base_seconds = 10.0
+        per_token_seconds = 0.1  # 100 ms per token
         estimated_seconds = base_seconds + per_token_seconds * approx_tokens
 
         # Clamp to reasonable dev bounds and add small jitter to feel natural
-        clamped = max(0.75, min(5.0, estimated_seconds))
+        clamped = max(0.75, min(30.0, estimated_seconds))
         jitter_scale = 1 + (random.random() - 0.5) * 0.2  # +/-10%
         delay = clamped * jitter_scale
 
@@ -531,145 +531,5 @@ async def list_transcript_agents() -> Dict[str, Any]:
         return build_error_response(
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message="Failed to retrieve transcript agent information",
-            details=str(e),
-        )
-
-
-@router.get("/cache/status")
-async def get_cache_status() -> Dict[str, Any]:
-    """Get information about the LLM response cache."""
-    try:
-        from src.app.core.config import settings
-        
-        if not settings.IS_DEVELOPMENT:
-            return build_error_response(
-                code=status.HTTP_403_FORBIDDEN,
-                message="Cache management only available in development environment",
-                details="This endpoint is restricted to development use only",
-            )
-        
-        cache_files = list(CACHE_DIR.glob("*.json"))
-        cache_stats = {
-            "total_files": len(cache_files),
-            "cache_directory": str(CACHE_DIR),
-            "cache_enabled": settings.USE_LLM_CACHE,
-            "environment": settings.ENVIRONMENT,
-        }
-        
-        # Group files by cache key
-        cache_groups = {}
-        for cache_file in cache_files:
-            try:
-                with open(cache_file, "r") as f:
-                    data = json.load(f)
-                    cache_key = data.get("cache_key", "unknown")
-                    if cache_key not in cache_groups:
-                        cache_groups[cache_key] = []
-                    cache_groups[cache_key].append({
-                        "filename": cache_file.name,
-                        "timestamp": data.get("timestamp"),
-                        "run_id": data.get("run_id"),
-                        "file_size": cache_file.stat().st_size,
-                    })
-            except Exception as e:
-                logger.warning(f"Failed to read cache file {cache_file.name}: {e}")
-        
-        cache_stats["cache_groups"] = cache_groups
-        cache_stats["unique_cache_keys"] = len(cache_groups)
-        
-        return build_success_response(
-            data=cache_stats,
-            message="Cache status retrieved successfully",
-        )
-    except Exception as e:
-        return build_error_response(
-            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to retrieve cache status",
-            details=str(e),
-        )
-
-
-@router.delete("/cache/clear")
-async def clear_cache() -> Dict[str, Any]:
-    """Clear all cached LLM responses."""
-    try:
-        from src.app.core.config import settings
-        
-        if not settings.IS_DEVELOPMENT:
-            return build_error_response(
-                code=status.HTTP_403_FORBIDDEN,
-                message="Cache management only available in development environment",
-                details="This endpoint is restricted to development use only",
-            )
-        
-        cache_files = list(CACHE_DIR.glob("*.json"))
-        cleared_count = 0
-        
-        for cache_file in cache_files:
-            try:
-                cache_file.unlink()
-                cleared_count += 1
-            except Exception as e:
-                logger.warning(f"Failed to delete cache file {cache_file.name}: {e}")
-        
-        logger.info(f"Cleared {cleared_count} cache files")
-        
-        return build_success_response(
-            data={"cleared_files": cleared_count},
-            message=f"Cache cleared successfully - {cleared_count} files removed",
-        )
-    except Exception as e:
-        return build_error_response(
-            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to clear cache",
-            details=str(e),
-        )
-
-
-@router.get("/cache/responses/{cache_key}")
-async def get_cached_responses(cache_key: str) -> Dict[str, Any]:
-    """Get all cached responses for a specific cache key."""
-    try:
-        from src.app.core.config import settings
-        
-        if not settings.IS_DEVELOPMENT:
-            return build_error_response(
-                code=status.HTTP_403_FORBIDDEN,
-                message="Cache management only available in development environment",
-                details="This endpoint is restricted to development use only",
-            )
-        
-        cache_files = list(CACHE_DIR.glob(f"{cache_key}_*.json"))
-        responses = []
-        
-        for cache_file in cache_files:
-            try:
-                with open(cache_file, "r") as f:
-                    data = json.load(f)
-                    responses.append({
-                        "filename": cache_file.name,
-                        "timestamp": data.get("timestamp"),
-                        "run_id": data.get("run_id"),
-                        "parsed_summary": data.get("parsed_summary"),
-                        "file_size": cache_file.stat().st_size,
-                    })
-            except Exception as e:
-                logger.warning(f"Failed to read cache file {cache_file.name}: {e}")
-        
-        # Sort by timestamp (newest first)
-        responses.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
-        
-        return build_success_response(
-            data={
-                "cache_key": cache_key,
-                "total_responses": len(responses),
-                "responses": responses,
-            },
-            message=f"Retrieved {len(responses)} cached responses for key: {cache_key}",
-        )
-    except Exception as e:
-        return build_error_response(
-            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="Failed to retrieve cached responses",
             details=str(e),
         )
