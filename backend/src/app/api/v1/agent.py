@@ -26,8 +26,6 @@ from src.app.utils import (
     transform_langgraph_error_response,
 )
 
-from src.data import cached_response
-
 router = APIRouter(prefix="/agent", tags=["agents"])
 
 
@@ -116,12 +114,10 @@ async def invoke(
 
     try:
         # TODO: Uncomment this when using real LangGraph API
-        # response_events: list[tuple[str, Any]] = await agent.ainvoke(**kwargs, stream_mode=["updates", "values"])
-        # response_type, response = response_events[-1]
-
-        # TODO: Remove this once we have a real response
-        response_type = "values"
-        response = cached_response
+        response_events: list[tuple[str, Any]] = await agent.ainvoke(
+            **kwargs, stream_mode=["updates", "values"]
+        )
+        response_type, response = response_events[-1]
 
         if response_type == "values":
             # Normal response, the agent completed successfully
