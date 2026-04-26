@@ -1,0 +1,113 @@
+{
+    "cache_key": "893090ff47ec50e7e3220d4e827d0a02",
+    "timestamp": "2026-02-22T12:50:42.578459",
+    "run_id": "64ad7e3f-3f4b-4f67-8be0-0de47b9ce88d",
+    "response_content": [
+        {
+            "text": "{\n  \"entities\": {\n    \"people\": [\n      \"Alex Rivera\"\n    ],\n    \"companies\": [\n      \"Stripe\"\n    ],\n    \"technologies\": [\n      \"Go\",\n      \"Kafka\",\n      \"Kubernetes\",\n      \"Microservices\",\n      \"React\"\n    ],\n    \"locations\": [\n      \"San Francisco\"\n    ]\n  },\n  \"sentiment_analysis\": {\n    \"highlights\": [\n      \"Strong experience scaling payment infrastructure at Stripe\",\n      \"Deep expertise in real-time data pipelines with Go and Kafka\",\n      \"Led successful microservices migration handling 50K+ RPS\",\n      \"Proactive curiosity about on-call structure and technical debt management\",\n      \"Clear interest in long-term career growth to Staff Engineer\"\n    ],\n    \"lowlights\": []\n  },\n  \"timeline\": [\n    {\n      \"timestamp\": \"00:00:05\",\n      \"category\": \"Introduction\",\n      \"content\": \"Interviewer opens and thanks Alex for joining; sets context for the session.\",\n      \"summary\": \"Interviewer: Thanks for joining us today, Alex. Interviewee: Happy to be here.\",\n      \"confidence_score\": 0.95\n    },\n    {\n      \"timestamp\": \"00:00:18\",\n      \"category\": \"Background\",\n      \"content\": \"Alex describes his current role and team focus at Stripe.\",\n      \"summary\": \"Interviewer asked about current role. Alex: Senior engineer on payment infrastructure team at Stripe, San Francisco.\",\n      \"confidence_score\": 0.95\n    },\n    {\n      \"timestamp\": \"00:00:45\",\n      \"category\": \"Technical Discussion\",\n      \"content\": \"Discussion of real-time data pipeline work using Go and Kafka.\",\n      \"summary\": \"Interviewer asked about most interesting recent project. Alex described building real-time data pipelines processing millions of payment events per second using Go and Kafka.\",\n      \"confidence_score\": 0.92\n    },\n    {\n      \"timestamp\": \"00:02:10\",\n      \"category\": \"System Design\",\n      \"content\": \"Alex explains the microservices migration challenge — handling 50K+ RPS with zero downtime.\",\n      \"summary\": \"Interviewer probed about a challenge. Alex: Led migration from monolith to microservices, 50K+ RPS, zero downtime — toughest part was data consistency across services.\",\n      \"confidence_score\": 0.93\n    },\n    {\n      \"timestamp\": \"00:04:30\",\n      \"category\": \"Architecture & Tools\",\n      \"content\": \"Alex describes the tech stack used: Go, Kafka, Kubernetes, React.\",\n      \"summary\": \"Interviewer asked about stack. Alex: Primarily Go for backend services, Kafka for event streaming, Kubernetes for orchestration, and React on frontend.\",\n      \"confidence_score\": 0.91\n    },\n    {\n      \"timestamp\": \"00:06:00\",\n      \"category\": \"Collaboration & Culture\",\n      \"content\": \"Conversation about team dynamics, code reviews, and engineering practices.\",\n      \"summary\": \"Interviewer asked about collaboration style. Alex described working closely with product and data teams, emphasising async communication and thorough code reviews.\",\n      \"confidence_score\": 0.88\n    },\n    {\n      \"timestamp\": \"00:07:30\",\n      \"category\": \"Career Growth\",\n      \"content\": \"Alex asks about on-call rotation structure, technical debt approach, and the path from Senior to Staff Engineer.\",\n      \"summary\": \"Alex: I'd love to know more about on-call rotation, how the team handles technical debt, and whether there's a clear path from senior engineer to staff. Interviewer: Great questions.\",\n      \"confidence_score\": 0.9\n    },\n    {\n      \"timestamp\": \"00:09:00-00:09:58\",\n      \"category\": \"Wrap-up\",\n      \"content\": \"Interviewer wraps up the session and outlines next steps in the hiring process.\",\n      \"summary\": \"Interviewer outlined next steps: technical screen, then system design round. Alex expressed enthusiasm about the role.\",\n      \"confidence_score\": 0.87\n    }\n  ],\n  \"overall_sentiment\": \"Positive\",\n  \"key_topics\": [\n    \"Payment Infrastructure\",\n    \"Real-time Data Pipelines\",\n    \"Microservices Migration\",\n    \"Technical Debt Management\",\n    \"Career Growth\"\n  ],\n  \"total_duration\": \"09:58\"\n}",
+            "type": "text",
+            "index": 0
+        }
+    ],
+    "parsed_summary": {
+        "entities": {
+            "people": [
+                "Alex Rivera"
+            ],
+            "companies": [
+                "Stripe"
+            ],
+            "technologies": [
+                "Go",
+                "Kafka",
+                "Kubernetes",
+                "Microservices",
+                "React"
+            ],
+            "locations": [
+                "San Francisco"
+            ]
+        },
+        "sentiment_analysis": {
+            "highlights": [
+                "Strong experience scaling payment infrastructure at Stripe",
+                "Deep expertise in real-time data pipelines with Go and Kafka",
+                "Led successful microservices migration handling 50K+ RPS",
+                "Proactive curiosity about on-call structure and technical debt management",
+                "Clear interest in long-term career growth to Staff Engineer"
+            ],
+            "lowlights": []
+        },
+        "timeline": [
+            {
+                "timestamp": "00:00:05",
+                "category": "Introduction",
+                "content": "Interviewer opens and thanks Alex for joining; sets context for the session.",
+                "summary": "Interviewer: Thanks for joining us today, Alex. Interviewee: Happy to be here.",
+                "confidence_score": 0.95
+            },
+            {
+                "timestamp": "00:00:18",
+                "category": "Background",
+                "content": "Alex describes his current role and team focus at Stripe.",
+                "summary": "Interviewer asked about current role. Alex: Senior engineer on payment infrastructure team at Stripe, San Francisco.",
+                "confidence_score": 0.95
+            },
+            {
+                "timestamp": "00:00:45",
+                "category": "Technical Discussion",
+                "content": "Discussion of real-time data pipeline work using Go and Kafka.",
+                "summary": "Interviewer asked about most interesting recent project. Alex described building real-time data pipelines processing millions of payment events per second using Go and Kafka.",
+                "confidence_score": 0.92
+            },
+            {
+                "timestamp": "00:02:10",
+                "category": "System Design",
+                "content": "Alex explains the microservices migration challenge — handling 50K+ RPS with zero downtime.",
+                "summary": "Interviewer probed about a challenge. Alex: Led migration from monolith to microservices, 50K+ RPS, zero downtime — toughest part was data consistency across services.",
+                "confidence_score": 0.93
+            },
+            {
+                "timestamp": "00:04:30",
+                "category": "Architecture & Tools",
+                "content": "Alex describes the tech stack used: Go, Kafka, Kubernetes, React.",
+                "summary": "Interviewer asked about stack. Alex: Primarily Go for backend services, Kafka for event streaming, Kubernetes for orchestration, and React on frontend.",
+                "confidence_score": 0.91
+            },
+            {
+                "timestamp": "00:06:00",
+                "category": "Collaboration & Culture",
+                "content": "Conversation about team dynamics, code reviews, and engineering practices.",
+                "summary": "Interviewer asked about collaboration style. Alex described working closely with product and data teams, emphasising async communication and thorough code reviews.",
+                "confidence_score": 0.88
+            },
+            {
+                "timestamp": "00:07:30",
+                "category": "Career Growth",
+                "content": "Alex asks about on-call rotation structure, technical debt approach, and the path from Senior to Staff Engineer.",
+                "summary": "Alex: I'd love to know more about on-call rotation, how the team handles technical debt, and whether there's a clear path from senior engineer to staff. Interviewer: Great questions.",
+                "confidence_score": 0.9
+            },
+            {
+                "timestamp": "00:09:00-00:09:58",
+                "category": "Wrap-up",
+                "content": "Interviewer wraps up the session and outlines next steps in the hiring process.",
+                "summary": "Interviewer outlined next steps: technical screen, then system design round. Alex expressed enthusiasm about the role.",
+                "confidence_score": 0.87
+            }
+        ],
+        "total_duration": "09:58",
+        "key_topics": [
+            "Payment Infrastructure",
+            "Real-time Data Pipelines",
+            "Microservices Migration",
+            "Technical Debt Management",
+            "Career Growth"
+        ],
+        "overall_sentiment": "Positive",
+        "metadata": {
+            "processed": true
+        }
+    },
+    "transcript_hash": "893090ff47ec50e7e3220d4e827d0a02"
+}

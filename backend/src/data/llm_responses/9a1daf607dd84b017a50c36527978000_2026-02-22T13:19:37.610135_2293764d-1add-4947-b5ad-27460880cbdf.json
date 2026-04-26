@@ -1,0 +1,118 @@
+{
+    "cache_key": "9a1daf607dd84b017a50c36527978000",
+    "timestamp": "2026-02-22T13:19:37.610135",
+    "run_id": "2293764d-1add-4947-b5ad-27460880cbdf",
+    "response_content": [
+        {
+            "text": "{\n  \"entities\": {\n    \"people\": [\n      \"Alex Rivera\"\n    ],\n    \"companies\": [\n      \"Stripe\"\n    ],\n    \"technologies\": [\n      \"Go\",\n      \"Kafka\",\n      \"Flink\",\n      \"Kubernetes\",\n      \"Microservices\",\n      \"React\"\n    ],\n    \"locations\": [\n      \"San Francisco\"\n    ]\n  },\n  \"sentiment_analysis\": {\n    \"highlights\": [\n      \"Led microservices migration at Stripe — cut latency 40% and saved ~$200k/year in infra costs\",\n      \"Strong cross-team coordination: successfully aligned 8 teams with different timelines\",\n      \"Data-driven conflict resolution — used on-call burden metrics to influence prioritisation decisions\",\n      \"Transparent about the 20-minute outage: took accountability and drove process improvements\",\n      \"Clear long-term career vision: targeting Staff Engineer or Engineering Manager track\"\n    ],\n    \"lowlights\": [\n      \"Misconfigured service caused a 20-minute production outage in week three of the migration\",\n      \"Acknowledged insufficient pre-deploy testing discipline before the incident\"\n    ]\n  },\n  \"timeline\": [\n    {\n      \"timestamp\": \"00:00:05\",\n      \"category\": \"Introduction\",\n      \"content\": \"Interviewer opens the session; Alex introduces himself as a senior engineer with 6 years of experience.\",\n      \"summary\": \"Interviewer: Thanks for joining us today. Alex: Senior software engineer, 6 years experience, most recently on Stripe's payment infrastructure team using Go and Kubernetes.\",\n      \"confidence_score\": 0.97\n    },\n    {\n      \"timestamp\": \"00:01:10\",\n      \"category\": \"Motivation\",\n      \"content\": \"Alex explains what drew him to the role — real-time data pipelines and the engineering culture.\",\n      \"summary\": \"Interviewer asked what drew Alex to the role. Alex: Excited about the work on real-time data pipelines; Kafka, Flink, and React are exactly where he wants to grow; admires the engineering culture in San Francisco.\",\n      \"confidence_score\": 0.95\n    },\n    {\n      \"timestamp\": \"00:02:30\",\n      \"category\": \"Experience\",\n      \"content\": \"Alex describes leading a monolith-to-microservices migration at Stripe, cutting latency 40% and saving $200k/year.\",\n      \"summary\": \"Interviewer asked about a challenging project. Alex: Led migration from monolith to microservices; reduced latency 40%, cut infra costs ~$200k annually; hardest part was coordinating across 8 teams with different timelines.\",\n      \"confidence_score\": 0.96\n    },\n    {\n      \"timestamp\": \"00:04:15\",\n      \"category\": \"Challenges & Setbacks\",\n      \"content\": \"Alex recounts a 20-minute production outage caused by a misconfigured service in week 3 of the migration.\",\n      \"summary\": \"Interviewer asked about setbacks. Alex: Major incident in week three — misconfigured service caused 20-minute outage; acknowledged should have pushed for more thorough testing; drove adoption of canary rollout procedures after the incident.\",\n      \"confidence_score\": 0.95\n    },\n    {\n      \"timestamp\": \"00:05:45\",\n      \"category\": \"Conflict Resolution\",\n      \"content\": \"Alex describes how he handles disagreements with managers — leading with data, not opinion.\",\n      \"summary\": \"Interviewer asked about handling manager disagreements. Alex: Comes with data; disagreed with Stripe manager about feature vs reliability priority; presented on-call burden metrics; compromised — reliability work came first.\",\n      \"confidence_score\": 0.94\n    },\n    {\n      \"timestamp\": \"00:07:00\",\n      \"category\": \"Career Goals\",\n      \"content\": \"Alex shares his 3-year vision: leading a platform infra team of 5–8 engineers, targeting Staff Engineer or EM track.\",\n      \"summary\": \"Interviewer asked about 3-year plan. Alex: Wants to lead a small engineering team (5–8 people) on platform infrastructure; still exploring Staff Engineer vs Engineering Manager path.\",\n      \"confidence_score\": 0.93\n    },\n    {\n      \"timestamp\": \"00:08:30\",\n      \"category\": \"Candidate Questions\",\n      \"content\": \"Alex asks about on-call rotation, technical debt management, and the Senior→Staff progression path.\",\n      \"summary\": \"Interviewer asked if Alex had questions. Alex: Asked about on-call rotation structure, approach to technical debt, and whether a clear Senior→Staff path exists.\",\n      \"confidence_score\": 0.92\n    },\n    {\n      \"timestamp\": \"00:09:50-00:09:58\",\n      \"category\": \"Wrap-up\",\n      \"content\": \"Interviewer closes the session; both parties express mutual appreciation.\",\n      \"summary\": \"Interviewer: Great questions, we'll cover all of that with the team. Thanks so much, Alex. Alex: Thank you, really enjoyed the conversation.\",\n      \"confidence_score\": 0.91\n    }\n  ],\n  \"overall_sentiment\": \"Positive\",\n  \"key_topics\": [\n    \"Software Engineering Experience\",\n    \"Microservices Migration\",\n    \"Real-time Data Pipelines\",\n    \"Incident Management\",\n    \"Conflict Resolution\",\n    \"Career Growth\"\n  ],\n  \"total_duration\": \"09:58\"\n}",
+            "type": "text",
+            "index": 0
+        }
+    ],
+    "parsed_summary": {
+        "entities": {
+            "people": [
+                "Alex Rivera"
+            ],
+            "companies": [
+                "Stripe"
+            ],
+            "technologies": [
+                "Go",
+                "Kafka",
+                "Flink",
+                "Kubernetes",
+                "Microservices",
+                "React"
+            ],
+            "locations": [
+                "San Francisco"
+            ]
+        },
+        "sentiment_analysis": {
+            "highlights": [
+                "Led microservices migration at Stripe — cut latency 40% and saved ~$200k/year in infra costs",
+                "Strong cross-team coordination: successfully aligned 8 teams with different timelines",
+                "Data-driven conflict resolution — used on-call burden metrics to influence prioritisation decisions",
+                "Transparent about the 20-minute outage: took accountability and drove process improvements",
+                "Clear long-term career vision: targeting Staff Engineer or Engineering Manager track"
+            ],
+            "lowlights": [
+                "Misconfigured service caused a 20-minute production outage in week three of the migration",
+                "Acknowledged insufficient pre-deploy testing discipline before the incident"
+            ]
+        },
+        "timeline": [
+            {
+                "timestamp": "00:00:05",
+                "category": "Introduction",
+                "content": "Interviewer opens the session; Alex introduces himself as a senior engineer with 6 years of experience.",
+                "summary": "Interviewer: Thanks for joining us today. Alex: Senior software engineer, 6 years experience, most recently on Stripe's payment infrastructure team using Go and Kubernetes.",
+                "confidence_score": 0.97
+            },
+            {
+                "timestamp": "00:01:10",
+                "category": "Motivation",
+                "content": "Alex explains what drew him to the role — real-time data pipelines and the engineering culture.",
+                "summary": "Interviewer asked what drew Alex to the role. Alex: Excited about the work on real-time data pipelines; Kafka, Flink, and React are exactly where he wants to grow; admires the engineering culture in San Francisco.",
+                "confidence_score": 0.95
+            },
+            {
+                "timestamp": "00:02:30",
+                "category": "Experience",
+                "content": "Alex describes leading a monolith-to-microservices migration at Stripe, cutting latency 40% and saving $200k/year.",
+                "summary": "Interviewer asked about a challenging project. Alex: Led migration from monolith to microservices; reduced latency 40%, cut infra costs ~$200k annually; hardest part was coordinating across 8 teams with different timelines.",
+                "confidence_score": 0.96
+            },
+            {
+                "timestamp": "00:04:15",
+                "category": "Challenges & Setbacks",
+                "content": "Alex recounts a 20-minute production outage caused by a misconfigured service in week 3 of the migration.",
+                "summary": "Interviewer asked about setbacks. Alex: Major incident in week three — misconfigured service caused 20-minute outage; acknowledged should have pushed for more thorough testing; drove adoption of canary rollout procedures after the incident.",
+                "confidence_score": 0.95
+            },
+            {
+                "timestamp": "00:05:45",
+                "category": "Conflict Resolution",
+                "content": "Alex describes how he handles disagreements with managers — leading with data, not opinion.",
+                "summary": "Interviewer asked about handling manager disagreements. Alex: Comes with data; disagreed with Stripe manager about feature vs reliability priority; presented on-call burden metrics; compromised — reliability work came first.",
+                "confidence_score": 0.94
+            },
+            {
+                "timestamp": "00:07:00",
+                "category": "Career Goals",
+                "content": "Alex shares his 3-year vision: leading a platform infra team of 5–8 engineers, targeting Staff Engineer or EM track.",
+                "summary": "Interviewer asked about 3-year plan. Alex: Wants to lead a small engineering team (5–8 people) on platform infrastructure; still exploring Staff Engineer vs Engineering Manager path.",
+                "confidence_score": 0.93
+            },
+            {
+                "timestamp": "00:08:30",
+                "category": "Candidate Questions",
+                "content": "Alex asks about on-call rotation, technical debt management, and the Senior→Staff progression path.",
+                "summary": "Interviewer asked if Alex had questions. Alex: Asked about on-call rotation structure, approach to technical debt, and whether a clear Senior→Staff path exists.",
+                "confidence_score": 0.92
+            },
+            {
+                "timestamp": "00:09:50-00:09:58",
+                "category": "Wrap-up",
+                "content": "Interviewer closes the session; both parties express mutual appreciation.",
+                "summary": "Interviewer: Great questions, we'll cover all of that with the team. Thanks so much, Alex. Alex: Thank you, really enjoyed the conversation.",
+                "confidence_score": 0.91
+            }
+        ],
+        "total_duration": "09:58",
+        "key_topics": [
+            "Software Engineering Experience",
+            "Microservices Migration",
+            "Real-time Data Pipelines",
+            "Incident Management",
+            "Conflict Resolution",
+            "Career Growth"
+        ],
+        "overall_sentiment": "Positive",
+        "metadata": {
+            "processed": true
+        }
+    },
+    "transcript_hash": "9a1daf607dd84b017a50c36527978000"
+}

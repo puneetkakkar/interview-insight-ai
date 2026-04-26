@@ -1,0 +1,78 @@
+{
+    "cache_key": "2ffb87cd5f627b556b2e75f8dc1290fd",
+    "timestamp": "2026-02-22T00:52:29.016328",
+    "run_id": "0bfbd0e2-d80b-4373-984d-93a15ae76873",
+    "response_content": [
+        {
+            "text": "{\n  \"entities\": {\n    \"people\": [\n      \"Engineering Manager\",\n      \"John\"\n    ],\n    \"companies\": [\n      \"TechCorp\",\n      \"DataFlow\",\n      \"CloudScale\"\n    ],\n    \"technologies\": [\n      \"Api\",\n      \"Aws\",\n      \"Django\",\n      \"Docker\",\n      \"Kubernetes\",\n      \"Microservices\",\n      \"Python\",\n      \"React\",\n      \"node.js\"\n    ],\n    \"locations\": []\n  },\n  \"sentiment_analysis\": {\n    \"highlights\": [\n      \"00:00:00 - 00:02:30 Interviewer: Good morning\",\n      \"Candidate: Good morning, Sarah\",\n      \"great experience\"\n    ],\n    \"lowlights\": []\n  },\n  \"timeline\": [\n    {\n      \"timestamp\": \"00:00\",\n      \"category\": \"Introduction\",\n      \"content\": \"Introduction phase covering 00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - could you tell me a bit about yourself and your background in software engineering?, Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataFlow, where I worked primarily with Python and Django for building data processing pipelines. After about 2 years, I moved to CloudScale, a mid-size company, where I've been working on microservices architecture using Node.js and React. I've also had the opportunity to work with AWS, Docker, and Kubernetes for deployment and orchestration.\",\n      \"confidence_score\": 0.88,\n      \"summary\": \"Discussion progressed from '00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - ' to 'Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataF'.\"\n    },\n    {\n      \"timestamp\": \"00:02:30\",\n      \"category\": \"Introduction\",\n      \"content\": \"00:05:15 Interviewer: That's great experience! I see you mentioned Python and Node.js. Which do you prefer, and why?\",\n      \"confidence_score\": 0.95,\n      \"summary\": \"00:05:15 Interviewer: That's great experience! I see you mentioned Python and Node.js. Which do you prefer, and why?\"\n    },\n    {\n      \"timestamp\": \"00:02:30-00:05:15\",\n      \"category\": \"Introduction\",\n      \"content\": \"Candidate: That's a tough question! I really enjoy both, but if I had to choose, I'd say Python. I find it more readable and expressive, especially for data manipulation and backend services. However, I appreciate Node.js for its event-driven architecture and how well it handles concurrent requests. At CloudScale, we actually use both - Python for our data processing services and Node.js for our API gateway and real-time features.\",\n      \"confidence_score\": 0.8,\n      \"summary\": \"Candidate: That's a tough question! I really enjoy both, but if I had to choose, I'd say Python. I find it more readable and expressive, especially for data manipulation and backen\"\n    }\n  ],\n  \"overall_sentiment\": \"Positive\",\n  \"key_topics\": [\n    \"Software engineering background\",\n    \"Python vs Node.js preferences\"\n  ],\n  \"total_duration\": \"05:15\"\n}",
+            "type": "text",
+            "index": 0
+        }
+    ],
+    "parsed_summary": {
+        "entities": {
+            "people": [
+                "Engineering Manager",
+                "John"
+            ],
+            "companies": [
+                "TechCorp",
+                "DataFlow",
+                "CloudScale"
+            ],
+            "technologies": [
+                "Api",
+                "Aws",
+                "Django",
+                "Docker",
+                "Kubernetes",
+                "Microservices",
+                "Python",
+                "React",
+                "node.js"
+            ],
+            "locations": []
+        },
+        "sentiment_analysis": {
+            "highlights": [
+                "00:00:00 - 00:02:30 Interviewer: Good morning",
+                "Candidate: Good morning, Sarah",
+                "great experience"
+            ],
+            "lowlights": []
+        },
+        "timeline": [
+            {
+                "timestamp": "00:00",
+                "category": "Introduction",
+                "content": "Introduction phase covering 00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - could you tell me a bit about yourself and your background in software engineering?, Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataFlow, where I worked primarily with Python and Django for building data processing pipelines. After about 2 years, I moved to CloudScale, a mid-size company, where I've been working on microservices architecture using Node.js and React. I've also had the opportunity to work with AWS, Docker, and Kubernetes for deployment and orchestration.",
+                "summary": "Discussion progressed from '00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - ' to 'Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataF'.",
+                "confidence_score": 0.88
+            },
+            {
+                "timestamp": "00:02:30",
+                "category": "Introduction",
+                "content": "00:05:15 Interviewer: That's great experience! I see you mentioned Python and Node.js. Which do you prefer, and why?",
+                "summary": "00:05:15 Interviewer: That's great experience! I see you mentioned Python and Node.js. Which do you prefer, and why?",
+                "confidence_score": 0.95
+            },
+            {
+                "timestamp": "00:02:30-00:05:15",
+                "category": "Introduction",
+                "content": "Candidate: That's a tough question! I really enjoy both, but if I had to choose, I'd say Python. I find it more readable and expressive, especially for data manipulation and backend services. However, I appreciate Node.js for its event-driven architecture and how well it handles concurrent requests. At CloudScale, we actually use both - Python for our data processing services and Node.js for our API gateway and real-time features.",
+                "summary": "Candidate: That's a tough question! I really enjoy both, but if I had to choose, I'd say Python. I find it more readable and expressive, especially for data manipulation and backen",
+                "confidence_score": 0.8
+            }
+        ],
+        "total_duration": "05:15",
+        "key_topics": [
+            "Software engineering background",
+            "Python vs Node.js preferences"
+        ],
+        "overall_sentiment": "Positive",
+        "metadata": {
+            "processed": true
+        }
+    },
+    "transcript_hash": "2ffb87cd5f627b556b2e75f8dc1290fd"
+}

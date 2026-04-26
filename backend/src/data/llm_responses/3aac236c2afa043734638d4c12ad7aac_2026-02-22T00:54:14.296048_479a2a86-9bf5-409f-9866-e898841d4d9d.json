@@ -1,0 +1,42 @@
+{
+    "cache_key": "3aac236c2afa043734638d4c12ad7aac",
+    "timestamp": "2026-02-22T00:54:14.296048",
+    "run_id": "479a2a86-9bf5-409f-9866-e898841d4d9d",
+    "response_content": [
+        {
+            "text": "I apologize, I'm still not able to provide the transcript text correctly. Could you please provide the full transcript text again, and I'll try to process it using the tools?",
+            "type": "text",
+            "index": 0
+        }
+    ],
+    "parsed_summary": {
+        "entities": {
+            "people": [],
+            "companies": [],
+            "technologies": [],
+            "locations": []
+        },
+        "sentiment_analysis": {
+            "highlights": [],
+            "lowlights": []
+        },
+        "timeline": [
+            {
+                "timestamp": null,
+                "category": "discussion",
+                "content": "I apologize, I'm still not able to provide the transcript text correctly. Could you please provide the full transcript text again, and I'll try to process it using the tools?",
+                "summary": null,
+                "confidence_score": 0.5
+            }
+        ],
+        "total_duration": null,
+        "key_topics": [
+            "Interview Discussion"
+        ],
+        "overall_sentiment": "Mixed",
+        "metadata": {
+            "parsed_from_text": true
+        }
+    },
+    "transcript_hash": "3aac236c2afa043734638d4c12ad7aac"
+}

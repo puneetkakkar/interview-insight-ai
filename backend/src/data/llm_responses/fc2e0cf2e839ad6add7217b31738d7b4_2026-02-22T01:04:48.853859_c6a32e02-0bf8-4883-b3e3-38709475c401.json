@@ -1,0 +1,61 @@
+{
+    "cache_key": "fc2e0cf2e839ad6add7217b31738d7b4",
+    "timestamp": "2026-02-22T01:04:48.853859",
+    "run_id": "c6a32e02-0bf8-4883-b3e3-38709475c401",
+    "response_content": [
+        {
+            "text": "{\n  \"entities\": {\n    \"people\": [\n      \"Sarah\",\n      \"John\"\n    ],\n    \"companies\": [\n      \"TechCorp\",\n      \"DataFlow\",\n      \"CloudScale\"\n    ],\n    \"technologies\": [\n      \"Python\",\n      \"Django\",\n      \"Node.js\",\n      \"React\",\n      \"AWS\",\n      \"Docker\",\n      \"Kubernetes\"\n    ],\n    \"locations\": []\n  },\n  \"sentiment_analysis\": {\n    \"highlights\": [\n      \"00:00:00 - 00:02:30 Interviewer: Good morning\",\n      \"Candidate: Good morning, Sarah\"\n    ],\n    \"lowlights\": []\n  },\n  \"timeline\": [\n    {\n      \"timestamp\": \"00:00\",\n      \"category\": \"Introduction\",\n      \"content\": \"Introduction phase covering 00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - could you tell me a bit about yourself and your background in software engineering?, Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataFlow, where I worked primarily with Python and Django for building data processing pipelines. After about 2 years, I moved to CloudScale, a mid-size company, where I've been working on microservices architecture using Node.js and React. I've also had the opportunity to work with AWS, Docker, and Kubernetes for deployment and orchestration.\",\n      \"summary\": \"Discussion progressed from '00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - ' to 'Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataF'.\",\n      \"confidence_score\": 0.88\n    }\n  ],\n  \"overall_sentiment\": \"Positive\",\n  \"key_topics\": [\n    \"Software Engineering Background\",\n    \"Technologies Used\"\n  ],\n  \"total_duration\": \"02:30\"\n}",
+            "type": "text",
+            "index": 0
+        }
+    ],
+    "parsed_summary": {
+        "entities": {
+            "people": [
+                "Sarah",
+                "John"
+            ],
+            "companies": [
+                "TechCorp",
+                "DataFlow",
+                "CloudScale"
+            ],
+            "technologies": [
+                "Python",
+                "Django",
+                "Node.js",
+                "React",
+                "AWS",
+                "Docker",
+                "Kubernetes"
+            ],
+            "locations": []
+        },
+        "sentiment_analysis": {
+            "highlights": [
+                "00:00:00 - 00:02:30 Interviewer: Good morning",
+                "Candidate: Good morning, Sarah"
+            ],
+            "lowlights": []
+        },
+        "timeline": [
+            {
+                "timestamp": "00:00",
+                "category": "Introduction",
+                "content": "Introduction phase covering 00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - could you tell me a bit about yourself and your background in software engineering?, Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataFlow, where I worked primarily with Python and Django for building data processing pipelines. After about 2 years, I moved to CloudScale, a mid-size company, where I've been working on microservices architecture using Node.js and React. I've also had the opportunity to work with AWS, Docker, and Kubernetes for deployment and orchestration.",
+                "summary": "Discussion progressed from '00:02:30 Interviewer: Good morning! Thanks for taking the time to speak with us today. I'm Sarah, the Engineering Manager here at TechCorp. Let's start with a quick introduction - ' to 'Candidate: Good morning, Sarah! Thank you for having me. I'm John, and I've been working as a software engineer for about 5 years now. I started my career at a startup called DataF'.",
+                "confidence_score": 0.88
+            }
+        ],
+        "total_duration": "02:30",
+        "key_topics": [
+            "Software Engineering Background",
+            "Technologies Used"
+        ],
+        "overall_sentiment": "Positive",
+        "metadata": {
+            "processed": true
+        }
+    },
+    "transcript_hash": "fc2e0cf2e839ad6add7217b31738d7b4"
+}
