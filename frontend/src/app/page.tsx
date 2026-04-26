@@ -6,7 +6,7 @@ import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <div className="to-coral-50 relative flex min-h-[calc(100vh-0px)] flex-col overflow-hidden bg-gradient-to-br from-blue-50 via-slate-50 dark:from-blue-950 dark:via-black dark:to-slate-950">
+    <div className="relative flex min-h-[calc(100vh-0px)] flex-col overflow-hidden bg-gradient-to-br from-slate-50 via-slate-50 dark:from-slate-950 dark:via-black dark:to-slate-950">
       {/* Hero Section */}
       <HeroSection />
 

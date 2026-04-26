@@ -1,1 +1,1 @@
-# Interview Insight AI Source Package
+# CandidateSignal Source Package

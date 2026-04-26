@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     "timeline",
     "insights",
   ],
-  authors: [{ name: "Interview Analyzer Team" }],
+  authors: [{ name: "CandidateSignal Team" }],
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

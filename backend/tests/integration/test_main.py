@@ -21,7 +21,7 @@ class TestMainEndpoints:
         
         data = response.json()
         assert data["success"] is True
-        assert "InterviewInsight" in data["data"]["message"]
+        assert "CandidateSignal" in data["data"]["message"]
         assert "data" in data
         assert "service" in data["data"]
         assert "version" in data["data"]
@@ -45,7 +45,7 @@ class TestMainEndpoints:
         assert "data" in data
         
         info_data = data["data"]
-        assert info_data["name"] == "InterviewInsight AI"
+        assert info_data["name"] == "CandidateSignal"
         assert info_data["description"] == "A production-ready AI-powered interview transcript analysis platform"
         assert "version" in info_data
         assert "environment" in info_data
@@ -161,7 +161,7 @@ class TestMainEndpoints:
         assert response.status_code == 200
         body = response.json()
         data = body["data"]
-        assert data["message"] == "Interview Insight AI"
+        assert data["message"] == "CandidateSignal"
         assert data["version"] == "0.1.0"
         assert data["docs"] == "/docs"
         assert data["health"] == "/health"
@@ -178,9 +178,9 @@ class TestMainEndpoints:
         assert response.status_code == 200
         body = response.json()
         data = body["data"]
-        assert data["name"] == "Interview Insight AI"
+        assert data["name"] == "CandidateSignal"
         assert data["version"] == "0.1.0"
-        assert data["description"] == "A production-ready Interview Insight AI"
+        assert data["description"] == "A production-ready AI-powered interview transcript analysis platform"
         assert data["status"] == "running"
 
     def test_root_endpoint_no_optional_fields(self):

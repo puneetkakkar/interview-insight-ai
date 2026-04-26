@@ -1,6 +1,5 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +10,7 @@ import type {
 } from "@/types/interview";
 import { motion } from "framer-motion";
 import {
+  AlertCircle,
   ArrowRight,
   Bot,
   ListTree,
@@ -161,7 +161,7 @@ export function TranscriptAnalyzer() {
             <div className="relative rounded-xl bg-[#0A0A0A]/80 p-4 sm:p-5">
               <div className="mb-3 flex items-center justify-between gap-3 text-white/70">
                 <div className="flex items-center gap-2">
-                  <NotepadText className="h-4 w-4 text-[#00A3E0]" />
+                  <NotepadText className="h-4 w-4 text-primary" />
                   <span className="text-xs sm:text-sm">
                     Which interview transcript would you like to analyze?
                   </span>
@@ -188,7 +188,7 @@ export function TranscriptAnalyzer() {
               <div className="mt-3 flex items-center justify-between text-xs text-white/50">
                 <span className="flex items-center gap-2">
                   <div
-                    className={`${state.transcript.length > 500 ? "bg-green-500" : "bg-amber-500"} h-1.5 w-1.5 rounded-full`}
+                    className={`${state.transcript.length > 500 ? "bg-[hsl(var(--success))]" : "bg-[hsl(var(--warning))]"} h-1.5 w-1.5 rounded-full`}
                   />
                   {state.transcript.length} characters
                 </span>
@@ -209,7 +209,7 @@ export function TranscriptAnalyzer() {
                     onClick={handleSubmit}
                     disabled={state.isLoading || !state.transcript.trim()}
                     size="icon"
-                    className="h-10 w-10 rounded-full bg-[#00A3E0] text-black transition-transform hover:translate-x-0.5 hover:bg-[#15b7f4]"
+                    className="h-10 w-10 rounded-full bg-accent text-accent-foreground transition-transform hover:translate-x-0.5 hover:bg-accent/90"
                     aria-label="Analyze"
                   >
                     {state.isLoading ? (
@@ -229,22 +229,18 @@ export function TranscriptAnalyzer() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="mt-4"
                 >
-                  <Alert
-                    variant="destructive"
-                    className="rounded-md border border-red-500/30 bg-red-500/10 text-red-200"
-                  >
-                    <AlertDescription className="flex items-center justify-between">
-                      <span>{state.error}</span>
-                      <Button
+                  <div className="flex items-start gap-3 rounded-lg border border-red-500/40 bg-red-950/60 px-4 py-3">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                    <div className="flex flex-1 items-center justify-between gap-3 min-w-0">
+                      <span className="text-sm text-red-300 leading-snug">{state.error}</span>
+                      <button
                         onClick={handleSubmit}
-                        variant="outline"
-                        size="sm"
-                        className="ml-3 rounded-md border-red-500/40 text-red-100 hover:bg-red-500/20"
+                        className="shrink-0 rounded-md border border-red-500/50 bg-red-500/15 px-3 py-1 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/25 hover:text-red-200"
                       >
                         Retry
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
+                      </button>
+                    </div>
+                  </div>
                 </motion.div>
               )}
 

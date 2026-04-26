@@ -1,4 +1,4 @@
-"""AI Agent API endpoints for InterviewInsight AI.
+"""AI Agent API endpoints for CandidateSignal.
 
 This module provides REST API endpoints for interacting with AI agents,
 including the research assistant and transcript analyzer agents.

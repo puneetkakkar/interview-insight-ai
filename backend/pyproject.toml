@@ -1,8 +1,8 @@
 [project]
-name = "interview-insight-ai"
+name = "candidate-signal"
 version = "1.0.0"
 description = "A production-ready AI-powered interview transcript analysis platform using FastAPI, SQLAlchemy 2.0, Pydantic V2, and LangGraph"
-authors = [{ name = "InterviewInsight AI", email = "dev@example.com" }]
+authors = [{ name = "CandidateSignal", email = "dev@example.com" }]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11"

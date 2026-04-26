@@ -1,6 +1,6 @@
-# Docker Configuration for InterviewInsight AI
+# Docker Configuration for CandidateSignal
 
-This directory contains Docker configurations for different environments of the InterviewInsight AI backend application.
+This directory contains Docker configurations for different environments of the CandidateSignal backend application.
 
 ## 🏗️ Architecture
 
@@ -90,9 +90,9 @@ make test-down
 ## 🗄️ Database Configuration
 
 ### Database Names
-- **Development**: Uses `interview_insight_dev_db` database
-- **Testing**: Uses `interview_insight_test_db` database (isolated)
-- **Production**: Uses `interview_insight_db` database
+- **Development**: Uses `candidate_signal_dev_db` database
+- **Testing**: Uses `candidate_signal_test_db` database (isolated)
+- **Production**: Uses `candidate_signal_db` database
 
 ### Database Volumes
 Each environment uses separate Docker volumes to ensure data isolation:
@@ -267,7 +267,7 @@ docker logs <container-name>
 docker exec -it <container-name> /bin/bash
 
 # Check database connectivity
-docker exec -it <container-name> psql -U postgres -d interview_insight_db
+docker exec -it <container-name> psql -U postgres -d candidate_signal_db
 ```
 
 ## 📚 Additional Resources

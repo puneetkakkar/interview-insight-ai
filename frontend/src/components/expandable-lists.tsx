@@ -26,7 +26,7 @@ function ExpandableList({
         {items.length > MAX && (
           <button
             onClick={() => setShowAll((v) => !v)}
-            className="text-xs text-[#00A3E0] hover:underline"
+            className="text-xs text-primary hover:underline"
           >
             {showAll ? "Show less" : `Show ${items.length - MAX} more`}
           </button>

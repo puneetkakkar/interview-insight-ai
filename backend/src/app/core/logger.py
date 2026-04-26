@@ -31,7 +31,7 @@ def _get_json_formatter() -> logging.Formatter:
 
 def setup_logger() -> logging.Logger:
     """Configure root app logger for dev/prod."""
-    logger = logging.getLogger("interview-insight-ai")
+    logger = logging.getLogger("candidate-signal")
     if logger.handlers:
         return logger
 

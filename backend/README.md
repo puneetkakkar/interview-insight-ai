@@ -1,4 +1,4 @@
-# InterviewInsight AI Backend
+# CandidateSignal Backend
 
 > **FastAPI Backend with Advanced AI/ML Capabilities**
 
@@ -103,7 +103,7 @@ src/app/agents/
 
 ```bash
 git clone <repository-url>
-cd interview-insight-ai/backend
+cd candidate-signal/backend
 ```
 
 ### 2. Environment Configuration
@@ -124,7 +124,7 @@ STORAGE_TYPE=memory
 # PostgreSQL Settings (only needed if STORAGE_TYPE=postgres)
 POSTGRES_SERVER=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=interview_insight_db
+POSTGRES_DB=candidate_signal_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 
@@ -638,7 +638,7 @@ backend/
 | `RELOAD` | Enable auto-reload | `true` |
 | `POSTGRES_SERVER` | PostgreSQL server host (only if STORAGE_TYPE=postgres) | `localhost` |
 | `POSTGRES_PORT` | PostgreSQL server port (only if STORAGE_TYPE=postgres) | `5432` |
-| `POSTGRES_DB` | PostgreSQL database name (only if STORAGE_TYPE=postgres) | `interview_insight_db` |
+| `POSTGRES_DB` | PostgreSQL database name (only if STORAGE_TYPE=postgres) | `candidate_signal_db` |
 | `POSTGRES_USER` | PostgreSQL username (only if STORAGE_TYPE=postgres) | `postgres` |
 | `POSTGRES_PASSWORD` | PostgreSQL password (only if STORAGE_TYPE=postgres) | `postgres` |
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude | `None` (optional) |
@@ -743,7 +743,7 @@ This backend is designed to be interview-friendly:
 ```bash
 # Clone and setup in under 2 minutes
 git clone <repo>
-cd interview-insight-ai/backend
+cd candidate-signal/backend
 echo "STORAGE_TYPE=memory" > .env
 uv run python -m src.app.main
 ```

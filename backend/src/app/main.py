@@ -20,9 +20,9 @@ async def root():
     """Root endpoint with basic information."""
     return {
         "success": True,
-        "message": "Interview Insight AI",
+        "message": "CandidateSignal",
         "data": {
-            "service": "Interview Insight AI",
+            "service": "CandidateSignal",
             "version": "1.0.0",
             "status": "running",
             "timestamp": datetime.utcnow().isoformat(),
@@ -38,7 +38,7 @@ async def get_info():
         "success": True,
         "message": "Application information retrieved successfully",
         "data": {
-            "name": "Interview Insight AI",
+            "name": "CandidateSignal",
             "description": "A production-ready AI-powered interview transcript analysis platform",
             "version": "1.0.0",
             "environment": settings.environment,

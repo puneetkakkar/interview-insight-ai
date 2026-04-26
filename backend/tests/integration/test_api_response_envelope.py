@@ -16,7 +16,7 @@ class TestAPIResponseEnvelope:
         assert body["success"] is True
         assert "data" in body
         assert body["data"]["status"] == "healthy"
-        assert body["data"]["service"] == "Interview Insight AI"
+        assert body["data"]["service"] == "CandidateSignal"
 
     def test_root_endpoint_response_structure(self, mock_client: TestClient):
         """Test that root endpoint returns expected response structure."""
@@ -36,7 +36,7 @@ class TestAPIResponseEnvelope:
         assert "timestamp" in data
         
         # Check specific values
-        assert body["data"]["service"] == "InterviewInsight AI"
+        assert body["data"]["service"] == "CandidateSignal"
         assert body["data"]["status"] == "running"
 
     def test_info_endpoint_response_structure(self, mock_client: TestClient):
@@ -61,7 +61,7 @@ class TestAPIResponseEnvelope:
         assert "timestamp" in data
         
         # Check specific values
-        assert "InterviewInsight" in body["data"]["message"]
+        assert "CandidateSignal" in body["data"]["message"]
 
     def test_response_envelope_structure_consistency(self, mock_client: TestClient):
         """Test all success responses follow consistent envelope structure."""

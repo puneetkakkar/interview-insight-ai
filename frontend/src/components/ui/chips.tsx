@@ -37,7 +37,7 @@ function Chips({ items }: { items: string[] }) {
       {showAll && items.length > MAX && (
         <button
           onClick={() => setShowAll(false)}
-          className="mt-2 text-xs text-[#00A3E0] hover:underline"
+          className="mt-2 text-xs text-primary hover:underline"
         >
           Show less
         </button>

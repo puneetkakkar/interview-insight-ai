@@ -1,4 +1,4 @@
-# Interview Insight AI
+# CandidateSignal
 
 > **AI-Powered Interview Transcript Analysis Platform**
 
@@ -10,9 +10,9 @@ A production-ready, full-stack AI application that transforms interview transcri
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 🌟 What is InterviewInsight AI?
+## 🌟 What is CandidateSignal?
 
-**InterviewInsight AI** is a sophisticated platform that leverages cutting-edge AI technology to analyze interview transcripts and extract meaningful insights. Whether you're a developer showcasing AI skills, a recruiter analyzing candidate interviews, or an HR professional reviewing performance discussions, this platform provides enterprise-grade transcript analysis capabilities.
+**CandidateSignal** is a sophisticated platform that leverages cutting-edge AI technology to analyze interview transcripts and extract meaningful insights. Whether you're a developer showcasing AI skills, a recruiter analyzing candidate interviews, or an HR professional reviewing performance discussions, this platform provides enterprise-grade transcript analysis capabilities.
 
 ### ✨ Key Features
 
@@ -108,7 +108,7 @@ graph TB
 ### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd interview-insight-ai
+cd candidate-signal
 ```
 
 ### 2. Backend Setup
@@ -169,7 +169,7 @@ OPENAI_API_KEY=your-openai-api-key
 ## 📁 Project Structure
 
 ```
-interview-insight-ai/
+candidate-signal/
 ├── backend/                          # FastAPI backend with AI capabilities
 │   ├── src/
 │   │   └── app/
@@ -358,7 +358,7 @@ Production features:
 # Storage
 STORAGE_TYPE=postgres          # or "memory" for development
 POSTGRES_SERVER=localhost
-POSTGRES_DB=interview_insight_db
+POSTGRES_DB=candidate_signal_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 

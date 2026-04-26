@@ -67,7 +67,7 @@ def test_app() -> FastAPI:
         """Root endpoint with basic information."""
         return build_success_response(
             {
-                "message": "Interview Insight AI",
+                "message": "CandidateSignal",
                 "version": "0.1.0",
                 "docs": "/docs",
                 "health": "/health",
@@ -80,8 +80,8 @@ def test_app() -> FastAPI:
         """Application information endpoint."""
         return build_success_response(
             {
-                "name": "Interview Insight AI",
-                "description": "A production-ready Interview Insight AI",
+                "name": "CandidateSignal",
+                "description": "A production-ready AI-powered interview transcript analysis platform",
                 "version": "0.1.0",
                 "status": "running",
             }
@@ -112,9 +112,9 @@ def sample_root_response():
     """Sample response for root endpoint."""
     return {
         "success": True,
-        "message": "InterviewInsight AI",
+        "message": "CandidateSignal",
         "data": {
-            "service": "InterviewInsight AI",
+            "service": "CandidateSignal",
             "version": "1.0.0",
             "status": "running",
             "timestamp": "2024-01-01T00:00:00",
@@ -128,7 +128,7 @@ def sample_info_response():
         "success": True,
         "message": "Application information retrieved successfully",
         "data": {
-            "name": "InterviewInsight AI",
+            "name": "CandidateSignal",
             "description": "A production-ready AI-powered interview transcript analysis platform",
             "version": "1.0.0",
             "environment": "development",

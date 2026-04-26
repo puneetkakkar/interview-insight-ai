@@ -16,7 +16,7 @@ class TranscriptInput(BaseModel):
     model: SerializeAsAny[AllModelEnum] | None = Field(
         title="Model",
         description="LLM Model to use for transcript analysis.",
-        default=AnthropicModelName.HAIKU_35,
+        default=AnthropicModelName.HAIKU_3,
         examples=[OpenAIModelName.GPT_4O_MINI, AnthropicModelName.HAIKU_35],
     )
     

@@ -44,6 +44,11 @@ def get_model(model_name: AllModelEnum, /) -> ModelT:
     if model_name in OpenAIModelName:
         return ChatOpenAI(model=api_model_name, temperature=0.5, streaming=True)
     if model_name in AnthropicModelName:
+        if not settings.ANTHROPIC_API_KEY:
+            raise ValueError(
+                "ANTHROPIC_API_KEY is not set. "
+                "Add it to backend/.env and restart the server."
+            )
         return ChatAnthropic(
             model=api_model_name,
             temperature=0.5,

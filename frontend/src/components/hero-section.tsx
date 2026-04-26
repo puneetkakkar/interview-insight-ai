@@ -16,7 +16,7 @@ export function HeroSection() {
           className="space-y-6"
         >
           <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-white/70 shadow-sm">
-            <Sparkles className="h-3.5 w-3.5 text-[#00A3E0]" />
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
             AI-powered transcript intelligence
           </div>
 

@@ -51,7 +51,7 @@ const TimelineRow = memo(function TimelineRow({
   const [open, setOpen] = useState(true);
   return (
     <div className="relative pl-4">
-      <div className="absolute top-2 left-[-6px] h-2 w-2 rounded-full bg-[#00A3E0]" />
+      <div className="absolute top-2 left-[-6px] h-2 w-2 rounded-full bg-primary" />
       {!last && (
         <div className="absolute top-4 left-[-1px] h-full w-px bg-white/10" />
       )}

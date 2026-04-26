@@ -1,6 +1,6 @@
 # Frontend Project Structure
 
-This is a modern Next.js 15 frontend application using React 19, TypeScript, Tailwind CSS, and shadcn/ui components for the InterviewInsight AI platform.
+This is a modern Next.js 15 frontend application using React 19, TypeScript, Tailwind CSS, and shadcn/ui components for the CandidateSignal platform.
 
 ## Project Structure
 

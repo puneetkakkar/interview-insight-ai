@@ -17,7 +17,7 @@ export default function AnalysisPage() {
   }, [params]);
 
   return (
-    <main className="to-coral-50/0 relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-50/0 via-slate-50/0 dark:from-blue-950 dark:via-black dark:to-slate-950">
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-slate-50 dark:from-slate-950 dark:via-black dark:to-slate-950">
       <div className="container mx-auto px-4 py-6">
         {/* Top header with back + action */}
         <div className="mb-6 flex items-center justify-between gap-3">
@@ -39,7 +39,7 @@ export default function AnalysisPage() {
               </span>
             </button>
             <h1 className="truncate text-base font-semibold text-white/90 sm:text-lg">
-              Interview Insights
+              CandidateSignal
             </h1>
           </div>
           {summary && (
@@ -50,7 +50,7 @@ export default function AnalysisPage() {
                 } catch {}
                 router.push("/");
               }}
-              className="cursor-pointer rounded-full bg-[#00A3E0] px-3 py-1.5 text-xs text-white font-semibold hover:bg-[#14b5f1] sm:text-sm"
+              className="cursor-pointer rounded-full bg-accent px-3 py-1.5 text-xs text-accent-foreground font-semibold hover:bg-accent/90 sm:text-sm"
             >
               New Analysis
             </button>

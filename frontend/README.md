@@ -1,4 +1,4 @@
-# InterviewInsight AI Frontend
+# CandidateSignal Frontend
 
 > **Modern Next.js 15 Frontend with AI-Powered Transcript Analysis**
 
@@ -441,7 +441,7 @@ pnpm test:watch   # Run tests in watch mode
 
 ## 📄 License
 
-This project is part of the InterviewInsight AI platform and follows the same licensing terms.
+This project is part of the CandidateSignal platform and follows the same licensing terms.
 
 ## 🆘 Support
 

@@ -7,7 +7,7 @@ export function Footer({ className = "" }: FooterProps) {
     <footer
       className={`mt-10 border-t border-white/10 py-6 text-center text-xs text-white/50 ${className}`}
     >
-      Interview Insights — Crafted for clarity
+      CandidateSignal — Crafted for clarity
     </footer>
   );
 }

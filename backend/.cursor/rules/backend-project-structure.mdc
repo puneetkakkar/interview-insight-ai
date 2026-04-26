@@ -1,6 +1,6 @@
 # Backend Project Structure
 
-This is a production-ready InterviewInsight AI backend using FastAPI, SQLAlchemy 2.0, Pydantic V2, and LangGraph for AI agents.
+This is a production-ready CandidateSignal backend using FastAPI, SQLAlchemy 2.0, Pydantic V2, and LangGraph for AI agents.
 
 ## Project Structure
 

@@ -12,30 +12,41 @@
   --popover: 0 0% 100%;
   --popover-foreground: 220 25% 15%;
   
-  /* Primary - Deep Blue */
-  --primary: 220 85% 25%;
+  /* Primary - Charcoal (#1E293B) */
+  --primary: 222 47% 11%;
   --primary-foreground: 0 0% 98%;
+  --primary-hover: 222 47% 9%;
   
-  /* Secondary - Soft Blue */
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 220 25% 15%;
+  /* Secondary - Warm Gray (#64748B) */
+  --secondary: 215 16% 50%;
+  --secondary-foreground: 0 0% 98%;
   
   /* Muted - Light Blue Gray */
   --muted: 210 20% 96%;
   --muted-foreground: 220 15% 45%;
   
-  /* Accent - Coral */
-  --accent: 15 85% 65%;
+  /* Accent - Warm Terracotta (#EA580C) */
+  --accent: 20 90% 48%;
   --accent-foreground: 0 0% 98%;
   
-  /* Destructive - Soft Red */
+  /* Semantic Colors */
+  --success: 142 70% 45%;
+  --success-foreground: 0 0% 98%;
+  --warning: 38 90% 55%;
+  --warning-foreground: 0 0% 98%;
+  --error: 0 75% 60%;
+  --error-foreground: 0 0% 98%;
+  --info: 222 47% 11%;
+  --info-foreground: 0 0% 98%;
+  
+  /* Destructive - Soft Red (mapped to error) */
   --destructive: 0 75% 60%;
   --destructive-foreground: 0 0% 98%;
   
   /* Border & Input */
   --border: 210 20% 90%;
   --input: 210 20% 96%;
-  --ring: 220 85% 25%;
+  --ring: 222 47% 11%;
   
   /* Chart Colors - Sophisticated Palette */
   --chart-1: 220 85% 60%;
@@ -80,38 +91,49 @@
 }
 
 .dark {
-  /* Dark Theme - Deep Blues & Warm Accents */
-  --background: 220 25% 8%;
-  --foreground: 210 20% 98%;
-  --card: 220 25% 12%;
-  --card-foreground: 210 20% 98%;
-  --popover: 220 25% 12%;
-  --popover-foreground: 210 20% 98%;
+  /* Dark Theme - Charcoal & Warm Terracotta */
+  --background: 222 47% 8%;
+  --foreground: 0 0% 98%;
+  --card: 222 47% 12%;
+  --card-foreground: 0 0% 98%;
+  --popover: 222 47% 12%;
+  --popover-foreground: 0 0% 98%;
   
-  /* Primary - Deep Blue */
-  --primary: 220 85% 70%;
-  --primary-foreground: 220 25% 8%;
+  /* Primary - Charcoal (lighter for dark mode visibility) */
+  --primary: 222 47% 18%;
+  --primary-foreground: 0 0% 98%;
+  --primary-hover: 222 47% 22%;
   
-  /* Secondary - Dark Blue */
-  --secondary: 220 25% 16%;
-  --secondary-foreground: 210 20% 98%;
+  /* Secondary - Warm Gray (dark mode) */
+  --secondary: 215 16% 40%;
+  --secondary-foreground: 0 0% 98%;
   
   /* Muted - Dark Blue Gray */
   --muted: 220 25% 16%;
   --muted-foreground: 210 20% 70%;
   
-  /* Accent - Coral */
-  --accent: 15 85% 70%;
-  --accent-foreground: 220 25% 8%;
+  /* Accent - Warm Terracotta (brighter for dark mode) */
+  --accent: 20 90% 55%;
+  --accent-foreground: 0 0% 98%;
   
-  /* Destructive - Soft Red */
-  --destructive: 0 75% 60%;
+  /* Semantic Colors (dark mode) */
+  --success: 142 70% 55%;
+  --success-foreground: 220 25% 8%;
+  --warning: 38 90% 65%;
+  --warning-foreground: 220 25% 8%;
+  --error: 0 75% 65%;
+  --error-foreground: 220 25% 8%;
+  --info: 222 47% 18%;
+  --info-foreground: 220 25% 8%;
+  
+  /* Destructive - Soft Red (mapped to error) */
+  --destructive: 0 75% 65%;
   --destructive-foreground: 220 25% 8%;
   
   /* Border & Input */
   --border: 220 25% 20%;
   --input: 220 25% 16%;
-  --ring: 220 85% 70%;
+  --ring: 222 47% 18%;
   
   /* Chart Colors - Dark Theme */
   --chart-1: 220 85% 70%;
@@ -153,6 +175,18 @@
   --slate-700: 220 25% 40%;
   --slate-800: 220 25% 45%;
   --slate-900: 220 25% 50%;
+  
+  /* Brand Color Scale (for gradients and subtle backgrounds) */
+  --brand-50: 222 47% 98%;
+  --brand-100: 222 47% 95%;
+  --brand-200: 222 47% 90%;
+  --brand-300: 222 47% 80%;
+  --brand-400: 222 47% 65%;
+  --brand-500: 222 47% 11%; /* Primary */
+  --brand-600: 222 47% 9%;
+  --brand-700: 222 47% 7%;
+  --brand-800: 222 47% 5%;
+  --brand-900: 222 47% 3%;
 }
 
 body {
@@ -194,7 +228,8 @@ button, [role="button"], .cursor-pointer {
 
 /* Focus styles */
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  --tw-ring-color: hsl(var(--primary));
 }
 
 /* Glass morphism */
@@ -210,7 +245,7 @@ button, [role="button"], .cursor-pointer {
 .animated-border {
   position: relative;
   border-radius: 0.75rem;
-  background: linear-gradient(90deg, rgba(1, 62, 81, 0.35), rgba(0,163,224,0.05) 25%, rgba(255,255,255,0.06) 50%, rgba(0,163,224,0.05) 95%, rgba(1, 62, 81, 0.35));
+  background: linear-gradient(90deg, rgba(30, 41, 59, 0.35), rgba(30, 41, 59, 0.05) 25%, rgba(255,255,255,0.06) 50%, rgba(30, 41, 59, 0.05) 95%, rgba(30, 41, 59, 0.35));
   z-index: 1;
   overflow: visible;
 }
@@ -228,8 +263,8 @@ button, [role="button"], .cursor-pointer {
     linear-gradient(
       90deg,
       transparent 0%,
-      #00A3E0 20%,
-      #00A3E0 25%,
+      hsl(var(--accent)) 20%,
+      hsl(var(--accent)) 25%,
       transparent 40%,
       transparent 100%
     );

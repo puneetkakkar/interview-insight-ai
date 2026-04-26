@@ -1,4 +1,4 @@
-"""Transcript Analysis API endpoints for InterviewInsight AI.
+"""Transcript Analysis API endpoints for CandidateSignal.
 
 This module provides REST API endpoints for analyzing interview transcripts
 using AI-powered agents for timeline extraction, entity recognition, and sentiment analysis.

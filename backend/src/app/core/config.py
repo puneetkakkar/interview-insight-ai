@@ -1,8 +1,14 @@
 from enum import Enum
+from pathlib import Path
 from typing import Any, Optional
 
 from pydantic import Field, ConfigDict
 from pydantic_settings import BaseSettings
+
+# Resolve .env path relative to this file so it works regardless of CWD.
+# config.py lives at: backend/src/app/core/config.py
+# .env lives at:      backend/.env  (4 levels up)
+_ENV_FILE = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 
 from src.app.schemas.language_models import (
     AllModelEnum,
@@ -23,7 +29,7 @@ class EnvironmentOption(str, Enum):
 class AppSettings(BaseSettings):
     """Application settings."""
 
-    APP_NAME: str = Field(default="InterviewInsight AI", description="Application name")
+    APP_NAME: str = Field(default="CandidateSignal", description="Application name")
     APP_DESCRIPTION: str = Field(
         default="A production-ready AI-powered interview transcript analysis platform",
         description="Application description",
@@ -60,14 +66,14 @@ class DatabaseSettings(BaseSettings):
     POSTGRES_SERVER: str = Field(default="localhost", description="PostgreSQL server")
     POSTGRES_PORT: int = Field(default=5432, description="PostgreSQL port")
     POSTGRES_DB: str = Field(
-        default="interview_insight_db", description="PostgreSQL database name"
+        default="candidate_signal_db", description="PostgreSQL database name"
     )
     POSTGRES_USER: str = Field(default="postgres", description="PostgreSQL username")
     POSTGRES_PASSWORD: str = Field(
         default="postgres", description="PostgreSQL password"
     )
     POSTGRES_TEST_DB: str = Field(
-        default="interview_insight_test_db", description="PostgreSQL test database name"
+        default="candidate_signal_test_db", description="PostgreSQL test database name"
     )
 
     @property
@@ -152,7 +158,7 @@ class Settings(AppSettings, DatabaseSettings, LanguageModelSettings):
         return DatabaseSettings.POSTGRES_ASYNC_URL
 
     model_config = ConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=True
+        env_file=str(_ENV_FILE), env_file_encoding="utf-8", case_sensitive=True
     )
 
 
